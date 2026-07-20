@@ -303,7 +303,7 @@
     </div>
   </div>
 
-  <p class="ver">١٣ · 13</p>
+  <p class="ver">١٤ · 14</p>
 </div>
 
 <div class="modal-bg" id="previewBg" hidden>
@@ -422,7 +422,8 @@ const STR = {
     editTitle:"✏️ عدّلوا العيلة", editSave:"احفظوا ✓", edited:"اتعدلت ✅", phoneOpt:"رقم واتساب (اختياري)",
     capLeft:n=>`فاضل ${n}`, capOver:n=>`زيادة ${n}`, capFull:"⚠️ اكتمل عدد الطرف — كلموا جوزيف قبل ما تضيفوا",
     capNear:"⚠️ قربتوا من العدد الكامل", person:"فرد",
-    myFams:n=>`🤍 اللي سجلتوه () — شوفوا وعدّلوا`, switchPin:"🔓 تبديل الرمز",
+    myFams:n=>`🤍 اللي سجلتوه (${n}) — شوفوا وعدّلوا`, switchPin:"🔓 تبديل الرمز",
+    samePhone:"📱 نفس رقم الواتساب — غالبًا نفس العيلة حتى لو الاسم مختلف",
   },
   en: {
     kicker:"Guest List", sideQ:"Which side are you from? One minute to add your families.",
@@ -462,7 +463,8 @@ const STR = {
     editTitle:"✏️ Edit family", editSave:"Save ✓", edited:"Updated ✅", phoneOpt:"WhatsApp number (optional)",
     capLeft:n=>`${n} left`, capOver:n=>`${n} over`, capFull:"⚠️ This side is at capacity — check with Joseph before adding",
     capNear:"⚠️ Getting close to capacity", person:"people",
-    myFams:n=>`🤍 Your additions () — view & edit`, switchPin:"🔓 Switch PIN",
+    myFams:n=>`🤍 Your additions (${n}) — view & edit`, switchPin:"🔓 Switch PIN",
+    samePhone:"📱 Same WhatsApp number — likely the same household even if the name differs",
   }
 };
 let L = localStorage.getItem("wedLang") || "ar";
@@ -766,15 +768,16 @@ function normName(s){
     .replace(/[^\p{L}\p{N}\s]/gu, "").replace(/\s+/g, " ").trim().toLowerCase();
 }
 let dupResolver = null;
+function phoneKey(p){ const d = String(p || "").replace(/\D/g, ""); return d.length >= 8 ? d.slice(-9) : ""; }
 function checkDuplicates(items, existing){
   const conflicts = [], clean = [];
   for (const it of items) {
-    const nn = normName(it.name);
-    const hit = existing.find(r =>
-      (nn && normName(r.name) === nn) ||
-      (it.phone && r.phone && it.phone.replace(/\D/g,"") === r.phone.replace(/\D/g,""))
-    );
-    hit ? conflicts.push({ item: it, existing: hit }) : clean.push(it);
+    const nn = normName(it.name), pk = phoneKey(it.phone);
+    // phone is the strong household fingerprint — check it FIRST, names can differ entirely
+    const phoneHit = pk && existing.find(r => phoneKey(r.phone) === pk);
+    const nameHit = !phoneHit && nn && existing.find(r => normName(r.name) === nn);
+    const hit = phoneHit || nameHit;
+    hit ? conflicts.push({ item: it, existing: hit, byPhone: !!phoneHit }) : clean.push(it);
   }
   return { conflicts, clean };
 }
@@ -787,6 +790,7 @@ function showDupModal(conflicts){
     const sideWord = c.existing.side === "bride" ? t("sideWordB") : t("sideWordG");
     row.innerHTML = `<b>${esc(c.item.name)}</b>
       <div class="dmeta">${t("dupReg")(esc(c.existing.name), sideWord, c.existing.count)}${c.existing.phone ? ` · <span dir="ltr">${esc(c.existing.phone)}</span>` : ""}</div>
+      ${c.byPhone ? `<div class="dmeta" style="color:#e8b55c;font-weight:700">${t("samePhone")}</div>` : ""}
       <label><input type="checkbox" checked data-i="${i}"> ${t("dupSame")}</label>`;
     el.appendChild(row);
   });
@@ -931,9 +935,17 @@ function renderAll(){
   $("orgCapG").hidden = role === "bride";
   document.querySelector(".filters").hidden = role !== "master";
   if (role !== "master") filter = role;
-  const groups = {};
-  vis.forEach(r => { const k = normName(r.name) || ("ph:" + (r.phone || r.id)); (groups[k] = groups[k] || []).push(r); });
-  const dupes = Object.values(groups).filter(g => g.length > 1);
+  const nameGroups = {}, phoneGroups = {};
+  vis.forEach(r => {
+    const nk = normName(r.name); if (nk) (nameGroups[nk] = nameGroups[nk] || []).push(r);
+    const pk = phoneKey(r.phone); if (pk) (phoneGroups[pk] = phoneGroups[pk] || []).push(r);
+  });
+  const seenSets = new Set();
+  const dupes = [];
+  [...Object.values(phoneGroups), ...Object.values(nameGroups)].filter(g => g.length > 1).forEach(g => {
+    const sig = g.map(x => x.id).sort().join("|");
+    if (!seenSets.has(sig)) { seenSets.add(sig); dupes.push(g); }
+  });
   $("dupesNote").innerHTML = dupes.length
     ? `<div class="dupes-note"><b>${t("dupsBanner")(dupes.length)}</b> ${dupes.map(g => `"${esc(g[0].name)}" (${g.map(x => x.side === "bride" ? t("fB") : t("fG")).join(" + ")})`).join(" · ")} ${t("dupsHint")}</div>`
     : "";
