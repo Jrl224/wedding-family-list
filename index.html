@@ -72,6 +72,13 @@
   .cc-toggle button{flex:1;padding:13px 8px;border:0;background:var(--card);color:var(--dim);font-size:16px;font-weight:700;cursor:pointer;font-family:inherit}
   .cc-toggle button.on{background:linear-gradient(120deg,var(--gold),var(--gold-b));color:#0b1524}
   .phone-big{direction:ltr;text-align:center;letter-spacing:.04em}
+  .ev2-row{display:flex;align-items:center;justify-content:center;gap:10px;margin:16px 0 2px;font-size:14.5px;color:var(--dim)}
+  .ev2-row .chips{display:flex;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .ev2-row .chips button{padding:9px 20px;border:0;background:var(--card);color:var(--dim);font-size:14.5px;font-weight:700;cursor:pointer;font-family:inherit}
+  .ev2-row .chips button.on{background:linear-gradient(120deg,#3f7d4e,#5aa66c);color:#fff}
+  .fam .ev2badge{font-size:13px;margin-inline-start:4px}
+  .fam .ev2t{background:none;border:1px solid var(--line);border-radius:50%;width:32px;height:32px;font-size:15px;cursor:pointer;opacity:.35}
+  .fam .ev2t.on{opacity:1;border-color:#5aa66c;background:rgba(90,166,108,.15)}
   .check{
     width:92px;height:92px;border-radius:50%;margin:4px auto 16px;display:flex;align-items:center;justify-content:center;
     border:1.5px solid var(--gold);background:radial-gradient(circle at 35% 30%, #16273f, var(--deep));
@@ -234,6 +241,7 @@
       <button type="button" id="ccUS" onclick="setCC('+1')">🇺🇸 USA</button>
     </div>
     <input class="wiz-in phone-big" id="wPhone" inputmode="tel" autocomplete="off">
+    <div class="ev2-row"><span id="ev2Label"></span><div class="chips"><button type="button" id="ev2No" class="on" onclick="setEv2(false)"></button><button type="button" id="ev2Yes" onclick="setEv2(true)"></button></div></div>
     <button class="next" onclick="saveFamily()" id="saveBtn"></button>
     <button class="skip" onclick="saveFamily(true)" id="skipBtn"></button>
   </div>
@@ -293,6 +301,7 @@
       <button id="fAll" class="on" onclick="setFilter('all')"></button>
       <button id="fB" onclick="setFilter('bride')"></button>
       <button id="fG" onclick="setFilter('groom')"></button>
+      <button id="fE2" onclick="setFilter('ev2')">🌿</button>
     </div>
     <input class="search" id="search" oninput="renderAll()">
     <div id="fullList" style="text-align:start"></div>
@@ -304,7 +313,7 @@
     </div>
   </div>
 
-  <p class="ver">١٥ · 15</p>
+  <p class="ver">١٦ · 16</p>
 </div>
 
 <div class="modal-bg" id="previewBg" hidden>
@@ -351,6 +360,7 @@
       <span id="eCount" style="font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:600;color:var(--gold-b);min-width:56px">2</span>
       <button type="button" onclick="eBump(-1)" style="width:52px;height:52px;font-size:26px">−</button>
     </div>
+    <div class="ev2-row"><span id="eEv2Label"></span><div class="chips"><button type="button" id="eEv2No" class="on" onclick="setEEv2(false)"></button><button type="button" id="eEv2Yes" onclick="setEEv2(true)"></button></div></div>
     <input class="wiz-in phone-big" id="ePhone" inputmode="tel" style="font-size:17px" autocomplete="off">
     <div class="m-actions">
       <button class="m-ok" onclick="saveEdit()" id="editSave"></button>
@@ -426,6 +436,7 @@ const STR = {
     myFams:n=>`🤍 اللي سجلتوه (${n}) — شوفوا وعدّلوا`, switchPin:"🔓 تبديل الرمز",
     samePhone:"📱 نفس رقم الواتساب — غالبًا نفس العيلة حتى لو الاسم مختلف",
     photoGone:"اتشالت الصورة",
+    ev2Q:n=>`🌿 هيتعزموا على ${n} كمان؟`, yes:"أيوة", no:"لأ", ev2Count:(f,p)=>`🌿 ${f} عيلة · ${p} فرد`,
   },
   en: {
     kicker:"Guest List", sideQ:"Which side are you from? One minute to add your families.",
@@ -468,6 +479,7 @@ const STR = {
     myFams:n=>`🤍 Your additions (${n}) — view & edit`, switchPin:"🔓 Switch PIN",
     samePhone:"📱 Same WhatsApp number — likely the same household even if the name differs",
     photoGone:"Photo removed",
+    ev2Q:n=>`🌿 Also invited to the ${n}?`, yes:"Yes", no:"No", ev2Count:(f,p)=>`🌿 ${f} families · ${p} people`,
   }
 };
 let L = localStorage.getItem("wedLang") || "ar";
@@ -510,13 +522,23 @@ function applyLang(){
 
 /* ── capacity (product-config: caps live in wedding_settings, not code) ── */
 let CAPS = { bride: 200, groom: 200 };
+let EV2 = { ar: "حفلة الحنة", en: "Henna Party" };
+const ev2Name = () => L === "ar" ? EV2.ar : EV2.en;
 let sideTotals = { bride: 0, groom: 0 };
 async function loadCaps(){
   try {
-    const r = await fetch("https://wydodvbkqhpoyefcwpnf.supabase.co/rest/v1/wedding_settings?select=bride_cap,groom_cap&id=eq.1", { headers: H });
-    if (r.ok) { const s = (await r.json())[0]; if (s) CAPS = { bride: s.bride_cap, groom: s.groom_cap }; }
+    const r = await fetch("https://wydodvbkqhpoyefcwpnf.supabase.co/rest/v1/wedding_settings?select=bride_cap,groom_cap,event2_name_ar,event2_name_en&id=eq.1", { headers: H });
+    if (r.ok) {
+      const s = (await r.json())[0];
+      if (s) { CAPS = { bride: s.bride_cap, groom: s.groom_cap }; EV2 = { ar: s.event2_name_ar, en: s.event2_name_en }; }
+      $("ev2Label").textContent = t("ev2Q")(ev2Name());
+      $("eEv2Label").textContent = t("ev2Q")(ev2Name());
+    }
   } catch(e) {}
 }
+let wEv2 = false, eEv2 = false;
+function setEv2(v){ wEv2 = v; $("ev2Yes").className = v ? "on" : ""; $("ev2No").className = v ? "" : "on"; }
+function setEEv2(v){ eEv2 = v; $("eEv2Yes").className = v ? "on" : ""; $("eEv2No").className = v ? "" : "on"; }
 async function refreshSideTotals(){
   try {
     const r = await fetch(SUPA + "?select=side,count", { headers: H });
@@ -619,7 +641,8 @@ async function saveFamily(skipPhone){
   if (!name) { toStep(1); return; }
   const rawPhone = skipPhone ? "" : $("wPhone").value.trim();
   const phone = rawPhone ? normalizePhone(rawPhone, cc) : "";
-  if (await insertRows([{ name, count: n, phone }])) {
+  if (await insertRows([{ name, count: n, phone, event2: wEv2 }])) {
+    setEv2(false);
     $("doneName").textContent = name;
     $("wName").value = ""; $("wPhone").value = "";
     n = 2; $("count").textContent = n;
@@ -823,7 +846,7 @@ async function insertRows(items){
       } else items = clean;
     }
   } catch(e) { /* best effort */ }
-  const payload = items.map(i => ({ name: i.name, count: i.count, phone: i.phone || "", side: mySide, added_by: device }));
+  const payload = items.map(i => ({ name: i.name, count: i.count, phone: i.phone || "", side: mySide, added_by: device, event2: !!i.event2 }));
   try {
     const r = await fetch(SUPA, { method: "POST", headers: H, body: JSON.stringify(payload) });
     if (!r.ok) throw 0;
@@ -869,7 +892,7 @@ function famRow(r, canDelete){
   const info = document.createElement("div");
   info.className = "info";
   const sideWord = r.side === "bride" ? t("sideWordB") : t("sideWordG");
-  info.innerHTML = `<b>${esc(r.name)}</b><div class="meta">${sideWord}${r.phone ? ` · <span dir="ltr">${esc(r.phone)}</span>` : ""}</div>`;
+  info.innerHTML = `<b>${esc(r.name)}${r.event2 ? '<span class="ev2badge">🌿</span>' : ""}</b><div class="meta">${sideWord}${r.phone ? ` · <span dir="ltr">${esc(r.phone)}</span>` : ""}</div>`;
   const cnt = document.createElement("div");
   cnt.className = "cnt";
   const minus = document.createElement("button"); minus.textContent = "−";
@@ -879,6 +902,16 @@ function famRow(r, canDelete){
   plus.onclick = () => patchCount(r, Math.min(30, r.count + 1));
   cnt.append(minus, num, plus);
   row.append(info, cnt);
+  if (canDelete && isOrg() && !$("orgView").hidden) {
+    const ev = document.createElement("button");
+    ev.className = "ev2t" + (r.event2 ? " on" : "");
+    ev.textContent = "🌿";
+    ev.onclick = async () => {
+      r.event2 = !r.event2; renderAll(); renderMine();
+      try { await fetch(`${SUPA}?id=eq.${r.id}`, { method: "PATCH", headers: H, body: JSON.stringify({ event2: r.event2 }) }); } catch(e) {}
+    };
+    row.append(ev);
+  }
   if (canDelete) {
     const ed = document.createElement("button");
     ed.className = "del"; ed.style.color = "var(--gold-b)"; ed.textContent = "✏️";
@@ -896,6 +929,7 @@ let editing = null, eCount = 2;
 function eBump(d){ eCount = Math.min(30, Math.max(1, eCount + d)); $("eCount").textContent = eCount; }
 function openEdit(r){
   editing = r; eCount = r.count;
+  setEEv2(!!r.event2);
   $("eName").value = r.name; $("ePhone").value = r.phone || ""; $("eCount").textContent = eCount;
   $("editBg").hidden = false;
   setTimeout(()=> $("eName").focus(), 60);
@@ -906,10 +940,10 @@ async function saveEdit(){
   if (!name) { $("eName").focus(); return; }
   const phone = $("ePhone").value.trim() ? normalizePhone($("ePhone").value.trim(), "") : "";
   $("editBg").hidden = true;
-  editing.name = name; editing.count = eCount; editing.phone = phone;
+  editing.name = name; editing.count = eCount; editing.phone = phone; editing.event2 = eEv2;
   renderMine(); renderAll();
   try {
-    await fetch(`${SUPA}?id=eq.${editing.id}`, { method: "PATCH", headers: H, body: JSON.stringify({ name, count: eCount, phone }) });
+    await fetch(`${SUPA}?id=eq.${editing.id}`, { method: "PATCH", headers: H, body: JSON.stringify({ name, count: eCount, phone, event2: eEv2 }) });
     toast(t("edited"));
   } catch(e) { toast(t("netErr"), true); }
   refreshMine(); if (isOrg()) refreshAll();
@@ -936,8 +970,11 @@ function renderAll(){
   document.querySelector(".tot.a").hidden = role !== "master";
   $("orgCapB").hidden = role === "groom";
   $("orgCapG").hidden = role === "bride";
-  document.querySelector(".filters").hidden = role !== "master";
-  if (role !== "master") filter = role;
+  document.querySelector(".filters").hidden = false;
+  $("fAll").hidden = $("fB").hidden = $("fG").hidden = role !== "master";
+  if (role !== "master" && filter !== "ev2") filter = role;
+  const e2f = vis.filter(x => x.event2);
+  $("fE2").textContent = "🌿 " + e2f.length + " · " + e2f.reduce((s, x) => s + x.count, 0);
   const nameGroups = {}, phoneGroups = {};
   vis.forEach(r => {
     const nk = normName(r.name); if (nk) (nameGroups[nk] = nameGroups[nk] || []).push(r);
@@ -954,7 +991,7 @@ function renderAll(){
     : "";
   const el = $("fullList");
   const q = ($("search").value || "").trim().toLowerCase();
-  const show = vis.filter(r => (filter === "all" || r.side === filter) && (!q || r.name.toLowerCase().includes(q) || (r.phone || "").includes(q)));
+  const show = vis.filter(r => (filter === "all" || (filter === "ev2" ? r.event2 : r.side === filter)) && (!q || r.name.toLowerCase().includes(q) || (r.phone || "").includes(q)));
   el.innerHTML = "";
   if (!show.length) { el.innerHTML = `<p class="empty">${t("listEmpty")}</p>`; return; }
   show.forEach(r => el.appendChild(famRow(r, true)));
@@ -963,6 +1000,7 @@ function renderAll(){
 function setFilter(f){
   filter = f;
   $("fAll").className = f === "all" ? "on" : ""; $("fB").className = f === "bride" ? "on" : ""; $("fG").className = f === "groom" ? "on" : "";
+  $("fE2").className = f === "ev2" ? "on" : "";
   renderAll();
 }
 
@@ -1139,10 +1177,10 @@ async function handleFiles(files){
 
 /* ── exports ── */
 function exportExcel(){
-  const head = ["Name (الاسم)", "Side (الطرف)", "People (الأفراد)", "WhatsApp", "Added"];
+  const head = ["Name (الاسم)", "Side (الطرف)", "People (الأفراد)", "WhatsApp", ev2Name(), "Added"];
   const xrole = orgRole() || "master";
   const xrows = xrole === "master" ? all : all.filter(r => r.side === xrole);
-  const rows_ = xrows.map(r => [r.name, r.side === "bride" ? "Bride عروسة" : "Groom عريس", r.count, r.phone || "", (r.created_at || "").slice(0, 10)]);
+  const rows_ = xrows.map(r => [r.name, r.side === "bride" ? "Bride عروسة" : "Groom عريس", r.count, r.phone || "", r.event2 ? "YES" : "", (r.created_at || "").slice(0, 10)]);
   const csv = "﻿" + [head, ...rows_].map(row => row.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\r\n");
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
