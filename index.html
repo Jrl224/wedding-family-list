@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>قائمة العزومة — Guest List</title>
 <meta property="og:title" content="قائمة عزومة فرح يوستينا ومحب 🤍">
-<meta property="og:description" content="سجّلوا عائلتكم في دقيقة — اختاروا طرفكم وضيفوا العائلات · Add your families for the wedding in a minute">
+<meta property="og:description" content="سجّلوا عائلتكم في دقيقة — Add your family for the wedding in a minute">
 <meta property="og:type" content="website">
 <meta name="robots" content="noindex, nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,33 +16,28 @@
   *{box-sizing:border-box;margin:0;padding:0}
   html{-webkit-text-size-adjust:100%}
   body{
-    background:
-      radial-gradient(900px 420px at 50% -8%, #1a2c47 0%, transparent 62%),
-      var(--deep);
-    color:var(--ivory);font:16.5px/1.65 'Cairo','Segoe UI',sans-serif;padding:26px 16px 46px;min-height:100svh;
+    background:radial-gradient(900px 420px at 50% -8%, #1a2c47 0%, transparent 62%), var(--deep);
+    color:var(--ivory);font:17px/1.65 'Cairo','Segoe UI',sans-serif;padding:24px 18px 40px;min-height:100svh;
   }
   body::before{
     content:"";position:fixed;inset:0;pointer-events:none;opacity:.05;z-index:0;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56'%3E%3Cpath d='M28 0 L56 28 L28 56 L0 28 Z M28 10 L46 28 L28 46 L10 28 Z' fill='none' stroke='%23c9a227' stroke-width='1'/%3E%3C/svg%3E");
   }
-  .wrap,.side-pick{position:relative;z-index:1}
-  .wrap{max-width:520px;margin:0 auto}
-  .kicker{font-family:'Amiri',serif;color:var(--gold);font-size:15px;text-align:center;letter-spacing:.06em}
+  .scr{position:relative;z-index:1;max-width:480px;margin:0 auto;text-align:center}
+  .kicker{font-family:'Amiri',serif;color:var(--gold);font-size:15px;letter-spacing:.06em}
   h1{
-    font-family:'Amiri',serif;font-weight:700;font-size:34px;text-align:center;line-height:1.6;
+    font-family:'Amiri',serif;font-weight:700;font-size:34px;line-height:1.6;
     background:linear-gradient(100deg,var(--gold) 20%,var(--gold-b) 40%,#fff8e0 50%,var(--gold-b) 60%,var(--gold) 80%);
-    background-size:220% auto;-webkit-background-clip:text;background-clip:text;color:transparent;
-    animation:shimmer 6s linear infinite;
+    background-size:220% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shimmer 6s linear infinite;
   }
   @keyframes shimmer{to{background-position:-220% center}}
-  .rule{width:110px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:10px auto 16px}
-  .sub{color:var(--dim);font-size:13.5px;text-align:center;margin:2px 0 20px;line-height:1.8}
-  .side-pick{max-width:460px;margin:5vh auto 0;text-align:center}
-  .doors{display:flex;gap:14px;margin-top:22px}
+  .rule{width:110px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:10px auto 14px}
+  .sub{color:var(--dim);font-size:13.5px;line-height:1.8;margin-bottom:8px}
+  .doors{display:flex;gap:14px;margin-top:20px}
   .doors button{
-    flex:1;padding:30px 12px 26px;border-radius:18px;cursor:pointer;color:var(--ivory);
+    flex:1;padding:30px 12px 26px;border-radius:18px;cursor:pointer;color:var(--ivory);font-family:inherit;
     background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);
-    box-shadow:0 10px 34px rgba(0,0,0,.35);transition:transform .18s, border-color .18s, box-shadow .18s;
+    box-shadow:0 10px 34px rgba(0,0,0,.35);transition:transform .18s;
   }
   .doors button:active{transform:scale(.97)}
   .doors button .big{font-family:'Amiri',serif;font-size:26px;display:block;margin:8px 0 2px}
@@ -50,57 +45,57 @@
   .doors button.b .big{color:var(--bride)} .doors button.g .big{color:var(--groom)}
   .doors button.b{border-top:3px solid var(--bride)} .doors button.g{border-top:3px solid var(--groom)}
   .doors .heart{font-size:22px}
-  .mine-side{text-align:center;font-size:13px;color:var(--dim);margin:4px 0 18px}
-  .mine-side b{color:var(--gold-b)}
-  .mine-side a{color:var(--dim);text-decoration:underline;cursor:pointer}
-  .paste-box{
-    background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:18px;
-    padding:18px;margin-bottom:14px;box-shadow:0 10px 34px rgba(0,0,0,.3);
+
+  /* ── wizard ── */
+  .dots{display:flex;gap:8px;justify-content:center;margin:6px 0 26px}
+  .dots i{width:8px;height:8px;border-radius:50%;background:var(--line)}
+  .dots i.on{background:var(--gold-b)}
+  .q{font-family:'Amiri',serif;font-size:27px;color:var(--ivory);line-height:1.7;margin-bottom:6px}
+  .qh{color:var(--dim);font-size:13.5px;margin-bottom:22px;line-height:1.7}
+  .wiz-in{
+    width:100%;padding:20px;border-radius:16px;border:1px solid var(--line);text-align:center;
+    background:rgba(9,18,32,.85);color:var(--ivory);font-size:23px;font-family:inherit;
   }
-  .paste-box h3{font-family:'Amiri',serif;font-size:19px;color:var(--gold-b);margin-bottom:4px}
-  .paste-box p{font-size:12.5px;color:var(--dim);line-height:1.7;margin-bottom:10px}
-  textarea{
-    width:100%;min-height:96px;padding:14px;border-radius:12px;border:1px solid rgba(201,162,39,.35);
-    background:rgba(9,18,32,.8);color:var(--ivory);font-size:16px;font-family:inherit;resize:vertical;
+  .wiz-in:focus{border-color:var(--gold);outline:none;box-shadow:0 0 0 4px rgba(201,162,39,.14)}
+  .next{
+    width:100%;margin-top:22px;padding:19px;border:0;border-radius:16px;cursor:pointer;font-family:inherit;
+    background:linear-gradient(120deg,var(--gold),var(--gold-b));color:#0b1524;font-size:21px;font-weight:800;
+    box-shadow:0 8px 26px rgba(201,162,39,.32);
   }
-  textarea:focus{border-color:var(--gold);outline:none;box-shadow:0 0 0 3px rgba(201,162,39,.12)}
-  .parse{
-    width:100%;margin-top:12px;padding:15px;border:0;border-radius:12px;cursor:pointer;
-    background:linear-gradient(120deg,var(--gold),var(--gold-b));color:#0b1524;font-size:17px;font-weight:800;font-family:inherit;
-    box-shadow:0 6px 22px rgba(201,162,39,.3);
-  }
-  .tip{font-size:12px;color:var(--dim);margin-top:10px;line-height:1.7}
-  .tip b{color:var(--gold-b)}
-  .quick{display:flex;gap:10px;margin:12px 0 8px}
-  .quick button{
-    flex:1;padding:13px 8px;border:1px solid var(--line);border-radius:14px;cursor:pointer;
-    background:var(--card);color:var(--ivory);font-size:14px;font-weight:700;line-height:1.45;font-family:inherit;
-  }
-  .quick button small{display:block;font-weight:400;color:var(--dim);font-size:11px}
-  .divider{display:flex;align-items:center;gap:12px;color:var(--gold);font-family:'Amiri',serif;font-size:14px;margin:18px 0 2px}
-  .divider::before,.divider::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent)}
-  label{display:block;margin:13px 0 6px;font-weight:700;font-size:15px}
-  label small{display:block;font-weight:400;color:var(--dim);font-size:12px}
-  input.f{
-    width:100%;padding:15px;border-radius:12px;border:1px solid var(--line);
-    background:rgba(9,18,32,.8);color:var(--ivory);font-size:17px;font-family:inherit;
-  }
-  input.f:focus{border-color:var(--gold);outline:none;box-shadow:0 0 0 3px rgba(201,162,39,.12)}
-  .count-row{display:flex;align-items:center;gap:16px;justify-content:center;margin-top:6px}
+  .next:active{transform:scale(.98)}
+  .skip{display:inline-block;margin-top:16px;color:var(--dim);font-size:15px;text-decoration:underline;cursor:pointer;background:none;border:0;font-family:inherit}
+  .back{position:absolute;top:0;inset-inline-start:0;background:none;border:0;color:var(--dim);font-size:15px;cursor:pointer;font-family:inherit;padding:6px}
+  .count-row{display:flex;align-items:center;gap:26px;justify-content:center;margin:14px 0 6px}
   .count-row button{
-    width:54px;height:54px;border-radius:50%;border:1px solid var(--gold);cursor:pointer;
-    background:var(--card);color:var(--gold-b);font-size:26px;font-weight:700;
+    width:78px;height:78px;border-radius:50%;border:1.5px solid var(--gold);cursor:pointer;
+    background:var(--card);color:var(--gold-b);font-size:38px;font-weight:700;
   }
-  #count{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:600;color:var(--gold-b);min-width:50px;text-align:center}
-  .add{
-    width:100%;margin-top:16px;padding:16px;border:0;border-radius:14px;cursor:pointer;font-family:inherit;
-    background:linear-gradient(120deg,var(--gold),var(--gold-b));color:#0b1524;font-size:18px;font-weight:800;
-    box-shadow:0 6px 22px rgba(201,162,39,.3);
+  #count{font-family:'Cormorant Garamond',serif;font-size:64px;font-weight:600;color:var(--gold-b);min-width:80px}
+  .cc-toggle{display:flex;gap:0;margin:0 auto 14px;border:1px solid var(--line);border-radius:14px;overflow:hidden;max-width:280px;direction:ltr}
+  .cc-toggle button{flex:1;padding:14px 8px;border:0;background:var(--card);color:var(--dim);font-size:17px;font-weight:700;cursor:pointer;font-family:inherit}
+  .cc-toggle button.on{background:linear-gradient(120deg,var(--gold),var(--gold-b));color:#0b1524}
+  .phone-big{direction:ltr;text-align:center;letter-spacing:.04em}
+
+  /* success */
+  .check{
+    width:96px;height:96px;border-radius:50%;margin:6px auto 18px;display:flex;align-items:center;justify-content:center;
+    border:1.5px solid var(--gold);background:radial-gradient(circle at 35% 30%, #16273f, var(--deep));
+    font-size:44px;color:var(--gold-b);box-shadow:0 0 44px rgba(201,162,39,.35);
   }
-  h2.sec{font-family:'Amiri',serif;font-size:19px;color:var(--gold-b);margin:28px 0 10px}
+  .done-name{font-family:'Amiri',serif;font-size:24px;color:var(--gold-b);margin-bottom:4px;overflow-wrap:anywhere}
+  .done-sub{color:var(--dim);font-size:14px;margin-bottom:24px}
+  .again{
+    width:100%;padding:19px;border:0;border-radius:16px;cursor:pointer;font-family:inherit;
+    background:linear-gradient(120deg,var(--gold),var(--gold-b));color:#0b1524;font-size:20px;font-weight:800;
+    box-shadow:0 8px 26px rgba(201,162,39,.32);
+  }
+  .finish{display:block;margin:18px auto 0;background:none;border:0;color:var(--dim);font-size:15.5px;text-decoration:underline;cursor:pointer;font-family:inherit}
+
+  /* my families + advanced + organizer */
+  h2.sec{font-family:'Amiri',serif;font-size:19px;color:var(--gold-b);margin:30px 0 10px;text-align:center}
   .fam{
     background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:14px;
-    padding:12px 14px;margin-bottom:9px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 16px rgba(0,0,0,.22);
+    padding:12px 14px;margin-bottom:9px;display:flex;align-items:center;gap:10px;text-align:start;box-shadow:0 4px 16px rgba(0,0,0,.22);
   }
   .fam.b{border-inline-start:4px solid var(--bride)} .fam.g{border-inline-start:4px solid var(--groom)}
   .fam .info{flex:1;min-width:0}
@@ -112,19 +107,23 @@
   .fam .cnt span{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--gold-b);min-width:20px;text-align:center}
   .fam .del{background:none;border:0;color:#c96a6a;font-size:20px;padding:4px 6px;cursor:pointer}
   .empty{text-align:center;color:var(--dim);font-size:13.5px;padding:16px 0;font-family:'Amiri',serif}
-  .modal-bg{position:fixed;inset:0;background:rgba(4,9,17,.85);z-index:20;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(3px)}
-  .modal{
-    background:var(--bg);border:1px solid var(--line);border-bottom:0;border-radius:22px 22px 0 0;
-    max-width:560px;width:100%;max-height:86vh;overflow:auto;padding:22px 16px 28px;
+  details.adv{margin-top:34px;border:1px solid var(--line);border-radius:14px;background:rgba(18,32,58,.5);text-align:start}
+  details.adv summary{padding:13px 16px;color:var(--dim);font-size:13.5px;cursor:pointer;text-align:center;list-style:none}
+  details.adv summary::-webkit-details-marker{display:none}
+  details.adv .inner{padding:4px 14px 16px}
+  textarea{
+    width:100%;min-height:90px;padding:13px;border-radius:12px;border:1px solid rgba(201,162,39,.35);
+    background:rgba(9,18,32,.8);color:var(--ivory);font-size:15.5px;font-family:inherit;resize:vertical;
   }
-  .modal h3{font-family:'Amiri',serif;color:var(--gold-b);font-size:19px;margin-bottom:4px}
-  .modal .mp{color:var(--dim);font-size:13px;margin-bottom:12px}
-  .m-actions{display:flex;gap:10px;margin-top:14px}
-  .m-actions button{flex:1;padding:15px;border:0;border-radius:12px;font-size:16px;font-weight:800;font-family:inherit;cursor:pointer}
-  .m-ok{background:var(--green);color:#fff}
-  .m-cancel{background:var(--card2);color:var(--ivory);border:1px solid var(--line)}
-  .org-bar{margin-top:36px;text-align:center}
-  .org-bar button{padding:12px 24px;border-radius:999px;border:1px solid var(--line);background:none;color:var(--dim);font-size:13px;font-family:inherit;cursor:pointer}
+  textarea:focus{border-color:var(--gold);outline:none}
+  .parse{width:100%;margin-top:10px;padding:13px;border:0;border-radius:12px;cursor:pointer;background:linear-gradient(120deg,var(--gold),var(--gold-b));color:#0b1524;font-size:15.5px;font-weight:800;font-family:inherit}
+  .tip{font-size:11.5px;color:var(--dim);margin-top:9px;line-height:1.7}
+  .tip b{color:var(--gold-b)}
+  .quick{display:flex;gap:8px;margin-top:10px}
+  .quick button{flex:1;padding:11px 8px;border:1px solid var(--line);border-radius:12px;cursor:pointer;background:var(--card);color:var(--ivory);font-size:12.5px;font-weight:700;font-family:inherit}
+  .org-bar{margin-top:26px;text-align:center}
+  .org-bar button{padding:11px 22px;border-radius:999px;border:1px solid var(--line);background:none;color:var(--dim);font-size:12.5px;font-family:inherit;cursor:pointer}
+  .ver{text-align:center;color:rgba(185,178,158,.4);font-size:10.5px;margin-top:18px}
   .totals{display:flex;gap:8px;margin:14px 0}
   .tot{flex:1;background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:14px;padding:12px 6px;text-align:center}
   .tot b{display:block;font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600}
@@ -135,88 +134,106 @@
   .filters button.on{border-color:var(--gold);color:var(--gold-b);background:rgba(201,162,39,.08)}
   .pulse{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--green);margin-inline-start:8px;animation:pp 2s infinite}
   @keyframes pp{50%{opacity:.3}}
-  .wa{width:100%;padding:14px;border:0;border-radius:12px;background:var(--green);color:#fff;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer}
-  .pin-in{
-    width:210px;padding:16px;font-family:'Cormorant Garamond',serif;font-size:32px;text-align:center;letter-spacing:.4em;
-    border-radius:14px;border:1px solid var(--line);background:rgba(9,18,32,.8);color:var(--gold-b);display:block;margin:12px auto;
-  }
-  .toast{
-    position:fixed;top:16px;left:50%;transform:translateX(-50%);background:#1f5c36;color:#fff;
-    padding:11px 20px;border-radius:12px;font-size:14.5px;display:none;z-index:30;max-width:92vw;text-align:center;
-    box-shadow:0 8px 26px rgba(0,0,0,.4);
-  }
-  .toast.err{background:#7a2c2c}
-  .toast button{margin-inline-start:12px;padding:5px 14px;border:0;border-radius:8px;background:#fff;color:#123;font-weight:800;font-size:13.5px;cursor:pointer}
-  .phone-row{display:flex;gap:8px;direction:ltr}
-  .phone-row select{padding:12px 8px;border-radius:12px;border:1px solid var(--line);background:rgba(9,18,32,.8);color:var(--ivory);font-size:14.5px;max-width:132px;font-family:inherit}
-  .phone-row input{flex:1}
   .search{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:rgba(9,18,32,.8);color:var(--ivory);font-size:15px;margin-bottom:10px;font-family:inherit}
-  .search:focus{border-color:var(--gold);outline:none}
   .org-actions{display:flex;gap:10px;margin-top:12px}
   .org-actions button{flex:1;padding:14px;border:0;border-radius:12px;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer}
   .xl{background:#1d6f42;color:#fff}
+  .wa{background:var(--green);color:#fff}
+  .modal-bg{position:fixed;inset:0;background:rgba(4,9,17,.85);z-index:20;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(3px)}
+  .modal{background:var(--bg);border:1px solid var(--line);border-bottom:0;border-radius:22px 22px 0 0;max-width:560px;width:100%;max-height:86vh;overflow:auto;padding:22px 16px 28px}
+  .modal h3{font-family:'Amiri',serif;color:var(--gold-b);font-size:19px;margin-bottom:4px}
+  .modal .mp{color:var(--dim);font-size:13px;margin-bottom:12px}
+  .m-actions{display:flex;gap:10px;margin-top:14px}
+  .m-actions button{flex:1;padding:15px;border:0;border-radius:12px;font-size:16px;font-weight:800;font-family:inherit;cursor:pointer}
+  .m-ok{background:var(--green);color:#fff}
+  .m-cancel{background:var(--card2);color:var(--ivory);border:1px solid var(--line)}
+  .pin-in{width:210px;padding:16px;font-family:'Cormorant Garamond',serif;font-size:32px;text-align:center;letter-spacing:.4em;border-radius:14px;border:1px solid var(--line);background:rgba(9,18,32,.8);color:var(--gold-b);display:block;margin:12px auto}
+  .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:#1f5c36;color:#fff;padding:11px 20px;border-radius:12px;font-size:14.5px;display:none;z-index:30;max-width:92vw;text-align:center;box-shadow:0 8px 26px rgba(0,0,0,.4)}
+  .toast.err{background:#7a2c2c}
+  .toast button{margin-inline-start:12px;padding:5px 14px;border:0;border-radius:8px;background:#fff;color:#123;font-weight:800;font-size:13.5px;cursor:pointer}
   [hidden]{display:none!important}
 </style>
 </head>
 <body>
 
-<!-- Side chooser (the only gate for contributors) -->
-<div class="side-pick" id="sidePick" hidden>
+<!-- Side chooser -->
+<div class="scr" id="sidePick" hidden>
   <p class="kicker">قائمة العزومة</p>
   <h1>يوستينا ومحب</h1>
   <div class="rule"></div>
-  <p class="sub">دقيقة واحدة — قولولنا أنتم من طرف مين وسجّلوا عائلتكم<br><span style="direction:ltr;display:inline-block">One minute — pick your side, add your families</span></p>
+  <p class="sub">أنتم من طرف مين؟</p>
   <div class="doors">
     <button class="b" onclick="setSide('bride')"><span class="heart">🤍</span><span class="big">طرف العروسة</span>يوستينا<br><small>Bride's side</small></button>
     <button class="g" onclick="setSide('groom')"><span class="heart">🤍</span><span class="big">طرف العريس</span>محب<br><small>Groom's side</small></button>
   </div>
 </div>
 
-<!-- Main app -->
-<div class="wrap" id="app" hidden>
+<!-- Wizard: one question per screen -->
+<div class="scr" id="app" hidden style="position:relative">
+  <button class="back" id="backBtn" onclick="backStep()" hidden>‹ رجوع</button>
   <p class="kicker">قائمة العزومة</p>
-  <h1>يوستينا ومحب</h1>
-  <div class="rule"></div>
-  <p class="mine-side">بتضيفوا على: <b id="mySideLabel"></b> · <a onclick="changeSide()">غيروا الطرف</a></p>
+  <h1 style="font-size:26px">يوستينا ومحب</h1>
+  <div class="dots"><i id="d1"></i><i id="d2"></i><i id="d3"></i></div>
 
-  <div class="paste-box">
-    <h3>📋 الصقوا أي حاجة هنا</h3>
-    <p>أسماء من رسالة واتساب · جهة اتصال منسوخة · نص متصوّر من ورقة — بأرقام أو من غير أرقام، عربي أو إنجليزي. هنرتبها ونوريكم قبل الحفظ.</p>
-    <textarea id="pasteArea" placeholder="مثال:&#10;عيلة عمو مجدي 4&#10;Tante Mona +20 100 123 4567&#10;عيلة خالو سمير"></textarea>
-    <button class="parse" type="button" onclick="parsePaste()">✨ رتّبوها · Sort it out</button>
-    <p class="tip" id="platformTip"></p>
+  <div id="step1">
+    <p class="q">مين العيلة اللي بتعزموها؟</p>
+    <p class="qh">اكتبوا الاسم زي ما بتقولوه عادي</p>
+    <input class="wiz-in" id="wName" placeholder="عيلة عمو مجدي" autocomplete="off">
+    <button class="next" onclick="toStep(2)">التالي ←</button>
   </div>
 
-  <div class="quick">
-    <button type="button" id="pickBtn" hidden onclick="pickContacts()">📇 من جهات الاتصال<small>يفتح تليفونكم مباشرة</small></button>
-    <button type="button" onclick="document.getElementById('file').click()">📎 ملف أو صورة<small>ملف جهات اتصال · صور الورقة</small></button>
+  <div id="step2" hidden>
+    <p class="q">هما كام واحد؟</p>
+    <div class="count-row">
+      <button type="button" onclick="bump(1)">+</button>
+      <span id="count">2</span>
+      <button type="button" onclick="bump(-1)">−</button>
+    </div>
+    <button class="next" onclick="toStep(3)">التالي ←</button>
   </div>
-  <input type="file" id="file" hidden multiple accept="image/*,.vcf,.txt,.csv,text/vcard,text/x-vcard" onchange="handleFiles(this.files)">
 
-  <div class="divider">أو سجّلوا عيلة عيلة · or one at a time</div>
-
-  <label>اسم العيلة أو كبير العيلة <small>زي ما بتعرفوه — مش لازم يكون مظبوط بالحرف</small></label>
-  <input class="f" id="name" placeholder="مثال: عيلة عمو مجدي" autocomplete="off">
-  <label>عدد الأفراد</label>
-  <div class="count-row">
-    <button type="button" onclick="bump(-1)">−</button>
-    <span id="count">2</span>
-    <button type="button" onclick="bump(1)">+</button>
+  <div id="step3" hidden>
+    <p class="q">رقمهم على واتساب؟</p>
+    <div class="cc-toggle" id="ccToggle">
+      <button type="button" id="ccEG" class="on" onclick="setCC('+20')">🇪🇬 مصر</button>
+      <button type="button" id="ccUS" onclick="setCC('+1')">🇺🇸 USA</button>
+    </div>
+    <input class="wiz-in phone-big" id="wPhone" inputmode="tel" placeholder="10 123 4567" autocomplete="off">
+    <button class="next" onclick="saveFamily()">سجّلوا العيلة 🤍</button>
+    <button class="skip" onclick="saveFamily(true)">مش معايا الرقم — كملوا من غيره</button>
   </div>
-  <label>رقم واتساب <small>رقم واحد للعيلة — ولو مش معاكم سيبوه فاضي · اختاروا كود الدولة</small></label>
-  <div class="phone-row">
-    <select id="cc"></select>
-    <input class="f" id="phone" inputmode="tel" placeholder="10 123 4567" autocomplete="off">
-  </div>
-  <button class="add" type="button" onclick="addManual()">➕ ضيف العيلة</button>
 
-  <h2 class="sec" id="mineHead" hidden>إضافاتكم 🤍</h2>
-  <div id="mineList"></div>
-
-  <!-- Organizer (PIN-locked) -->
-  <div class="org-bar" id="orgBar">
-    <button type="button" onclick="askPin()">🔒 للمنظمين — عرض القائمة الكاملة</button>
+  <div id="stepDone" hidden>
+    <div class="check">✓</div>
+    <p class="done-name" id="doneName"></p>
+    <p class="done-sub">اتسجلت — شكرًا 🤍</p>
+    <button class="again" onclick="toStep(1)">➕ ضيفوا عيلة تانية</button>
+    <button class="finish" onclick="showMine()">خلصنا — شوفوا اللي سجلناه</button>
   </div>
+
+  <div id="mineWrap" hidden>
+    <h2 class="sec">اللي سجلتوه 🤍</h2>
+    <div id="mineList"></div>
+    <button class="again" style="margin-top:10px" onclick="toStep(1)">➕ ضيفوا عيلة تانية</button>
+  </div>
+
+  <details class="adv" id="advBox">
+    <summary>⚡ للشباب — طرق أسرع (لصق · جهات اتصال · ملفات)</summary>
+    <div class="inner">
+      <p class="tip" style="margin:4px 0 8px">الصقوا أسماء من واتساب أو نص متصوّر من ورقة — هنرتبها ونعرضها قبل الحفظ.</p>
+      <textarea id="pasteArea" placeholder="عيلة عمو مجدي 4&#10;Tante Mona +20 100 123 4567"></textarea>
+      <button class="parse" type="button" onclick="parsePaste()">✨ رتّبوها</button>
+      <div class="quick">
+        <button type="button" id="pickBtn" hidden onclick="pickContacts()">📇 من جهات الاتصال</button>
+        <button type="button" onclick="document.getElementById('file').click()">📎 ملف أو صورة</button>
+      </div>
+      <input type="file" id="file" hidden multiple accept="image/*,.vcf,.txt,.csv,text/vcard,text/x-vcard" onchange="handleFiles(this.files)">
+      <p class="tip" id="platformTip"></p>
+    </div>
+  </details>
+
+  <div class="org-bar"><button type="button" onclick="askPin()">🔒 للمنظمين</button></div>
+
   <div id="orgView" hidden>
     <h2 class="sec">القائمة الكاملة لايف<span class="pulse"></span></h2>
     <div class="totals">
@@ -229,20 +246,22 @@
       <button id="fB" onclick="setFilter('bride')">العروسة</button>
       <button id="fG" onclick="setFilter('groom')">العريس</button>
     </div>
-    <input class="search" id="search" placeholder="🔍 دوروا على اسم عشان تعدلوه أو تشيلوه" oninput="renderAll()">
-    <div id="fullList"></div>
+    <input class="search" id="search" placeholder="🔍 دوروا على اسم" oninput="renderAll()">
+    <div id="fullList" style="text-align:start"></div>
     <div class="org-actions">
       <button class="xl" type="button" onclick="exportExcel()">⬇️ Excel</button>
-      <button class="wa" style="margin-top:0" type="button" onclick="sendSnapshot()">📤 واتساب</button>
+      <button class="wa" type="button" onclick="sendSnapshot()">📤 واتساب</button>
     </div>
   </div>
+
+  <p class="ver">٧</p>
 </div>
 
 <!-- Paste preview modal -->
 <div class="modal-bg" id="previewBg" hidden>
   <div class="modal">
     <h3>لقينا العائلات دي 👇</h3>
-    <p class="mp">راجعوها — عدّلوا العدد بـ + و − أو شيلوا اللي مش مظبوط، وبعدين احفظوا.</p>
+    <p class="mp">عدّلوا العدد بـ + و − أو شيلوا اللي مش مظبوط، وبعدين احفظوا.</p>
     <div id="previewList"></div>
     <div class="m-actions">
       <button class="m-ok" onclick="confirmPreview()" id="previewOk">احفظوا الكل ✓</button>
@@ -255,7 +274,7 @@
 <div class="modal-bg" id="pinBg" hidden>
   <div class="modal" style="text-align:center">
     <h3>🔒 للمنظمين بس</h3>
-    <p class="mp">ادخلوا الرقم السري لعرض القائمة الكاملة</p>
+    <p class="mp">ادخلوا الرقم السري</p>
     <input class="pin-in" id="pinIn" inputmode="numeric" maxlength="4" placeholder="• • • •">
     <p class="mp" id="pinErr" style="color:#e08a8a;display:none">الرقم مش صح</p>
     <div class="m-actions">
@@ -276,7 +295,8 @@ const H = { "apikey": KEY, "Authorization": "Bearer " + KEY, "Content-Type": "ap
 let device = localStorage.getItem("wedDevice");
 if (!device) { device = "d" + Math.random().toString(36).slice(2, 10); localStorage.setItem("wedDevice", device); }
 let mySide = localStorage.getItem("wedSide") || "";
-let mine = [], all = [], filter = "all", n = 2, orgTimer = null, pending = [];
+let cc = localStorage.getItem("wedCC") || "+20";   // sticky Egypt/US toggle
+let mine = [], all = [], filter = "all", n = 2, orgTimer = null, pending = [], step = 1;
 
 const $ = id => document.getElementById(id);
 const isOrg = () => localStorage.getItem("wedOrg") === "ok";
@@ -292,65 +312,88 @@ function toast(msg, err, action){
   }
   t.className = "toast" + (err ? " err" : "");
   t.style.display = "block";
-  clearTimeout(t._h); t._h = setTimeout(()=> t.style.display = "none", action ? 8000 : 2800);
-}
-
-/* ── country codes: Egypt + US first, then the family's likely diaspora ── */
-const CCS = [
-  ["+20","🇪🇬 مصر +20"], ["+1","🇺🇸 USA/Canada +1"], ["+44","🇬🇧 UK +44"],
-  ["+966","🇸🇦 السعودية +966"], ["+971","🇦🇪 الإمارات +971"], ["+965","🇰🇼 الكويت +965"],
-  ["+974","🇶🇦 قطر +974"], ["+973","🇧🇭 البحرين +973"], ["+962","🇯🇴 الأردن +962"],
-  ["+961","🇱🇧 لبنان +961"], ["+49","🇩🇪 Germany +49"], ["+33","🇫🇷 France +33"],
-  ["+39","🇮🇹 Italy +39"], ["+31","🇳🇱 Netherlands +31"], ["+61","🇦🇺 Australia +61"], ["+30","🇬🇷 Greece +30"],
-];
-(function(){
-  const sel = $("cc");
-  CCS.forEach(([v, l]) => { const o = document.createElement("option"); o.value = v; o.textContent = l; sel.appendChild(o); });
-})();
-
-/* ── phone normalization: manual entries use the selector; imports auto-detect ── */
-function normalizePhone(raw, cc){
-  if (!raw) return "";
-  let p = raw.replace(/[\s\-().]/g, "");
-  if (p.startsWith("00")) p = "+" + p.slice(2);
-  if (p.startsWith("+")) return p;                       // already international
-  if (cc) {                                              // manual entry: apply the chosen code
-    if (cc === "+20" && p.startsWith("0")) p = p.slice(1);  // Egyptian 010 → 10
-    if (cc === "+1" && p.length === 11 && p.startsWith("1")) p = p.slice(1);
-    return cc + p;
-  }
-  // imported/pasted with no code: detect
-  if (/^01\d{9}$/.test(p)) return "+20" + p.slice(1);    // Egyptian mobile 01XXXXXXXXX
-  if (/^1\d{9}$/.test(p) && p.length === 10) return "+20" + p; // Egyptian without leading 0
-  if (/^\d{10}$/.test(p) && !p.startsWith("0")) return "+1" + p; // US 10-digit
-  if (/^1\d{10}$/.test(p)) return "+" + p;               // US with country digit
-  return p;                                              // leave as-is, human reviews in preview
+  clearTimeout(t._h); t._h = setTimeout(()=> t.style.display = "none", action ? 8000 : 2600);
 }
 function esc(s){ const d = document.createElement("span"); d.textContent = s; return d.innerHTML; }
-function bump(d){ n = Math.min(15, Math.max(1, n + d)); $("count").textContent = n; }
+function bump(d){ n = Math.min(30, Math.max(1, n + d)); $("count").textContent = n; }
 
-/* ── routing (no PIN to contribute) ── */
+/* ── routing ── */
 function setSide(s){ mySide = s; localStorage.setItem("wedSide", s); route(); }
-function changeSide(){ localStorage.removeItem("wedSide"); mySide = ""; stopOrg(); route(); }
 function route(){
   $("sidePick").hidden = !!mySide;
   $("app").hidden = !mySide;
-  if (mySide) {
-    $("mySideLabel").textContent = mySide === "bride" ? "طرف العروسة 🤍" : "طرف العريس 🤍";
-    refreshMine();
-    if (isOrg()) openOrg();
+  if (mySide) { toStep(1); refreshMine(); if (isOrg()) openOrg(); }
+}
+
+/* ── wizard ── */
+function toStep(s){
+  step = s;
+  ["step1","step2","step3","stepDone","mineWrap"].forEach(id => $(id).hidden = true);
+  if (s === 1) { $("step1").hidden = false; setTimeout(()=> $("wName").focus(), 60); }
+  if (s === 2) $("step2").hidden = false;
+  if (s === 3) { $("step3").hidden = false; setTimeout(()=> $("wPhone").focus(), 60); }
+  [1,2,3].forEach(i => $("d"+i).className = (s >= i && s <= 3) ? (s === i ? "on" : "") : "");
+  $("d"+Math.min(s,3)).className = "on";
+  $("backBtn").hidden = (s === 1 || s > 3);
+  $("dots") && null;
+  if (s === 2 && !$("wName").value.trim()) { toStep(1); return; }
+}
+function backStep(){ if (step === 3) toStep(2); else if (step === 2) toStep(1); }
+function setCC(v){
+  cc = v; localStorage.setItem("wedCC", v);
+  $("ccEG").className = v === "+20" ? "on" : "";
+  $("ccUS").className = v === "+1" ? "on" : "";
+  $("wPhone").placeholder = v === "+20" ? "10 123 4567" : "(973) 555 0100";
+}
+async function saveFamily(skipPhone){
+  const name = $("wName").value.trim();
+  if (!name) { toStep(1); return; }
+  const rawPhone = skipPhone ? "" : $("wPhone").value.trim();
+  const phone = rawPhone ? normalizePhone(rawPhone, cc) : "";
+  if (await insertRows([{ name, count: n, phone }])) {
+    $("doneName").textContent = name;
+    $("wName").value = ""; $("wPhone").value = "";
+    n = 2; $("count").textContent = n;
+    ["step1","step2","step3","mineWrap"].forEach(id => $(id).hidden = true);
+    $("stepDone").hidden = false;
+    $("backBtn").hidden = true;
+    [1,2,3].forEach(i => $("d"+i).className = "on");
   }
+}
+function showMine(){
+  ["step1","step2","step3","stepDone"].forEach(id => $(id).hidden = true);
+  $("mineWrap").hidden = false;
+  refreshMine();
 }
 
 /* ── platform tip ── */
 (function(){
   const ios = /iPhone|iPad|iPod/.test(navigator.userAgent);
   $("platformTip").innerHTML = ios
-    ? "💡 <b>عندكم صورة الورقة؟</b> افتحوها في الصور، دوسوا على الكلام اللي في الصورة (Live Text)، انسخوه، والصقوه فوق."
-    : "💡 <b>عندكم صورة الورقة؟</b> افتحوها في الاستوديو، دوسوا على أيقونة Lens، انسخوا النص، والصقوه فوق.";
+    ? "💡 <b>صورة الورقة؟</b> افتحوها في الصور، دوسوا على الكلام (Live Text)، انسخوه، والصقوه فوق."
+    : "💡 <b>صورة الورقة؟</b> افتحوها ودوسوا على أيقونة Lens، انسخوا النص، والصقوه فوق.";
+  setCC(cc);
 })();
 
-/* ── universal paste parser ── */
+/* ── phone normalization ── */
+function normalizePhone(raw, ccSel){
+  if (!raw) return "";
+  let p = raw.replace(/[\s\-().]/g, "");
+  if (p.startsWith("00")) p = "+" + p.slice(2);
+  if (p.startsWith("+")) return p;
+  if (ccSel) {
+    if (ccSel === "+20" && p.startsWith("0")) p = p.slice(1);
+    if (ccSel === "+1" && p.length === 11 && p.startsWith("1")) p = p.slice(1);
+    return ccSel + p;
+  }
+  if (/^01\d{9}$/.test(p)) return "+20" + p.slice(1);
+  if (/^1\d{9}$/.test(p) && p.length === 10) return "+20" + p;
+  if (/^\d{10}$/.test(p) && !p.startsWith("0")) return "+1" + p;
+  if (/^1\d{10}$/.test(p)) return "+" + p;
+  return p;
+}
+
+/* ── parser ── */
 function normDigits(s){
   return s.replace(/[٠-٩]/g, c => "٠١٢٣٤٥٦٧٨٩".indexOf(c)).replace(/[۰-۹]/g, c => "۰۱۲۳۴۵۶۷۸۹".indexOf(c));
 }
@@ -379,27 +422,23 @@ function parseFree(text){
   if (/BEGIN:VCARD/i.test(text)) return parseVcf(text);
   const out = [];
   let lines = text.split(/\r?\n/);
-  // single line with commas and no phone → treat commas as separators
   if (lines.length === 1 && /[،,]/.test(lines[0]) && !/\d{8,}/.test(lines[0].replace(/[\s\-()]/g, ""))) {
     lines = lines[0].split(/[،,]/);
   }
   for (const raw of lines) {
     let line = raw.trim();
     if (!line) continue;
-    // phone: 8+ digits (with separators allowed)
     let phone = "";
     const pm = line.match(/(\+?\d[\d\s\-().]{6,}\d)/);
     if (pm && pm[1].replace(/\D/g, "").length >= 8) {
       phone = normalizePhone(pm[1], "");
       line = line.replace(pm[1], " ");
     }
-    // party count: standalone 1-30, optionally with a unit word
     let count = 2;
     const cm = line.match(/(?:^|[\s×x*])([1-9]|[12][0-9]|30)\s*(?:أفراد|فرد|أشخاص|اشخاص|انفار|نفر|people|ppl|pax|persons)?\s*$/i);
     if (cm) { count = parseInt(cm[1], 10); line = line.slice(0, cm.index) + " "; }
     const name = line.replace(/[،,;|:•·—_]+/g, " ").replace(/\s+/g, " ").trim();
     if (!name && phone) {
-      // phone-only line → attach to the previous family that has no phone yet
       const prev = out.slice().reverse().find(r => !r.phone);
       if (prev) prev.phone = phone;
       continue;
@@ -409,12 +448,12 @@ function parseFree(text){
   return out;
 }
 
-/* ── paste flow with preview ── */
+/* ── paste flow ── */
 function parsePaste(){
   const text = $("pasteArea").value.trim();
   if (!text) { $("pasteArea").focus(); return; }
   pending = parseFree(text);
-  if (!pending.length) { toast("مش لاقيين أسماء — جربوا تكتبوها سطر سطر", true); return; }
+  if (!pending.length) { toast("مش لاقيين أسماء — جربوا سطر سطر", true); return; }
   renderPreview();
   $("previewBg").hidden = false;
 }
@@ -448,7 +487,7 @@ async function confirmPreview(){
   closePreview();
   if (await insertRows(items)) {
     $("pasteArea").value = "";
-    toast(`اتسجل ${items.length} عيلة ✅ شكرًا 🤍`);
+    toast(`اتسجل ${items.length} عيلة ✅ 🤍`);
   }
 }
 function closePreview(){ $("previewBg").hidden = true; }
@@ -493,7 +532,6 @@ async function removeRow(row){
     } catch(e) { toast("النت قطع — ضيفوها تاني", true); }
   }});
 }
-
 function famRow(r, canDelete){
   const row = document.createElement("div");
   row.className = "fam " + (r.side === "bride" ? "b" : "g");
@@ -518,9 +556,10 @@ function famRow(r, canDelete){
   return row;
 }
 function renderMine(){
-  $("mineHead").hidden = !mine.length;
   const el = $("mineList");
+  if (!el) return;
   el.innerHTML = "";
+  if (!mine.length) { el.innerHTML = '<p class="empty">لسه مسجلتوش حد</p>'; return; }
   mine.forEach(r => el.appendChild(famRow(r, true)));
 }
 function renderAll(){
@@ -541,7 +580,7 @@ function setFilter(f){
   renderAll();
 }
 
-/* ── organizer PIN gate ── */
+/* ── organizer ── */
 function askPin(){
   if (isOrg()) { openOrg(); return; }
   $("pinErr").style.display = "none"; $("pinIn").value = "";
@@ -554,26 +593,13 @@ function tryPin(){
 }
 $("pinIn").addEventListener("keydown", e => { if (e.key === "Enter") tryPin(); });
 function openOrg(){
-  $("orgView").hidden = false; $("orgBar").hidden = true;
+  $("orgView").hidden = false;
   refreshAll();
   if (!orgTimer) orgTimer = setInterval(() => { if (!document.hidden) refreshAll(); }, 4000);
 }
-function stopOrg(){ if (orgTimer) { clearInterval(orgTimer); orgTimer = null; } $("orgView").hidden = true; $("orgBar").hidden = false; }
 document.addEventListener("visibilitychange", () => { if (!document.hidden) { refreshMine(); if (isOrg() && !$("orgView").hidden) refreshAll(); } });
 
-/* ── manual add ── */
-async function addManual(){
-  const name = $("name").value.trim();
-  if (!name) { $("name").focus(); return; }
-  if (await insertRows([{ name, count: n, phone: normalizePhone($("phone").value.trim(), $("cc").value) }])) {
-    $("name").value = ""; $("phone").value = "";
-    n = 2; $("count").textContent = n;
-    toast("اتضافت ✅ شكرًا 🤍");
-    $("name").focus();
-  }
-}
-
-/* ── contact picker (bonus where supported) ── */
+/* ── contact picker ── */
 if ("contacts" in navigator && "select" in navigator.contacts) $("pickBtn").hidden = false;
 async function pickContacts(){
   try {
@@ -583,7 +609,7 @@ async function pickContacts(){
   } catch(e) { /* cancelled */ }
 }
 
-/* ── files: vcf/text parse to preview; photos → share sheet ── */
+/* ── files ── */
 async function handleFiles(files){
   const photos = [];
   let items = [];
@@ -596,12 +622,12 @@ async function handleFiles(files){
     if (navigator.canShare && navigator.canShare({ files: photos })) {
       try { await navigator.share({ files: photos, text: "صور قائمة عزومة فرح يوستينا ومحب 🤍" }); toast("اختاروا واتساب وابعتوا الصور لجوزيف 🤍"); }
       catch(e) { /* cancelled */ }
-    } else toast("الصور دي ابعتوها لجوزيف على واتساب مباشرة 🤍");
+    } else toast("الصور دي ابعتوها لجوزيف على واتساب 🤍");
   }
   $("file").value = "";
 }
 
-/* ── Excel export (UTF-8 BOM so Arabic opens clean in Excel) ── */
+/* ── exports ── */
 function exportExcel(){
   const head = ["Name (الاسم)", "Side (الطرف)", "People (الأفراد)", "WhatsApp", "Added"];
   const rows_ = all.map(r => [r.name, r.side === "bride" ? "Bride عروسة" : "Groom عريس", r.count, r.phone || "", (r.created_at || "").slice(0, 10)]);
@@ -610,10 +636,8 @@ function exportExcel(){
   a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
   a.download = "Youstina & Moheb — Guest List.csv";
   a.click();
-  toast("اتنزلت — تفتح في Excel على طول ✅");
+  toast("اتنزلت — تفتح في Excel ✅");
 }
-
-/* ── organizer WhatsApp snapshot ── */
 function sendSnapshot(){
   const part = side => all.filter(r => r.side === side);
   const fmt = list => list.map((r, i) => `${i+1}. ${r.name} — ${r.count} أفراد${r.phone ? " — " + r.phone : ""}`).join("\n");
@@ -622,6 +646,10 @@ function sendSnapshot(){
   const msg = `قائمة عزومة فرح يوستينا ومحب 🤍\n${all.length} عيلة · ${total} فرد\n\n🤍 طرف العروسة (${bp.reduce((s,r)=>s+r.count,0)} فرد):\n${fmt(bp) || "—"}\n\n🤍 طرف العريس (${gp.reduce((s,r)=>s+r.count,0)} فرد):\n${fmt(gp) || "—"}`;
   location.href = "https://wa.me/?text=" + encodeURIComponent(msg);
 }
+
+/* enter key moves the wizard forward */
+$("wName").addEventListener("keydown", e => { if (e.key === "Enter") toStep(2); });
+$("wPhone").addEventListener("keydown", e => { if (e.key === "Enter") saveFamily(); });
 
 route();
 </script>
