@@ -300,7 +300,7 @@
     </div>
   </div>
 
-  <p class="ver">١١ · 11</p>
+  <p class="ver">١٢ · 12</p>
 </div>
 
 <div class="modal-bg" id="previewBg" hidden>
@@ -376,7 +376,7 @@ const STORAGE = "https://wydodvbkqhpoyefcwpnf.supabase.co/storage/v1";
 const FN_URL = "https://wydodvbkqhpoyefcwpnf.supabase.co/functions/v1/parse-guest-photo";
 const KEY = "sb_publishable_TSmh8zzk8gvPL5uIrcNbwA_HK45ASUe";
 const ANON_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5ZG9kdmJrcWhwb3llZmN3cG5mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxOTYxNjcsImV4cCI6MjA4ODc3MjE2N30.x65toIsFqhKnSDK8n6dXEYg64dLz8idG6r-T9KxijaE";
-const PIN = "1360";
+const PINS = { "1994": "master", "1360": "groom", "3882": "bride" };
 const H = { "apikey": KEY, "Authorization": "Bearer " + KEY, "Content-Type": "application/json" };
 
 /* ═══ i18n ═══ */
@@ -551,7 +551,9 @@ let cc = localStorage.getItem("wedCC") || "+20";
 let mine = [], all = [], filter = "all", n = 2, orgTimer = null, pending = [], step = 1, photoTick = 0;
 
 const $ = id => document.getElementById(id);
-const isOrg = () => localStorage.getItem("wedOrg") === "ok";
+const orgRole = () => { const r = localStorage.getItem("wedOrg"); return ["master","bride","groom"].includes(r) ? r : ""; };
+const isOrg = () => !!orgRole();
+if (localStorage.getItem("wedOrg") === "ok") localStorage.removeItem("wedOrg"); // legacy single-pin sessions re-authenticate
 function toast(msg, err, action){
   const el = $("toast");
   el.innerHTML = "";
@@ -909,18 +911,27 @@ function renderMine(){
 }
 function renderAll(){
   if ($("orgView").hidden) return;
+  const role = orgRole() || "master";
+  const vis = role === "master" ? all : all.filter(r => r.side === role);
   const bp = all.filter(r => r.side === "bride").reduce((s, r) => s + r.count, 0);
   const gp = all.filter(r => r.side === "groom").reduce((s, r) => s + r.count, 0);
   $("tB").textContent = bp; $("tG").textContent = gp; $("tA").textContent = bp + gp;
+  document.querySelector(".tot.b").hidden = role === "groom";
+  document.querySelector(".tot.g").hidden = role === "bride";
+  document.querySelector(".tot.a").hidden = role !== "master";
+  $("orgCapB").hidden = role === "groom";
+  $("orgCapG").hidden = role === "bride";
+  document.querySelector(".filters").hidden = role !== "master";
+  if (role !== "master") filter = role;
   const groups = {};
-  all.forEach(r => { const k = normName(r.name) || ("ph:" + (r.phone || r.id)); (groups[k] = groups[k] || []).push(r); });
+  vis.forEach(r => { const k = normName(r.name) || ("ph:" + (r.phone || r.id)); (groups[k] = groups[k] || []).push(r); });
   const dupes = Object.values(groups).filter(g => g.length > 1);
   $("dupesNote").innerHTML = dupes.length
     ? `<div class="dupes-note"><b>${t("dupsBanner")(dupes.length)}</b> ${dupes.map(g => `"${esc(g[0].name)}" (${g.map(x => x.side === "bride" ? t("fB") : t("fG")).join(" + ")})`).join(" · ")} ${t("dupsHint")}</div>`
     : "";
   const el = $("fullList");
   const q = ($("search").value || "").trim().toLowerCase();
-  const show = all.filter(r => (filter === "all" || r.side === filter) && (!q || r.name.toLowerCase().includes(q) || (r.phone || "").includes(q)));
+  const show = vis.filter(r => (filter === "all" || r.side === filter) && (!q || r.name.toLowerCase().includes(q) || (r.phone || "").includes(q)));
   el.innerHTML = "";
   if (!show.length) { el.innerHTML = `<p class="empty">${t("listEmpty")}</p>`; return; }
   show.forEach(r => el.appendChild(famRow(r, true)));
@@ -940,7 +951,8 @@ function askPin(){
   $("pinIn").focus();
 }
 function tryPin(){
-  if ($("pinIn").value.trim() === PIN) { localStorage.setItem("wedOrg", "ok"); $("pinBg").hidden = true; openOrg(); }
+  const role = PINS[$("pinIn").value.trim()];
+  if (role) { localStorage.setItem("wedOrg", role); $("pinBg").hidden = true; openOrg(); }
   else $("pinErr").style.display = "block";
 }
 $("pinIn").addEventListener("keydown", e => { if (e.key === "Enter") tryPin(); });
@@ -1006,7 +1018,9 @@ async function loadPhotos(){
       body: JSON.stringify({ prefix: "", limit: 60, sortBy: { column: "created_at", order: "desc" } }),
     });
     if (!r.ok) return;
-    const objs = (await r.json()).filter(o => o.name && o.name.endsWith(".jpg"));
+    let objs = (await r.json()).filter(o => o.name && o.name.endsWith(".jpg"));
+    const prole = orgRole();
+    if (prole && prole !== "master") objs = objs.filter(o => o.name.startsWith(prole));
     const el = $("photoGrid");
     if (!el) return;
     el.innerHTML = "";
@@ -1080,7 +1094,9 @@ async function handleFiles(files){
 /* ── exports ── */
 function exportExcel(){
   const head = ["Name (الاسم)", "Side (الطرف)", "People (الأفراد)", "WhatsApp", "Added"];
-  const rows_ = all.map(r => [r.name, r.side === "bride" ? "Bride عروسة" : "Groom عريس", r.count, r.phone || "", (r.created_at || "").slice(0, 10)]);
+  const xrole = orgRole() || "master";
+  const xrows = xrole === "master" ? all : all.filter(r => r.side === xrole);
+  const rows_ = xrows.map(r => [r.name, r.side === "bride" ? "Bride عروسة" : "Groom عريس", r.count, r.phone || "", (r.created_at || "").slice(0, 10)]);
   const csv = "﻿" + [head, ...rows_].map(row => row.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\r\n");
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
@@ -1089,11 +1105,13 @@ function exportExcel(){
   toast(t("xls"));
 }
 function sendSnapshot(){
-  const part = side => all.filter(r => r.side === side);
+  const srole = orgRole() || "master";
+  const src = srole === "master" ? all : all.filter(r => r.side === srole);
+  const part = side => src.filter(r => r.side === side);
   const fmt = list => list.map((r, i) => `${i+1}. ${r.name} — ${r.count} أفراد${r.phone ? " — " + r.phone : ""}`).join("\n");
   const bp = part("bride"), gp = part("groom");
-  const total = all.reduce((s, r) => s + r.count, 0);
-  const msg = `قائمة عزومة فرح يوستينا ومحب 🤍\n${all.length} عيلة · ${total} فرد\n\n🤍 طرف العروسة (${bp.reduce((s,r)=>s+r.count,0)} فرد):\n${fmt(bp) || "—"}\n\n🤍 طرف العريس (${gp.reduce((s,r)=>s+r.count,0)} فرد):\n${fmt(gp) || "—"}`;
+  const total = src.reduce((s, r) => s + r.count, 0);
+  const msg = `قائمة عزومة فرح يوستينا ومحب 🤍\n${src.length} عيلة · ${total} فرد\n\n🤍 طرف العروسة (${bp.reduce((s,r)=>s+r.count,0)} فرد):\n${fmt(bp) || "—"}\n\n🤍 طرف العريس (${gp.reduce((s,r)=>s+r.count,0)} فرد):\n${fmt(gp) || "—"}`;
   location.href = "https://wa.me/?text=" + encodeURIComponent(msg);
 }
 
