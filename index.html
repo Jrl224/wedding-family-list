@@ -550,6 +550,7 @@ function normName(s){
     .replace(/\s?؟$/, "")
     .replace(/^(عيلة|عائلة|عيله|اسرة|أسرة|بيت|family|fam\.?)\s+/i, "")
     .replace(/[أإآا]/g, "ا").replace(/[ىي]/g, "ي").replace(/ة/g, "ه").replace(/[ؤئء]/g, "")
+    .replace(/چ/g, "ج").replace(/پ/g, "ب").replace(/[ڤڥﭪﭬ]/g, "ف").replace(/گ/g, "ك").replace(/ژ/g, "ز")
     .replace(/[^\p{L}\p{N}\s]/gu, "").replace(/\s+/g, " ").trim().toLowerCase();
 }
 let dupResolver = null;
