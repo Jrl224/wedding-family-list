@@ -133,6 +133,23 @@
   .photo-grid a{display:block;position:relative}
   .photo-grid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;border:1px solid var(--line);background:#0b1524}
   .photo-grid .tag{position:absolute;bottom:5px;inset-inline-start:5px;background:rgba(9,18,32,.85);border-radius:6px;padding:1px 7px;font-size:10px;color:var(--ivory)}
+  .cap-card{
+    background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:14px;
+    padding:12px 16px 14px;margin:0 0 18px;text-align:start;
+  }
+  .cap-card .cap-line{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:var(--dim);margin-bottom:7px}
+  .cap-card .cap-line b{color:var(--ivory);font-size:14.5px}
+  .cap-card .cap-left{font-weight:700;color:var(--gold-b)}
+  .cap-bar{height:12px;border-radius:999px;background:rgba(9,18,32,.9);border:1px solid var(--line);overflow:hidden}
+  .cap-fill{height:100%;border-radius:999px;width:0%;transition:width .8s ease, background .5s ease}
+  .cap-fill.ok{background:linear-gradient(90deg,var(--gold),var(--gold-b))}
+  .cap-fill.warn{background:linear-gradient(90deg,#c98a27,#e8b55c)}
+  .cap-fill.full{background:linear-gradient(90deg,#a83232,#d94f4f);animation:capPulse 1.2s ease-in-out infinite}
+  @keyframes capPulse{50%{opacity:.65}}
+  .cap-card.warned .cap-left{color:#e8b55c}
+  .cap-card.maxed .cap-left{color:#e08a8a}
+  .cap-full-msg{margin-top:7px;font-size:12.5px;color:#e08a8a;font-weight:700;display:none}
+  .cap-card.maxed .cap-full-msg{display:block}
   .admin-pill,.lang-pill{
     position:fixed;top:12px;z-index:15;padding:9px 15px;border-radius:999px;cursor:pointer;
     border:1px solid var(--line);background:rgba(18,32,58,.92);color:var(--gold-b);font-size:13.5px;font-weight:700;font-family:inherit;
@@ -185,6 +202,12 @@
   <h1 style="font-size:24px">يوستينا ومحب</h1>
   <p class="mine-side"><span id="onSideWord"></span> <b id="mySideLabel"></b> · <a onclick="changeSide()" id="changeLink"></a></p>
   <div class="dots"><i id="d1"></i><i id="d2"></i><i id="d3"></i></div>
+
+  <div class="cap-card" id="capCard" hidden>
+    <div class="cap-line"><b id="capName"></b><span><span id="capUsed">0</span> / <span id="capMax">200</span> · <span class="cap-left" id="capLeft"></span></span></div>
+    <div class="cap-bar"><div class="cap-fill ok" id="capFill"></div></div>
+    <p class="cap-full-msg" id="capMsg"></p>
+  </div>
 
   <div id="step1">
     <p class="q" id="q1"></p>
@@ -254,6 +277,14 @@
       <div class="tot g"><b id="tG">0</b><span id="lG"></span></div>
       <div class="tot a"><b id="tA">0</b><span id="lA"></span></div>
     </div>
+    <div class="cap-card" id="orgCapB">
+      <div class="cap-line"><b id="orgCapBName"></b><span><span id="orgCapBUsed">0</span> / <span id="orgCapBMax">200</span> · <span class="cap-left" id="orgCapBLeft"></span></span></div>
+      <div class="cap-bar"><div class="cap-fill ok" id="orgCapBFill"></div></div>
+    </div>
+    <div class="cap-card" id="orgCapG">
+      <div class="cap-line"><b id="orgCapGName"></b><span><span id="orgCapGUsed">0</span> / <span id="orgCapGMax">200</span> · <span class="cap-left" id="orgCapGLeft"></span></span></div>
+      <div class="cap-bar"><div class="cap-fill ok" id="orgCapGFill"></div></div>
+    </div>
     <div class="filters">
       <button id="fAll" class="on" onclick="setFilter('all')"></button>
       <button id="fB" onclick="setFilter('bride')"></button>
@@ -269,7 +300,7 @@
     </div>
   </div>
 
-  <p class="ver">١٠ · 10</p>
+  <p class="ver">١١ · 11</p>
 </div>
 
 <div class="modal-bg" id="previewBg" hidden>
@@ -386,6 +417,8 @@ const STR = {
     pasteNone:"مش لاقيين أسماء — جربوا سطر سطر", dupsBanner:n=>`⚠️ ${n} تكرار محتمل:`, dupsHint:"— دوروا بالاسم وشيلوا الزيادة.",
     xls:"اتنزلت — تفتح في Excel ✅", people:"أفراد", picked:n=>`اتضاف ${n} عيلة ✅ — ظبطوا العدد بـ + و −`, lang:"English",
     editTitle:"✏️ عدّلوا العيلة", editSave:"احفظوا ✓", edited:"اتعدلت ✅", phoneOpt:"رقم واتساب (اختياري)",
+    capLeft:n=>`فاضل ${n}`, capOver:n=>`زيادة ${n}`, capFull:"⚠️ اكتمل عدد الطرف — كلموا جوزيف قبل ما تضيفوا",
+    capNear:"⚠️ قربتوا من العدد الكامل", person:"فرد",
   },
   en: {
     kicker:"Guest List", sideQ:"Which side are you from? One minute to add your families.",
@@ -423,6 +456,8 @@ const STR = {
     pasteNone:"No names found — try one per line", dupsBanner:n=>`⚠️ ${n} possible duplicates:`, dupsHint:"— search the name and remove extras.",
     xls:"Downloaded — opens in Excel ✅", people:"people", picked:n=>`Added ${n} families ✅ — adjust counts with + and −`, lang:"بالعربي",
     editTitle:"✏️ Edit family", editSave:"Save ✓", edited:"Updated ✅", phoneOpt:"WhatsApp number (optional)",
+    capLeft:n=>`${n} left`, capOver:n=>`${n} over`, capFull:"⚠️ This side is at capacity — check with Joseph before adding",
+    capNear:"⚠️ Getting close to capacity", person:"people",
   }
 };
 let L = localStorage.getItem("wedLang") || "ar";
@@ -459,8 +494,55 @@ function applyLang(){
     $("mySideLabel").textContent = mySide === "bride" ? t("sideB") : t("sideG");
     $("adminPill").textContent = isOrg() ? t("orgPillOn") : t("orgPill");
   }
-  renderMine(); renderAll();
+  renderMine(); renderAll(); renderCaps();
 }
+
+/* ── capacity (product-config: caps live in wedding_settings, not code) ── */
+let CAPS = { bride: 200, groom: 200 };
+let sideTotals = { bride: 0, groom: 0 };
+async function loadCaps(){
+  try {
+    const r = await fetch("https://wydodvbkqhpoyefcwpnf.supabase.co/rest/v1/wedding_settings?select=bride_cap,groom_cap&id=eq.1", { headers: H });
+    if (r.ok) { const s = (await r.json())[0]; if (s) CAPS = { bride: s.bride_cap, groom: s.groom_cap }; }
+  } catch(e) {}
+}
+async function refreshSideTotals(){
+  try {
+    const r = await fetch(SUPA + "?select=side,count", { headers: H });
+    if (!r.ok) return;
+    const rows = await r.json();
+    sideTotals = { bride: 0, groom: 0 };
+    rows.forEach(x => { if (sideTotals[x.side] !== undefined) sideTotals[x.side] += x.count; });
+    renderCaps();
+  } catch(e) {}
+}
+function paintCap(prefix, side){
+  const used = sideTotals[side], cap = CAPS[side] || 1;
+  const pct = Math.min(100, Math.round(used / cap * 100));
+  const fill = $(prefix + "Fill"), card = fill.closest(".cap-card");
+  $(prefix + "Used").textContent = used;
+  $(prefix + "Max").textContent = cap;
+  $(prefix + "Left").textContent = used > cap ? t("capOver")(used - cap) : t("capLeft")(cap - used);
+  fill.style.width = pct + "%";
+  fill.className = "cap-fill " + (pct >= 90 ? "full" : pct >= 70 ? "warn" : "ok");
+  card.classList.toggle("maxed", used >= cap);
+  card.classList.toggle("warned", pct >= 70 && used < cap);
+}
+function renderCaps(){
+  if (mySide) {
+    $("capCard").hidden = false;
+    $("capName").textContent = mySide === "bride" ? t("sideWordB") : t("sideWordG");
+    paintCap("cap", mySide);
+    $("capMsg").textContent = sideTotals[mySide] >= CAPS[mySide] ? t("capFull") : t("capNear");
+  }
+  if (!$("orgView").hidden) {
+    $("orgCapBName").textContent = t("sideWordB");
+    $("orgCapGName").textContent = t("sideWordG");
+    paintCap("orgCapB", "bride");
+    paintCap("orgCapG", "groom");
+  }
+}
+setInterval(() => { if (!document.hidden && mySide) refreshSideTotals(); }, 15000);
 
 let device = localStorage.getItem("wedDevice");
 if (!device) { device = "d" + Math.random().toString(36).slice(2, 10); localStorage.setItem("wedDevice", device); }
@@ -495,7 +577,7 @@ function route(){
   $("app").hidden = !mySide;
   $("adminPill").hidden = !mySide;
   applyLang();
-  if (mySide) { toStep(1); refreshMine(); }
+  if (mySide) { toStep(1); refreshMine(); loadCaps().then(refreshSideTotals); }
 }
 const WIZ_IDS = ["step1","step2","step3","stepDone","mineWrap","advBox"];
 
@@ -738,6 +820,7 @@ async function refreshMine(){
   try {
     const r = await fetch(`${SUPA}?select=*&added_by=eq.${device}&order=created_at.desc`, { headers: H });
     if (r.ok) { mine = await r.json(); renderMine(); }
+    refreshSideTotals();
   } catch(e) {}
 }
 async function refreshAll(){
@@ -841,6 +924,7 @@ function renderAll(){
   el.innerHTML = "";
   if (!show.length) { el.innerHTML = `<p class="empty">${t("listEmpty")}</p>`; return; }
   show.forEach(r => el.appendChild(famRow(r, true)));
+  renderCaps();
 }
 function setFilter(f){
   filter = f;
