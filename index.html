@@ -1079,7 +1079,7 @@ async function deletePhoto(name, url, tile){
       loadPhotos();
       toast(t("restored"));
     } catch(e) { toast(t("netErr"), true); }
-  } : undefined);
+  } } : undefined);
 }
 let fbPhotos = [];
 function showPhotoFallback(photos){ fbPhotos = photos; $("photoFbBg").hidden = false; }
