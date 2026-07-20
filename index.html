@@ -269,7 +269,7 @@
     </div>
   </div>
 
-  <p class="ver">٩ · 9</p>
+  <p class="ver">١٠ · 10</p>
 </div>
 
 <div class="modal-bg" id="previewBg" hidden>
@@ -303,6 +303,23 @@
     <div class="m-actions">
       <button class="m-ok" id="photoShareBtn"></button>
       <button class="m-cancel" onclick="document.getElementById('photoFbBg').hidden=true" id="fbBack"></button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="editBg" hidden>
+  <div class="modal">
+    <h3 id="editTitle"></h3>
+    <input class="wiz-in" id="eName" style="font-size:18px;margin-bottom:10px" autocomplete="off">
+    <div class="count-row" style="margin:4px 0 10px">
+      <button type="button" onclick="eBump(1)" style="width:52px;height:52px;font-size:26px">+</button>
+      <span id="eCount" style="font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:600;color:var(--gold-b);min-width:56px">2</span>
+      <button type="button" onclick="eBump(-1)" style="width:52px;height:52px;font-size:26px">−</button>
+    </div>
+    <input class="wiz-in phone-big" id="ePhone" inputmode="tel" style="font-size:17px" autocomplete="off">
+    <div class="m-actions">
+      <button class="m-ok" onclick="saveEdit()" id="editSave"></button>
+      <button class="m-cancel" onclick="document.getElementById('editBg').hidden=true" id="editCancel"></button>
     </div>
   </div>
 </div>
@@ -368,6 +385,7 @@ const STR = {
     photoSaved:"📷 الصورة اتحفظت ✅", reading:"📖 بنقرأ الصورة… ثواني", noNames:"مش لاقيين أسماء واضحة — بس الصورة اتحفظت لجوزيف ✅",
     pasteNone:"مش لاقيين أسماء — جربوا سطر سطر", dupsBanner:n=>`⚠️ ${n} تكرار محتمل:`, dupsHint:"— دوروا بالاسم وشيلوا الزيادة.",
     xls:"اتنزلت — تفتح في Excel ✅", people:"أفراد", picked:n=>`اتضاف ${n} عيلة ✅ — ظبطوا العدد بـ + و −`, lang:"English",
+    editTitle:"✏️ عدّلوا العيلة", editSave:"احفظوا ✓", edited:"اتعدلت ✅", phoneOpt:"رقم واتساب (اختياري)",
   },
   en: {
     kicker:"Guest List", sideQ:"Which side are you from? One minute to add your families.",
@@ -404,6 +422,7 @@ const STR = {
     photoSaved:"📷 Photo saved ✅", reading:"📖 Reading the photo… seconds", noNames:"No clear names found — but the photo is saved for Joseph ✅",
     pasteNone:"No names found — try one per line", dupsBanner:n=>`⚠️ ${n} possible duplicates:`, dupsHint:"— search the name and remove extras.",
     xls:"Downloaded — opens in Excel ✅", people:"people", picked:n=>`Added ${n} families ✅ — adjust counts with + and −`, lang:"بالعربي",
+    editTitle:"✏️ Edit family", editSave:"Save ✓", edited:"Updated ✅", phoneOpt:"WhatsApp number (optional)",
   }
 };
 let L = localStorage.getItem("wedLang") || "ar";
@@ -432,6 +451,8 @@ function applyLang(){
   set("dupTitle","dupTitle"); set("dupSub","dupSub"); set("dupGo","dupGo"); set("dupCancel","dupCancel");
   set("fbTitle","fbTitle"); set("fbSub","fbSub"); set("photoShareBtn","fbShare"); set("fbBack","fbBack");
   set("pinTitle","pinTitle"); set("pinSub","pinSub"); set("pinOpen","pinOpen"); set("pinBack","pinBack"); set("pinErr","pinErr");
+  set("editTitle","editTitle"); set("editSave","editSave"); set("editCancel","cancel");
+  $("eName").placeholder = t("q1ph"); $("ePhone").placeholder = t("phoneOpt");
   $("backBtn").textContent = L === "ar" ? "‹ رجوع" : "‹ Back";
   $("platformTip").innerHTML = /iPhone|iPad|iPod/.test(navigator.userAgent) ? t("tipIOS") : t("tipAnd");
   if (mySide) {
@@ -609,7 +630,16 @@ function renderPreview(){
     row.className = "fam " + (mySide === "bride" ? "b" : "g");
     const info = document.createElement("div");
     info.className = "info";
-    info.innerHTML = `<b>${esc(r.name)}</b><div class="meta">${r.phone ? `<span dir="ltr">${esc(r.phone)}</span>` : t("noPhone")}</div>`;
+    const nameIn = document.createElement("input");
+    nameIn.value = r.name;
+    nameIn.style.cssText = "width:100%;background:rgba(9,18,32,.6);border:1px solid var(--line);border-radius:8px;color:var(--ivory);font-size:15px;padding:7px 9px;font-family:inherit";
+    nameIn.oninput = () => { r.name = nameIn.value; };
+    const phoneIn = document.createElement("input");
+    phoneIn.value = r.phone || "";
+    phoneIn.placeholder = t("phoneOpt");
+    phoneIn.style.cssText = "width:100%;margin-top:5px;background:rgba(9,18,32,.6);border:1px solid var(--line);border-radius:8px;color:var(--dim);font-size:13px;padding:6px 9px;font-family:inherit;direction:ltr";
+    phoneIn.oninput = () => { r.phone = phoneIn.value; };
+    info.append(nameIn, phoneIn);
     const cnt = document.createElement("div");
     cnt.className = "cnt";
     const minus = document.createElement("button"); minus.textContent = "−";
@@ -627,7 +657,7 @@ function renderPreview(){
   $("previewOk").textContent = t("saveAll")(pending.length);
 }
 async function confirmPreview(){
-  const items = pending.slice();
+  const items = pending.slice().filter(r => r.name.trim()).map(r => ({ ...r, name: r.name.trim(), phone: r.phone ? normalizePhone(r.phone.trim(), "") : "" }));
   closePreview();
   if (await insertRows(items)) {
     $("pasteArea").value = "";
@@ -752,12 +782,40 @@ function famRow(r, canDelete){
   cnt.append(minus, num, plus);
   row.append(info, cnt);
   if (canDelete) {
+    const ed = document.createElement("button");
+    ed.className = "del"; ed.style.color = "var(--gold-b)"; ed.textContent = "✏️";
+    ed.onclick = () => openEdit(r);
     const del = document.createElement("button");
     del.className = "del"; del.textContent = "✕";
     del.onclick = () => removeRow(r);
-    row.append(del);
+    row.append(ed, del);
   }
   return row;
+}
+
+/* ── edit saved rows ── */
+let editing = null, eCount = 2;
+function eBump(d){ eCount = Math.min(30, Math.max(1, eCount + d)); $("eCount").textContent = eCount; }
+function openEdit(r){
+  editing = r; eCount = r.count;
+  $("eName").value = r.name; $("ePhone").value = r.phone || ""; $("eCount").textContent = eCount;
+  $("editBg").hidden = false;
+  setTimeout(()=> $("eName").focus(), 60);
+}
+async function saveEdit(){
+  if (!editing) return;
+  const name = $("eName").value.trim();
+  if (!name) { $("eName").focus(); return; }
+  const phone = $("ePhone").value.trim() ? normalizePhone($("ePhone").value.trim(), "") : "";
+  $("editBg").hidden = true;
+  editing.name = name; editing.count = eCount; editing.phone = phone;
+  renderMine(); renderAll();
+  try {
+    await fetch(`${SUPA}?id=eq.${editing.id}`, { method: "PATCH", headers: H, body: JSON.stringify({ name, count: eCount, phone }) });
+    toast(t("edited"));
+  } catch(e) { toast(t("netErr"), true); }
+  refreshMine(); if (isOrg()) refreshAll();
+  editing = null;
 }
 function renderMine(){
   const el = $("mineList");
