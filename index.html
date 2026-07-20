@@ -148,7 +148,21 @@
   .m-ok{background:var(--green);color:#fff}
   .m-cancel{background:var(--card2);color:var(--ivory);border:1px solid var(--line)}
   .pin-in{width:210px;padding:16px;font-family:'Cormorant Garamond',serif;font-size:32px;text-align:center;letter-spacing:.4em;border-radius:14px;border:1px solid var(--line);background:rgba(9,18,32,.8);color:var(--gold-b);display:block;margin:12px auto}
+  .admin-pill{
+    position:fixed;top:14px;inset-inline-end:14px;z-index:15;padding:10px 16px;border-radius:999px;cursor:pointer;
+    border:1px solid var(--line);background:rgba(18,32,58,.9);color:var(--gold-b);font-size:14px;font-weight:700;font-family:inherit;
+    box-shadow:0 4px 18px rgba(0,0,0,.35);backdrop-filter:blur(4px);
+  }
+  .org-back{display:block;margin:0 auto 8px;background:none;border:0;color:var(--dim);font-size:14.5px;text-decoration:underline;cursor:pointer;font-family:inherit}
+  .dup-row{background:rgba(122,44,44,.18);border:1px solid rgba(201,106,106,.4);border-radius:12px;padding:11px 13px;margin-bottom:9px;text-align:start}
+  .dup-row b{font-size:15px;display:block}
+  .dup-row .dmeta{color:var(--dim);font-size:12.5px;margin:2px 0 8px}
+  .dup-row label{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ivory);cursor:pointer}
+  .dup-row input{width:20px;height:20px;accent-color:#c96a6a}
+  .dupes-note{background:rgba(122,44,44,.15);border:1px solid rgba(201,106,106,.35);border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:13px;text-align:start;line-height:1.7}
+  .dupes-note b{color:#e08a8a}
   .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:#1f5c36;color:#fff;padding:11px 20px;border-radius:12px;font-size:14.5px;display:none;z-index:30;max-width:92vw;text-align:center;box-shadow:0 8px 26px rgba(0,0,0,.4)}
+  .toast.busy{background:#1a3a63}
   .toast.err{background:#7a2c2c}
   .toast button{margin-inline-start:12px;padding:5px 14px;border:0;border-radius:8px;background:#fff;color:#123;font-weight:800;font-size:13.5px;cursor:pointer}
   [hidden]{display:none!important}
@@ -169,10 +183,13 @@
 </div>
 
 <!-- Wizard: one question per screen -->
+<button class="admin-pill" id="adminPill" onclick="askPin()" hidden>🔒 المنظمين</button>
+
 <div class="scr" id="app" hidden style="position:relative">
   <button class="back" id="backBtn" onclick="backStep()" hidden>‹ رجوع</button>
   <p class="kicker">قائمة العزومة</p>
   <h1 style="font-size:26px">يوستينا ومحب</h1>
+  <p class="mine-side" id="sideChip" style="margin:2px 0 6px;font-size:13px;color:var(--dim)">بتضيفوا على <b id="mySideLabel" style="color:var(--gold-b)"></b> · <a style="color:var(--dim);text-decoration:underline;cursor:pointer" onclick="changeSide()">تغيير</a></p>
   <div class="dots"><i id="d1"></i><i id="d2"></i><i id="d3"></i></div>
 
   <div id="step1">
@@ -235,7 +252,9 @@
   <div class="org-bar"><button type="button" onclick="askPin()">🔒 للمنظمين</button></div>
 
   <div id="orgView" hidden>
+    <button class="org-back" onclick="closeOrg()">‹ رجوع لتسجيل العائلات</button>
     <h2 class="sec">القائمة الكاملة لايف<span class="pulse"></span></h2>
+    <div id="dupesNote"></div>
     <div class="totals">
       <div class="tot b"><b id="tB">0</b><span>طرف العروسة · فرد</span></div>
       <div class="tot g"><b id="tG">0</b><span>طرف العريس · فرد</span></div>
@@ -254,7 +273,7 @@
     </div>
   </div>
 
-  <p class="ver">٧</p>
+  <p class="ver">٨</p>
 </div>
 
 <!-- Paste preview modal -->
@@ -266,6 +285,31 @@
     <div class="m-actions">
       <button class="m-ok" onclick="confirmPreview()" id="previewOk">احفظوا الكل ✓</button>
       <button class="m-cancel" onclick="closePreview()">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- Duplicate check modal -->
+<div class="modal-bg" id="dupBg" hidden>
+  <div class="modal">
+    <h3>⚠️ في عائلات شبهها متسجلة</h3>
+    <p class="mp">ممكن تكون نفس العيلة اتسجلت من الطرف التاني — شيلوا العلامة لو دي عيلة مختلفة فعلًا.</p>
+    <div id="dupList"></div>
+    <div class="m-actions">
+      <button class="m-ok" onclick="resolveDups()">تمام — كملوا ✓</button>
+      <button class="m-cancel" onclick="cancelDups()">إلغاء الكل</button>
+    </div>
+  </div>
+</div>
+
+<!-- Photo AI fallback modal -->
+<div class="modal-bg" id="photoFbBg" hidden>
+  <div class="modal" style="text-align:center">
+    <h3>📷 الذكاء الاصطناعي لسه مش متوصل</h3>
+    <p class="mp">مش هنقدر نقرأ الصورة تلقائي دلوقتي — ابعتوها لجوزيف وهو هيسجلها لكم في دقايق.</p>
+    <div class="m-actions">
+      <button class="m-ok" id="photoShareBtn">📤 ابعتوا الصورة على واتساب</button>
+      <button class="m-cancel" onclick="document.getElementById('photoFbBg').hidden=true">رجوع</button>
     </div>
   </div>
 </div>
@@ -319,15 +363,23 @@ function bump(d){ n = Math.min(30, Math.max(1, n + d)); $("count").textContent =
 
 /* ── routing ── */
 function setSide(s){ mySide = s; localStorage.setItem("wedSide", s); route(); }
+function changeSide(){ localStorage.removeItem("wedSide"); mySide = ""; closeOrg(); route(); }
 function route(){
   $("sidePick").hidden = !!mySide;
   $("app").hidden = !mySide;
-  if (mySide) { toStep(1); refreshMine(); if (isOrg()) openOrg(); }
+  $("adminPill").hidden = !mySide;
+  if (mySide) {
+    $("mySideLabel").textContent = mySide === "bride" ? "طرف العروسة 🤍" : "طرف العريس 🤍";
+    $("adminPill").textContent = isOrg() ? "📊 المنظمين" : "🔒 المنظمين";
+    toStep(1); refreshMine();
+  }
 }
+const WIZ_IDS = ["step1","step2","step3","stepDone","mineWrap","advBox"];
 
 /* ── wizard ── */
 function toStep(s){
   step = s;
+  $("advBox").hidden = false;
   ["step1","step2","step3","stepDone","mineWrap"].forEach(id => $(id).hidden = true);
   if (s === 1) { $("step1").hidden = false; setTimeout(()=> $("wName").focus(), 60); }
   if (s === 2) $("step2").hidden = false;
@@ -492,8 +544,67 @@ async function confirmPreview(){
 }
 function closePreview(){ $("previewBg").hidden = true; }
 
+/* ── duplicate intelligence ── */
+function normName(s){
+  return normDigits(String(s))
+    .replace(/\s?؟$/, "")
+    .replace(/^(عيلة|عائلة|عيله|اسرة|أسرة|بيت|family|fam\.?)\s+/i, "")
+    .replace(/[أإآا]/g, "ا").replace(/[ىي]/g, "ي").replace(/ة/g, "ه").replace(/[ؤئء]/g, "")
+    .replace(/[^\p{L}\p{N}\s]/gu, "").replace(/\s+/g, " ").trim().toLowerCase();
+}
+let dupResolver = null;
+function checkDuplicates(items, existing){
+  const conflicts = [], clean = [];
+  for (const it of items) {
+    const nn = normName(it.name);
+    const hit = existing.find(r =>
+      (nn && normName(r.name) === nn) ||
+      (it.phone && r.phone && it.phone.replace(/\D/g,"") === r.phone.replace(/\D/g,""))
+    );
+    hit ? conflicts.push({ item: it, existing: hit }) : clean.push(it);
+  }
+  return { conflicts, clean };
+}
+function showDupModal(conflicts){
+  const el = $("dupList");
+  el.innerHTML = "";
+  conflicts.forEach((c, i) => {
+    const row = document.createElement("div");
+    row.className = "dup-row";
+    row.innerHTML = `<b>${esc(c.item.name)}</b>
+      <div class="dmeta">متسجلة خلاص: "${esc(c.existing.name)}" — ${c.existing.side === "bride" ? "طرف العروسة" : "طرف العريس"} · ${c.existing.count} أفراد${c.existing.phone ? ` · <span dir="ltr">${esc(c.existing.phone)}</span>` : ""}</div>
+      <label><input type="checkbox" checked data-i="${i}"> نفس العيلة — متسجلوهاش تاني</label>`;
+    el.appendChild(row);
+  });
+  $("dupBg").hidden = false;
+  return new Promise(res => { dupResolver = res; });
+}
+function resolveDups(){
+  const keep = [];
+  $("dupList").querySelectorAll("input[type=checkbox]").forEach(cb => { if (!cb.checked) keep.push(parseInt(cb.dataset.i, 10)); });
+  $("dupBg").hidden = true;
+  if (dupResolver) dupResolver({ cancelled: false, keepIdx: keep });
+}
+function cancelDups(){ $("dupBg").hidden = true; if (dupResolver) dupResolver({ cancelled: true, keepIdx: [] }); }
+
 /* ── cloud ── */
 async function insertRows(items){
+  // duplicate gate: compare against the whole live list before writing
+  try {
+    const r0 = await fetch(SUPA + "?select=id,name,phone,side,count", { headers: H });
+    if (r0.ok) {
+      const existing = await r0.json();
+      const { conflicts, clean } = checkDuplicates(items, existing);
+      if (conflicts.length) {
+        const res = await showDupModal(conflicts);
+        if (res.cancelled) return false;
+        items = clean.concat(res.keepIdx.map(i => conflicts[i].item));
+        if (!items.length) { toast("تمام — كله كان متسجل خلاص ✅"); refreshMine(); return true; }
+      } else {
+        items = clean;
+      }
+    }
+  } catch(e) { /* dedup is best-effort; never block adding */ }
   const payload = items.map(i => ({ name: i.name, count: i.count, phone: i.phone || "", side: mySide, added_by: device }));
   try {
     const r = await fetch(SUPA, { method: "POST", headers: H, body: JSON.stringify(payload) });
@@ -567,6 +678,13 @@ function renderAll(){
   const bp = all.filter(r => r.side === "bride").reduce((s, r) => s + r.count, 0);
   const gp = all.filter(r => r.side === "groom").reduce((s, r) => s + r.count, 0);
   $("tB").textContent = bp; $("tG").textContent = gp; $("tA").textContent = bp + gp;
+  // possible duplicates across the whole list (same normalized name or phone)
+  const groups = {};
+  all.forEach(r => { const k = normName(r.name) || ("ph:" + (r.phone||r.id)); (groups[k] = groups[k] || []).push(r); });
+  const dupes = Object.values(groups).filter(g => g.length > 1);
+  $("dupesNote").innerHTML = dupes.length
+    ? `<div class="dupes-note"><b>⚠️ ${dupes.length} تكرار محتمل:</b> ${dupes.map(g => `"${esc(g[0].name)}" (${g.map(x => x.side === "bride" ? "عروسة" : "عريس").join(" + ")})`).join(" · ")} — دوروا بالاسم وشيلوا الزيادة.</div>`
+    : "";
   const el = $("fullList");
   const q = ($("search").value || "").trim().toLowerCase();
   const show = all.filter(r => (filter === "all" || r.side === filter) && (!q || r.name.toLowerCase().includes(q) || (r.phone || "").includes(q)));
@@ -593,9 +711,21 @@ function tryPin(){
 }
 $("pinIn").addEventListener("keydown", e => { if (e.key === "Enter") tryPin(); });
 function openOrg(){
+  WIZ_IDS.forEach(id => $(id).hidden = true);
+  document.querySelector(".org-bar").hidden = true;
+  $("backBtn").hidden = true;
   $("orgView").hidden = false;
+  $("adminPill").textContent = "📊 المنظمين";
   refreshAll();
   if (!orgTimer) orgTimer = setInterval(() => { if (!document.hidden) refreshAll(); }, 4000);
+  window.scrollTo({ top: 0 });
+}
+function closeOrg(){
+  if (orgTimer) { clearInterval(orgTimer); orgTimer = null; }
+  $("orgView").hidden = true;
+  document.querySelector(".org-bar").hidden = false;
+  $("advBox").hidden = false;
+  toStep(1);
 }
 document.addEventListener("visibilitychange", () => { if (!document.hidden) { refreshMine(); if (isOrg() && !$("orgView").hidden) refreshAll(); } });
 
@@ -609,6 +739,57 @@ async function pickContacts(){
   } catch(e) { /* cancelled */ }
 }
 
+/* ── photo AI ── */
+const FN_URL = "https://wydodvbkqhpoyefcwpnf.supabase.co/functions/v1/parse-guest-photo";
+const ANON_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5ZG9kdmJrcWhwb3llZmN3cG5mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxOTYxNjcsImV4cCI6MjA4ODc3MjE2N30.x65toIsFqhKnSDK8n6dXEYg64dLz8idG6r-T9KxijaE";
+function shrinkToJpeg(file){
+  return new Promise((res, rej) => {
+    const img = new Image();
+    img.onload = () => {
+      const max = 1600, sc = Math.min(1, max / Math.max(img.width, img.height));
+      const c = document.createElement("canvas");
+      c.width = Math.round(img.width * sc); c.height = Math.round(img.height * sc);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      res(c.toDataURL("image/jpeg", 0.82).split(",")[1]);
+    };
+    img.onerror = rej;
+    img.src = URL.createObjectURL(file);
+  });
+}
+let fbPhotos = [];
+function showPhotoFallback(photos){
+  fbPhotos = photos;
+  $("photoFbBg").hidden = false;
+}
+$("photoShareBtn").addEventListener("click", async () => {
+  $("photoFbBg").hidden = true;
+  if (navigator.canShare && navigator.canShare({ files: fbPhotos })) {
+    try { await navigator.share({ files: fbPhotos, text: "صور قائمة عزومة فرح يوستينا ومحب 🤍" }); } catch(e) {}
+  } else toast("الصور ابعتوها لجوزيف على واتساب 🤍");
+});
+async function photosToFamilies(photos){
+  toast("📖 بنقرأ الصورة… ثواني", false); $("toast").className = "toast busy";
+  let fams = [], hardError = null;
+  for (const f of photos.slice(0, 3)) {
+    try {
+      const b64 = await shrinkToJpeg(f);
+      const r = await fetch(FN_URL, {
+        method: "POST",
+        headers: { "Authorization": "Bearer " + ANON_JWT, "apikey": ANON_JWT, "Content-Type": "application/json" },
+        body: JSON.stringify({ image: b64, media_type: "image/jpeg" }),
+      });
+      const body = await r.json().catch(() => ({}));
+      if (r.status === 503) { hardError = body.error || "no_key"; break; }
+      if (r.ok && Array.isArray(body.families)) {
+        fams = fams.concat(body.families
+          .filter(x => x && x.name)
+          .map(x => ({ name: String(x.name).slice(0, 80), count: Math.min(30, Math.max(1, parseInt(x.count, 10) || 2)), phone: normalizePhone(String(x.phone || ""), "") })));
+      } else hardError = body.error || "upstream";
+    } catch(e) { hardError = "network"; }
+  }
+  $("toast").style.display = "none";
+  return { fams, hardError };
+}
 /* ── files ── */
 async function handleFiles(files){
   const photos = [];
@@ -617,13 +798,13 @@ async function handleFiles(files){
     if (f.type.startsWith("image/")) { photos.push(f); continue; }
     items = items.concat(parseFree(await f.text()));
   }
-  if (items.length) { pending = items; renderPreview(); $("previewBg").hidden = false; }
   if (photos.length) {
-    if (navigator.canShare && navigator.canShare({ files: photos })) {
-      try { await navigator.share({ files: photos, text: "صور قائمة عزومة فرح يوستينا ومحب 🤍" }); toast("اختاروا واتساب وابعتوا الصور لجوزيف 🤍"); }
-      catch(e) { /* cancelled */ }
-    } else toast("الصور دي ابعتوها لجوزيف على واتساب 🤍");
+    const { fams, hardError } = await photosToFamilies(photos);
+    if (fams.length) items = items.concat(fams);
+    else if (hardError) showPhotoFallback(photos);
+    else toast("مش لاقيين أسماء واضحة في الصورة — جربوا صورة أقرب", true);
   }
+  if (items.length) { pending = items; renderPreview(); $("previewBg").hidden = false; }
   $("file").value = "";
 }
 
