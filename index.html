@@ -251,6 +251,8 @@
     <button class="again" style="margin-top:10px" onclick="toStep(1)" id="againBtn2"></button>
   </div>
 
+  <button class="finish" id="myFamsBtn" style="margin:22px auto 0;display:none" onclick="showMine()"></button>
+
   <details class="adv" id="advBox">
     <summary id="advSum"></summary>
     <div class="inner">
@@ -270,6 +272,7 @@
 
   <div id="orgView" hidden>
     <button class="org-back" onclick="closeOrg()" id="orgBack"></button>
+    <button class="org-back" style="margin-top:-4px" onclick="switchPin()" id="switchPinBtn"></button>
     <h2 class="sec"><span id="orgTitle"></span><span class="pulse"></span></h2>
     <div id="dupesNote"></div>
     <div class="totals">
@@ -300,7 +303,7 @@
     </div>
   </div>
 
-  <p class="ver">١٢ · 12</p>
+  <p class="ver">١٣ · 13</p>
 </div>
 
 <div class="modal-bg" id="previewBg" hidden>
@@ -419,6 +422,7 @@ const STR = {
     editTitle:"✏️ عدّلوا العيلة", editSave:"احفظوا ✓", edited:"اتعدلت ✅", phoneOpt:"رقم واتساب (اختياري)",
     capLeft:n=>`فاضل ${n}`, capOver:n=>`زيادة ${n}`, capFull:"⚠️ اكتمل عدد الطرف — كلموا جوزيف قبل ما تضيفوا",
     capNear:"⚠️ قربتوا من العدد الكامل", person:"فرد",
+    myFams:n=>`🤍 اللي سجلتوه () — شوفوا وعدّلوا`, switchPin:"🔓 تبديل الرمز",
   },
   en: {
     kicker:"Guest List", sideQ:"Which side are you from? One minute to add your families.",
@@ -458,6 +462,7 @@ const STR = {
     editTitle:"✏️ Edit family", editSave:"Save ✓", edited:"Updated ✅", phoneOpt:"WhatsApp number (optional)",
     capLeft:n=>`${n} left`, capOver:n=>`${n} over`, capFull:"⚠️ This side is at capacity — check with Joseph before adding",
     capNear:"⚠️ Getting close to capacity", person:"people",
+    myFams:n=>`🤍 Your additions () — view & edit`, switchPin:"🔓 Switch PIN",
   }
 };
 let L = localStorage.getItem("wedLang") || "ar";
@@ -487,6 +492,7 @@ function applyLang(){
   set("fbTitle","fbTitle"); set("fbSub","fbSub"); set("photoShareBtn","fbShare"); set("fbBack","fbBack");
   set("pinTitle","pinTitle"); set("pinSub","pinSub"); set("pinOpen","pinOpen"); set("pinBack","pinBack"); set("pinErr","pinErr");
   set("editTitle","editTitle"); set("editSave","editSave"); set("editCancel","cancel");
+  set("switchPinBtn","switchPin");
   $("eName").placeholder = t("q1ph"); $("ePhone").placeholder = t("phoneOpt");
   $("backBtn").textContent = L === "ar" ? "‹ رجوع" : "‹ Back";
   $("platformTip").innerHTML = /iPhone|iPad|iPod/.test(navigator.userAgent) ? t("tipIOS") : t("tipAnd");
@@ -903,6 +909,8 @@ async function saveEdit(){
   editing = null;
 }
 function renderMine(){
+  const btn = $("myFamsBtn");
+  if (btn) { btn.style.display = mine.length ? "block" : "none"; btn.textContent = t("myFams")(mine.length); }
   const el = $("mineList");
   if (!el) return;
   el.innerHTML = "";
@@ -944,6 +952,12 @@ function setFilter(f){
 }
 
 /* ── organizer ── */
+function switchPin(){
+  localStorage.removeItem("wedOrg");
+  closeOrg();
+  $("adminPill").textContent = t("orgPill");
+  askPin();
+}
 function askPin(){
   if (isOrg()) { openOrg(); return; }
   $("pinErr").style.display = "none"; $("pinIn").value = "";
