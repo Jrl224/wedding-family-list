@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>قائمة العزومة — Guest List</title>
+<style>
+  :root{--bg:#0e1a2b;--card:#152438;--gold:#c9a227;--gold-b:#e8c95c;--ivory:#f5efe2;--dim:#b9b29e;--line:#26364e;--green:#1f8a4c}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ivory);font:17px/1.6 'Segoe UI',-apple-system,sans-serif;padding:22px 14px 120px}
+  .wrap{max-width:520px;margin:0 auto}
+  h1{font-size:22px;color:var(--gold-b);text-align:center}
+  .sub{color:var(--dim);font-size:14px;text-align:center;margin:6px 0 22px;line-height:1.7}
+  label{display:block;margin:14px 0 6px;font-weight:700;font-size:16px}
+  label small{display:block;font-weight:400;color:var(--dim);font-size:12.5px}
+  input,textarea{width:100%;padding:16px;border-radius:12px;border:1.5px solid var(--line);background:#0b1524;color:var(--ivory);font-size:18px}
+  input:focus{border-color:var(--gold);outline:none}
+  .count-row{display:flex;align-items:center;gap:14px;justify-content:center;margin-top:4px}
+  .count-row button{width:64px;height:64px;border-radius:50%;border:1.5px solid var(--gold);background:var(--card);color:var(--gold-b);font-size:30px;font-weight:700}
+  #count{font-size:34px;font-weight:800;color:var(--gold-b);min-width:56px;text-align:center}
+  .add{width:100%;margin-top:20px;padding:18px;border:0;border-radius:14px;background:linear-gradient(120deg,var(--gold),var(--gold-b));color:#0b1524;font-size:19px;font-weight:800}
+  .list{margin-top:26px}
+  .fam{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .fam b{font-size:16.5px}
+  .fam .meta{color:var(--dim);font-size:13.5px}
+  .fam .del{background:none;border:0;color:#c96a6a;font-size:22px;padding:4px 8px}
+  .send{position:fixed;bottom:0;left:0;right:0;padding:14px;background:linear-gradient(transparent,rgba(9,18,32,.96) 30%)}
+  .send button{width:100%;max-width:520px;margin:0 auto;display:block;padding:18px;border:0;border-radius:14px;background:var(--green);color:#fff;font-size:19px;font-weight:800}
+  .send button:disabled{opacity:.4}
+  .hint{text-align:center;color:var(--dim);font-size:12.5px;margin-top:8px}
+  .en{direction:ltr;font-size:.86em;color:var(--dim)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>فرح يوستينا ومحب 🤍</h1>
+  <p class="sub">سجّلوا كل عيلة وابعتوها بضغطة واحدة على واتساب.<br><span class="en">Add each family, then one tap sends the whole list on WhatsApp.</span></p>
+
+  <label>اسم العيلة أو كبير العيلة <small>زي ما بتعرفوه — مش لازم يكون مظبوط بالحرف · The family / head of household, however you know them</small></label>
+  <input id="name" placeholder="مثال: عيلة عمو مجدي — Tante Mona's family" autocomplete="off">
+
+  <label>عدد الأفراد <small>تقريبًا — كام واحد جاي؟ · How many people?</small></label>
+  <div class="count-row">
+    <button type="button" onclick="bump(-1)">−</button>
+    <span id="count">2</span>
+    <button type="button" onclick="bump(1)">+</button>
+  </div>
+
+  <label>رقم واتساب <small>رقم واحد بس للعيلة كلها — ولو مش معاكم سيبوه فاضي · ONE number per family — leave empty if you don't have it</small></label>
+  <input id="phone" inputmode="tel" placeholder="+20 1X XXX XXXX" autocomplete="off">
+
+  <button class="add" type="button" onclick="add()">➕ ضيف العيلة · Add family</button>
+
+  <div class="list" id="list"></div>
+</div>
+
+<div class="send">
+  <button id="sendBtn" type="button" onclick="send()" disabled>📤 ابعت القائمة على واتساب · Send list on WhatsApp</button>
+  <p class="hint">هتفتح واتساب وتختاروا تبعتوها لمين — جوزيف أو مين ما تحبوا · Opens WhatsApp — you choose who to send it to</p>
+</div>
+
+<script>
+let fams = [];
+try { fams = JSON.parse(localStorage.getItem("wedFams") || "[]"); } catch(e) {}
+let n = 2;
+
+function bump(d){ n = Math.min(15, Math.max(1, n + d)); document.getElementById("count").textContent = n; }
+
+function esc(s){ const d = document.createElement("span"); d.textContent = s; return d.innerHTML; }
+
+function render(){
+  const el = document.getElementById("list");
+  el.innerHTML = "";
+  fams.forEach((f, i) => {
+    const row = document.createElement("div");
+    row.className = "fam";
+    row.innerHTML = `<div><b>${esc(f.name)}</b><div class="meta">${f.count} أفراد ${f.phone ? "· " + esc(f.phone) : "· بدون رقم"}</div></div>`;
+    const del = document.createElement("button");
+    del.className = "del"; del.textContent = "✕";
+    del.onclick = () => { fams.splice(i, 1); save(); };
+    row.appendChild(del);
+    el.appendChild(row);
+  });
+  const total = fams.reduce((s, f) => s + f.count, 0);
+  document.getElementById("sendBtn").disabled = fams.length === 0;
+  document.getElementById("sendBtn").textContent = fams.length
+    ? `📤 ابعت القائمة (${fams.length} عيلة · ${total} فرد) · Send on WhatsApp`
+    : "📤 ابعت القائمة على واتساب · Send list on WhatsApp";
+}
+
+function save(){ localStorage.setItem("wedFams", JSON.stringify(fams)); render(); }
+
+function add(){
+  const name = document.getElementById("name").value.trim();
+  if (!name) { document.getElementById("name").focus(); return; }
+  fams.push({ name, count: n, phone: document.getElementById("phone").value.trim() });
+  document.getElementById("name").value = ""; document.getElementById("phone").value = "";
+  n = 2; document.getElementById("count").textContent = n;
+  save();
+  document.getElementById("name").focus();
+}
+
+function send(){
+  const total = fams.reduce((s, f) => s + f.count, 0);
+  const lines = fams.map((f, i) => `${i+1}. ${f.name} — ${f.count} أفراد${f.phone ? " — " + f.phone : ""}`);
+  const msg = `قائمة عزومة فرح يوستينا ومحب 🤍\n${fams.length} عيلة · ${total} فرد\n\n${lines.join("\n")}`;
+  location.href = "https://wa.me/?text=" + encodeURIComponent(msg);
+}
+render();
+</script>
+</body>
+</html>
