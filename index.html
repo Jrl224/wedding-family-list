@@ -5,156 +5,279 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>قائمة العزومة — Guest List</title>
 <meta property="og:title" content="قائمة عزومة فرح يوستينا ومحب 🤍">
-<meta property="og:description" content="سجّلوا كل عيلة وابعتوها بضغطة واحدة على واتساب — Add each family, one tap sends the list on WhatsApp">
+<meta property="og:description" content="قائمة واحدة مباشرة للعائلتين — سجّلوا وشوفوا القائمة بتكبر لايف · One live shared list for both families">
 <meta property="og:type" content="website">
 <meta name="robots" content="noindex, nofollow">
 <style>
-  :root{--bg:#0e1a2b;--card:#152438;--gold:#c9a227;--gold-b:#e8c95c;--ivory:#f5efe2;--dim:#b9b29e;--line:#26364e;--green:#1f8a4c}
+  :root{--bg:#0e1a2b;--card:#152438;--gold:#c9a227;--gold-b:#e8c95c;--ivory:#f5efe2;--dim:#b9b29e;--line:#26364e;--green:#1f8a4c;--bride:#c98aa8;--groom:#7ea6d9}
   *{box-sizing:border-box;margin:0;padding:0}
-  body{background:var(--bg);color:var(--ivory);font:17px/1.6 'Segoe UI',-apple-system,sans-serif;padding:22px 14px 120px}
+  body{background:var(--bg);color:var(--ivory);font:17px/1.6 'Segoe UI',-apple-system,sans-serif;padding:22px 14px 130px}
   .wrap{max-width:520px;margin:0 auto}
   h1{font-size:22px;color:var(--gold-b);text-align:center}
   .sub{color:var(--dim);font-size:14px;text-align:center;margin:6px 0 18px;line-height:1.7}
+  .gate{max-width:420px;margin:8vh auto 0;text-align:center}
+  .gate input{width:220px;padding:18px;font-size:32px;text-align:center;letter-spacing:.4em;border-radius:14px;border:1.5px solid var(--line);background:#0b1524;color:var(--gold-b)}
+  .gate .go,.side-pick button{display:block;width:100%;margin-top:16px;padding:18px;border:0;border-radius:14px;font-size:19px;font-weight:800;cursor:pointer}
+  .gate .go{background:linear-gradient(120deg,var(--gold),var(--gold-b));color:#0b1524}
+  .gate .err{color:#e08a8a;font-size:14px;margin-top:10px;display:none}
+  .side-pick button.b{background:linear-gradient(120deg,#a86a88,var(--bride));color:#fff}
+  .side-pick button.g{background:linear-gradient(120deg,#5d84b8,var(--groom));color:#fff}
+  .totals{display:flex;gap:8px;margin-bottom:14px}
+  .tot{flex:1;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 6px;text-align:center}
+  .tot b{display:block;font-size:20px}
+  .tot span{font-size:11.5px;color:var(--dim)}
+  .tot.b b{color:var(--bride)} .tot.g b{color:var(--groom)} .tot.a b{color:var(--gold-b)}
+  .mine{text-align:center;font-size:13px;color:var(--dim);margin-bottom:12px}
+  .mine b{color:var(--gold-b)}
+  .mine a{color:var(--dim);text-decoration:underline;cursor:pointer}
   .quick{display:flex;gap:10px;margin-bottom:8px}
-  .quick button{flex:1;padding:15px 8px;border:1.5px solid var(--gold);border-radius:14px;background:var(--card);color:var(--gold-b);font-size:15.5px;font-weight:700;line-height:1.4}
+  .quick button{flex:1;padding:14px 8px;border:1.5px solid var(--gold);border-radius:14px;background:var(--card);color:var(--gold-b);font-size:15px;font-weight:700;line-height:1.4}
   .quick button small{display:block;font-weight:400;color:var(--dim);font-size:11.5px}
-  .divider{display:flex;align-items:center;gap:10px;color:var(--dim);font-size:13px;margin:16px 0 2px}
+  .divider{display:flex;align-items:center;gap:10px;color:var(--dim);font-size:13px;margin:14px 0 2px}
   .divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--line)}
-  label{display:block;margin:14px 0 6px;font-weight:700;font-size:16px}
+  label{display:block;margin:12px 0 6px;font-weight:700;font-size:15.5px}
   label small{display:block;font-weight:400;color:var(--dim);font-size:12.5px}
-  input{width:100%;padding:16px;border-radius:12px;border:1.5px solid var(--line);background:#0b1524;color:var(--ivory);font-size:18px}
-  input:focus{border-color:var(--gold);outline:none}
+  input.f{width:100%;padding:15px;border-radius:12px;border:1.5px solid var(--line);background:#0b1524;color:var(--ivory);font-size:18px}
+  input.f:focus{border-color:var(--gold);outline:none}
   .count-row{display:flex;align-items:center;gap:14px;justify-content:center;margin-top:4px}
-  .count-row button{width:64px;height:64px;border-radius:50%;border:1.5px solid var(--gold);background:var(--card);color:var(--gold-b);font-size:30px;font-weight:700}
-  #count{font-size:34px;font-weight:800;color:var(--gold-b);min-width:56px;text-align:center}
-  .add{width:100%;margin-top:20px;padding:18px;border:0;border-radius:14px;background:linear-gradient(120deg,var(--gold),var(--gold-b));color:#0b1524;font-size:19px;font-weight:800}
-  .list{margin-top:26px}
-  .fam{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;display:flex;align-items:center;gap:10px}
+  .count-row button{width:58px;height:58px;border-radius:50%;border:1.5px solid var(--gold);background:var(--card);color:var(--gold-b);font-size:28px;font-weight:700}
+  #count{font-size:32px;font-weight:800;color:var(--gold-b);min-width:52px;text-align:center}
+  .add{width:100%;margin-top:18px;padding:17px;border:0;border-radius:14px;background:linear-gradient(120deg,var(--gold),var(--gold-b));color:#0b1524;font-size:19px;font-weight:800}
+  .live-head{display:flex;align-items:center;justify-content:space-between;margin:26px 0 8px}
+  .live-head h2{font-size:16px;color:var(--gold-b)}
+  .pulse{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--green);margin-inline-start:7px;animation:pp 2s infinite}
+  @keyframes pp{50%{opacity:.3}}
+  .filters{display:flex;gap:6px}
+  .filters button{padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:none;color:var(--dim);font-size:12.5px}
+  .filters button.on{border-color:var(--gold);color:var(--gold-b)}
+  .fam{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-bottom:9px;display:flex;align-items:center;gap:10px}
+  .fam.b{border-inline-start:4px solid var(--bride)} .fam.g{border-inline-start:4px solid var(--groom)}
   .fam .info{flex:1;min-width:0}
-  .fam b{font-size:16px;display:block;overflow-wrap:anywhere}
-  .fam .meta{color:var(--dim);font-size:13px}
-  .fam .cnt{display:flex;align-items:center;gap:6px}
-  .fam .cnt button{width:34px;height:34px;border-radius:50%;border:1px solid var(--gold);background:none;color:var(--gold-b);font-size:18px;font-weight:700}
-  .fam .cnt span{font-size:17px;font-weight:800;color:var(--gold-b);min-width:20px;text-align:center}
-  .fam .del{background:none;border:0;color:#c96a6a;font-size:21px;padding:4px 6px}
+  .fam b{font-size:15.5px;display:block;overflow-wrap:anywhere}
+  .fam .meta{color:var(--dim);font-size:12.5px}
+  .fam .cnt{display:flex;align-items:center;gap:5px}
+  .fam .cnt button{width:32px;height:32px;border-radius:50%;border:1px solid var(--gold);background:none;color:var(--gold-b);font-size:17px;font-weight:700}
+  .fam .cnt span{font-size:16px;font-weight:800;color:var(--gold-b);min-width:20px;text-align:center}
+  .fam .del{background:none;border:0;color:#c96a6a;font-size:20px;padding:4px 6px}
+  .empty{text-align:center;color:var(--dim);font-size:14px;padding:20px 0}
   .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:#1f5c36;color:#fff;padding:11px 20px;border-radius:10px;font-size:14.5px;display:none;z-index:9;max-width:92vw;text-align:center}
+  .toast.err{background:#7a2c2c}
   .send{position:fixed;bottom:0;left:0;right:0;padding:14px;background:linear-gradient(transparent,rgba(9,18,32,.96) 30%)}
-  .send button{width:100%;max-width:520px;margin:0 auto;display:block;padding:18px;border:0;border-radius:14px;background:var(--green);color:#fff;font-size:19px;font-weight:800}
-  .send button:disabled{opacity:.4}
-  .hint{text-align:center;color:var(--dim);font-size:12.5px;margin-top:8px}
+  .send button{width:100%;max-width:520px;margin:0 auto;display:block;padding:17px;border:0;border-radius:14px;background:var(--green);color:#fff;font-size:18px;font-weight:800}
+  .hint{text-align:center;color:var(--dim);font-size:12px;margin-top:7px}
   .en{direction:ltr;font-size:.86em;color:var(--dim)}
+  [hidden]{display:none!important}
 </style>
 </head>
 <body>
-<div class="wrap">
+
+<!-- PIN gate -->
+<div class="gate" id="gate">
   <h1>فرح يوستينا ومحب 🤍</h1>
-  <p class="sub">سجّلوا كل عيلة وابعتوها بضغطة واحدة على واتساب.<br><span class="en">Add each family, then one tap sends the whole list on WhatsApp.</span></p>
+  <p class="sub">القائمة عائلية خاصة — ادخلوا الرقم السري<br><span class="en">Family only — enter the PIN</span></p>
+  <input id="pin" inputmode="numeric" maxlength="4" placeholder="• • • •" autocomplete="off">
+  <button class="go" onclick="tryPin()">ادخلوا · Enter</button>
+  <p class="err" id="pinErr">الرقم مش صح — جربوا تاني · Wrong PIN</p>
+</div>
+
+<!-- Side chooser -->
+<div class="gate side-pick" id="sidePick" hidden>
+  <h1>أنتم من طرف مين؟</h1>
+  <p class="sub">اختاروا مرة واحدة — كل اللي هتضيفوه هيتحسب على طرفكم<br><span class="en">Pick once — everything you add counts for your side</span></p>
+  <button class="b" onclick="setSide('bride')">🤍 طرف العروسة — يوستينا</button>
+  <button class="g" onclick="setSide('groom')">🤍 طرف العريس — محب</button>
+</div>
+
+<!-- Main app -->
+<div class="wrap" id="app" hidden>
+  <h1>فرح يوستينا ومحب 🤍</h1>
+  <p class="sub">قائمة واحدة لايف — أي حد يضيف، الكل يشوف فورًا.<br><span class="en">One live list — everyone sees every addition instantly.</span></p>
+
+  <div class="totals">
+    <div class="tot b"><b id="tB">0</b><span>طرف العروسة · فرد</span></div>
+    <div class="tot g"><b id="tG">0</b><span>طرف العريس · فرد</span></div>
+    <div class="tot a"><b id="tA">0</b><span>الإجمالي · فرد</span></div>
+  </div>
+  <p class="mine">بتضيفوا على: <b id="mySideLabel"></b> · <a onclick="changeSide()">غيروا الطرف</a></p>
 
   <div class="quick">
-    <button type="button" id="pickBtn" hidden onclick="pickContacts()">📇 اختار من جهات الاتصال<small>يفتح تليفونك وتعلّم على العائلات · Pick straight from your phone contacts</small></button>
-    <button type="button" onclick="document.getElementById('file').click()">📎 ارفع ملف أو صورة<small>صور الورقة أو سكرين شوت أو ملف جهات اتصال · Photos, screenshots, or contact files</small></button>
+    <button type="button" id="pickBtn" hidden onclick="pickContacts()">📇 اختار من جهات الاتصال<small>يفتح تليفونك وتعلّم على العائلات</small></button>
+    <button type="button" onclick="document.getElementById('file').click()">📎 ارفع ملف أو صورة<small>صور الورقة · سكرين شوت · ملف جهات اتصال</small></button>
   </div>
   <input type="file" id="file" hidden multiple accept="image/*,.vcf,.txt,.csv,text/vcard,text/x-vcard" onchange="handleFiles(this.files)">
 
   <div class="divider">أو سجّلوا بنفسكم · or type manually</div>
 
-  <label>اسم العيلة أو كبير العيلة <small>زي ما بتعرفوه — مش لازم يكون مظبوط بالحرف · The family / head of household, however you know them</small></label>
-  <input id="name" placeholder="مثال: عيلة عمو مجدي — Tante Mona's family" autocomplete="off">
+  <label>اسم العيلة أو كبير العيلة <small>زي ما بتعرفوه — مش لازم يكون مظبوط بالحرف</small></label>
+  <input class="f" id="name" placeholder="مثال: عيلة عمو مجدي" autocomplete="off">
 
-  <label>عدد الأفراد <small>تقريبًا — كام واحد جاي؟ · How many people?</small></label>
+  <label>عدد الأفراد <small>تقريبًا — كام واحد جاي؟</small></label>
   <div class="count-row">
     <button type="button" onclick="bump(-1)">−</button>
     <span id="count">2</span>
     <button type="button" onclick="bump(1)">+</button>
   </div>
 
-  <label>رقم واتساب <small>رقم واحد بس للعيلة كلها — ولو مش معاكم سيبوه فاضي · ONE number per family — leave empty if you don't have it</small></label>
-  <input id="phone" inputmode="tel" placeholder="+20 1X XXX XXXX" autocomplete="off">
+  <label>رقم واتساب <small>رقم واحد للعيلة — ولو مش معاكم سيبوه فاضي</small></label>
+  <input class="f" id="phone" inputmode="tel" placeholder="+20 1X XXX XXXX" autocomplete="off">
 
   <button class="add" type="button" onclick="add()">➕ ضيف العيلة · Add family</button>
 
-  <div class="list" id="list"></div>
+  <div class="live-head">
+    <h2>القائمة اللايف<span class="pulse"></span></h2>
+    <div class="filters">
+      <button id="fAll" class="on" onclick="setFilter('all')">الكل</button>
+      <button id="fB" onclick="setFilter('bride')">العروسة</button>
+      <button id="fG" onclick="setFilter('groom')">العريس</button>
+    </div>
+  </div>
+  <div class="list" id="list"><p class="empty">لسه مفيش حد — كونوا أول عيلة 🤍</p></div>
 </div>
 
 <div class="toast" id="toast"></div>
-<div class="send">
-  <button id="sendBtn" type="button" onclick="send()" disabled>📤 ابعت القائمة على واتساب · Send list on WhatsApp</button>
-  <p class="hint">هتفتح واتساب وتختاروا تبعتوها لمين — جوزيف أو مين ما تحبوا · Opens WhatsApp — you choose who to send it to</p>
+<div class="send" id="sendBar" hidden>
+  <button id="sendBtn" type="button" onclick="sendList()">📤 ابعت نسخة من القائمة على واتساب</button>
+  <p class="hint">القائمة متسجلة لايف تلقائيًا — الزرار ده بس لو عايزين تبعتوا نسخة نصية</p>
 </div>
 
 <script>
-let fams = [];
-try { fams = JSON.parse(localStorage.getItem("wedFams") || "[]"); } catch(e) {}
-let n = 2;
+const SUPA = "https://wydodvbkqhpoyefcwpnf.supabase.co/rest/v1/wedding_families";
+const KEY = "sb_publishable_TSmh8zzk8gvPL5uIrcNbwA_HK45ASUe";
+const PIN = "1360";
+const H = { "apikey": KEY, "Authorization": "Bearer " + KEY, "Content-Type": "application/json" };
 
-function bump(d){ n = Math.min(15, Math.max(1, n + d)); document.getElementById("count").textContent = n; }
+let device = localStorage.getItem("wedDevice");
+if (!device) { device = "d" + Math.random().toString(36).slice(2, 10); localStorage.setItem("wedDevice", device); }
+let mySide = localStorage.getItem("wedSide") || "";
+let rows = [], filter = "all", n = 2, pollTimer = null;
+
+const $ = id => document.getElementById(id);
+function toast(msg, err){ const t = $("toast"); t.textContent = msg; t.className = "toast" + (err ? " err" : ""); t.style.display = "block"; clearTimeout(t._h); t._h = setTimeout(()=> t.style.display = "none", 2800); }
 function esc(s){ const d = document.createElement("span"); d.textContent = s; return d.innerHTML; }
-function toast(msg){ const t = document.getElementById("toast"); t.textContent = msg; t.style.display = "block"; clearTimeout(t._h); t._h = setTimeout(()=> t.style.display = "none", 2600); }
+function bump(d){ n = Math.min(15, Math.max(1, n + d)); $("count").textContent = n; }
+
+/* ── gates ── */
+function tryPin(){
+  if ($("pin").value.trim() === PIN) { localStorage.setItem("wedPin", "ok"); route(); }
+  else { $("pinErr").style.display = "block"; $("pin").value = ""; }
+}
+$("pin").addEventListener("keydown", e => { if (e.key === "Enter") tryPin(); });
+function setSide(s){ mySide = s; localStorage.setItem("wedSide", s); route(); }
+function changeSide(){ localStorage.removeItem("wedSide"); mySide = ""; route(); }
+function route(){
+  const pinOk = localStorage.getItem("wedPin") === "ok";
+  $("gate").hidden = pinOk;
+  $("sidePick").hidden = !(pinOk && !mySide);
+  $("app").hidden = $("sendBar").hidden = !(pinOk && mySide);
+  if (pinOk && mySide) {
+    $("mySideLabel").textContent = mySide === "bride" ? "طرف العروسة 🤍" : "طرف العريس 🤍";
+    startPolling();
+  }
+}
+
+/* ── live sync ── */
+async function refresh(){
+  try {
+    const r = await fetch(SUPA + "?select=*&order=created_at.desc", { headers: H });
+    if (!r.ok) throw 0;
+    rows = await r.json();
+    render();
+  } catch(e) { /* transient network — keep last state */ }
+}
+function startPolling(){
+  if (pollTimer) return;
+  refresh();
+  pollTimer = setInterval(() => { if (!document.hidden) refresh(); }, 4000);
+}
+document.addEventListener("visibilitychange", () => { if (!document.hidden && pollTimer) refresh(); });
+
+function setFilter(f){
+  filter = f;
+  $("fAll").className = f === "all" ? "on" : ""; $("fB").className = f === "bride" ? "on" : ""; $("fG").className = f === "groom" ? "on" : "";
+  render();
+}
 
 function render(){
-  const el = document.getElementById("list");
+  const bp = rows.filter(r => r.side === "bride").reduce((s, r) => s + r.count, 0);
+  const gp = rows.filter(r => r.side === "groom").reduce((s, r) => s + r.count, 0);
+  $("tB").textContent = bp; $("tG").textContent = gp; $("tA").textContent = bp + gp;
+
+  const el = $("list");
+  const show = rows.filter(r => filter === "all" || r.side === filter);
   el.innerHTML = "";
-  fams.forEach((f, i) => {
+  if (!show.length) { el.innerHTML = '<p class="empty">لسه مفيش حد — كونوا أول عيلة 🤍</p>'; return; }
+  show.forEach(r => {
     const row = document.createElement("div");
-    row.className = "fam";
+    row.className = "fam " + (r.side === "bride" ? "b" : "g");
     const info = document.createElement("div");
     info.className = "info";
-    info.innerHTML = `<b>${esc(f.name)}</b><div class="meta">${f.phone ? esc(f.phone) : "بدون رقم"}</div>`;
+    info.innerHTML = `<b>${esc(r.name)}</b><div class="meta">${r.side === "bride" ? "طرف العروسة" : "طرف العريس"}${r.phone ? " · " + esc(r.phone) : ""}</div>`;
     const cnt = document.createElement("div");
     cnt.className = "cnt";
     const minus = document.createElement("button"); minus.textContent = "−";
-    minus.onclick = () => { f.count = Math.max(1, f.count - 1); save(); };
-    const num = document.createElement("span"); num.textContent = f.count;
+    minus.onclick = () => patchCount(r, Math.max(1, r.count - 1));
+    const num = document.createElement("span"); num.textContent = r.count;
     const plus = document.createElement("button"); plus.textContent = "+";
-    plus.onclick = () => { f.count = Math.min(15, f.count + 1); save(); };
+    plus.onclick = () => patchCount(r, Math.min(30, r.count + 1));
     cnt.append(minus, num, plus);
-    const del = document.createElement("button");
-    del.className = "del"; del.textContent = "✕";
-    del.onclick = () => { fams.splice(i, 1); save(); };
-    row.append(info, cnt, del);
+    row.append(info, cnt);
+    if (r.added_by === device) {
+      const del = document.createElement("button");
+      del.className = "del"; del.textContent = "✕";
+      del.onclick = () => removeRow(r);
+      row.append(del);
+    }
     el.appendChild(row);
   });
-  const total = fams.reduce((s, f) => s + f.count, 0);
-  document.getElementById("sendBtn").disabled = fams.length === 0;
-  document.getElementById("sendBtn").textContent = fams.length
-    ? `📤 ابعت القائمة (${fams.length} عيلة · ${total} فرد) · Send on WhatsApp`
-    : "📤 ابعت القائمة على واتساب · Send list on WhatsApp";
-}
-function save(){ localStorage.setItem("wedFams", JSON.stringify(fams)); render(); }
-
-function add(){
-  const name = document.getElementById("name").value.trim();
-  if (!name) { document.getElementById("name").focus(); return; }
-  fams.push({ name, count: n, phone: document.getElementById("phone").value.trim() });
-  document.getElementById("name").value = ""; document.getElementById("phone").value = "";
-  n = 2; document.getElementById("count").textContent = n;
-  save();
-  document.getElementById("name").focus();
 }
 
-/* ── Pick from phone contacts (Android Chrome; button hidden elsewhere) ── */
-if ("contacts" in navigator && "select" in navigator.contacts) {
-  document.getElementById("pickBtn").hidden = false;
+/* ── mutations ── */
+async function insertRows(items){
+  const payload = items.map(i => ({ ...i, side: mySide, added_by: device }));
+  try {
+    const r = await fetch(SUPA, { method: "POST", headers: H, body: JSON.stringify(payload) });
+    if (!r.ok) throw 0;
+    refresh();
+    return true;
+  } catch(e) { toast("النت قطع — حاولوا تاني", true); return false; }
 }
+async function patchCount(row, newCount){
+  row.count = newCount; render();
+  try { await fetch(`${SUPA}?id=eq.${row.id}`, { method: "PATCH", headers: H, body: JSON.stringify({ count: newCount }) }); } catch(e) {}
+  refresh();
+}
+async function removeRow(row){
+  rows = rows.filter(r => r.id !== row.id); render();
+  try { await fetch(`${SUPA}?id=eq.${row.id}`, { method: "DELETE", headers: H }); } catch(e) {}
+  refresh();
+}
+
+async function add(){
+  const name = $("name").value.trim();
+  if (!name) { $("name").focus(); return; }
+  const ok = await insertRows([{ name, count: n, phone: $("phone").value.trim() }]);
+  if (ok) {
+    $("name").value = ""; $("phone").value = "";
+    n = 2; $("count").textContent = n;
+    toast("اتضافت ✅ — الكل شايفها دلوقتي");
+    $("name").focus();
+  }
+}
+
+/* ── contact picker ── */
+if ("contacts" in navigator && "select" in navigator.contacts) $("pickBtn").hidden = false;
 async function pickContacts(){
   try {
     const picked = await navigator.contacts.select(["name", "tel"], { multiple: true });
-    let added = 0;
-    for (const c of picked) {
-      const name = (c.name && c.name[0]) ? c.name[0] : "";
-      if (!name) continue;
-      fams.push({ name, count: 2, phone: (c.tel && c.tel[0]) ? c.tel[0] : "" });
-      added++;
-    }
-    if (added) { save(); toast(`اتضاف ${added} عيلة ✅ — ظبطوا عدد الأفراد بعلامة + و −`); }
-  } catch(e) { /* user cancelled */ }
+    const items = picked
+      .filter(c => c.name && c.name[0])
+      .map(c => ({ name: c.name[0], count: 2, phone: (c.tel && c.tel[0]) || "" }));
+    if (items.length && await insertRows(items)) toast(`اتضاف ${items.length} عيلة ✅ — ظبطوا العدد بـ + و −`);
+  } catch(e) { /* cancelled */ }
 }
 
-/* ── Upload: .vcf/.csv/.txt parse into rows; photos forward via share sheet ── */
-function decodeQP(s){
-  try { return decodeURIComponent(s.replace(/=\r?\n/g, "").replace(/=([0-9A-Fa-f]{2})/g, "%$1")); }
-  catch(e) { return s; }
-}
+/* ── uploads ── */
+function decodeQP(s){ try { return decodeURIComponent(s.replace(/=\r?\n/g, "").replace(/=([0-9A-Fa-f]{2})/g, "%$1")); } catch(e) { return s; } }
 function parseVcf(text){
   const out = [];
   for (const card of text.split(/BEGIN:VCARD/i).slice(1)) {
@@ -188,33 +311,33 @@ function parseLines(text){
 }
 async function handleFiles(files){
   const photos = [];
-  let added = 0;
+  let items = [];
   for (const f of files) {
     if (f.type.startsWith("image/")) { photos.push(f); continue; }
     const text = await f.text();
-    const rows = /BEGIN:VCARD/i.test(text) ? parseVcf(text) : parseLines(text);
-    rows.forEach(r => { fams.push(r); added++; });
+    items = items.concat(/BEGIN:VCARD/i.test(text) ? parseVcf(text) : parseLines(text));
   }
-  if (added) { save(); toast(`اتضاف ${added} عيلة من الملف ✅ — راجعوا العدد بعلامة + و −`); }
+  if (items.length && await insertRows(items)) toast(`اتضاف ${items.length} عيلة من الملف ✅`);
   if (photos.length) {
-    const payload = { files: photos, text: "صور قائمة عزومة فرح يوستينا ومحب 🤍" };
     if (navigator.canShare && navigator.canShare({ files: photos })) {
-      try { await navigator.share(payload); toast("اختاروا واتساب وابعتوا الصور لجوزيف 🤍"); }
+      try { await navigator.share({ files: photos, text: "صور قائمة عزومة فرح يوستينا ومحب 🤍" }); toast("اختاروا واتساب وابعتوا الصور لجوزيف 🤍"); }
       catch(e) { /* cancelled */ }
-    } else {
-      toast("الصور دي ابعتوها لجوزيف على واتساب مباشرة 🤍");
-    }
+    } else toast("الصور دي ابعتوها لجوزيف على واتساب مباشرة 🤍");
   }
-  document.getElementById("file").value = "";
+  $("file").value = "";
 }
 
-function send(){
-  const total = fams.reduce((s, f) => s + f.count, 0);
-  const lines = fams.map((f, i) => `${i+1}. ${f.name} — ${f.count} أفراد${f.phone ? " — " + f.phone : ""}`);
-  const msg = `قائمة عزومة فرح يوستينا ومحب 🤍\n${fams.length} عيلة · ${total} فرد\n\n${lines.join("\n")}`;
+/* ── WhatsApp text snapshot ── */
+function sendList(){
+  const part = side => rows.filter(r => r.side === side);
+  const fmt = list => list.map((r, i) => `${i+1}. ${r.name} — ${r.count} أفراد${r.phone ? " — " + r.phone : ""}`).join("\n");
+  const bp = part("bride"), gp = part("groom");
+  const total = rows.reduce((s, r) => s + r.count, 0);
+  const msg = `قائمة عزومة فرح يوستينا ومحب 🤍\n${rows.length} عيلة · ${total} فرد\n\n🤍 طرف العروسة (${bp.reduce((s,r)=>s+r.count,0)} فرد):\n${fmt(bp) || "—"}\n\n🤍 طرف العريس (${gp.reduce((s,r)=>s+r.count,0)} فرد):\n${fmt(gp) || "—"}`;
   location.href = "https://wa.me/?text=" + encodeURIComponent(msg);
 }
-render();
+
+route();
 </script>
 </body>
 </html>
