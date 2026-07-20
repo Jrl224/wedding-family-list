@@ -17,7 +17,7 @@
   html{-webkit-text-size-adjust:100%}
   body{
     background:radial-gradient(900px 420px at 50% -8%, #1a2c47 0%, transparent 62%), var(--deep);
-    color:var(--ivory);font:17px/1.65 'Cairo','Segoe UI',sans-serif;padding:24px 18px 40px;min-height:100svh;
+    color:var(--ivory);font:17px/1.65 'Cairo','Segoe UI',sans-serif;padding:64px 18px 40px;min-height:100svh;
   }
   body::before{
     content:"";position:fixed;inset:0;pointer-events:none;opacity:.05;z-index:0;
@@ -26,73 +26,66 @@
   .scr{position:relative;z-index:1;max-width:480px;margin:0 auto;text-align:center}
   .kicker{font-family:'Amiri',serif;color:var(--gold);font-size:15px;letter-spacing:.06em}
   h1{
-    font-family:'Amiri',serif;font-weight:700;font-size:34px;line-height:1.6;
+    font-family:'Amiri',serif;font-weight:700;font-size:32px;line-height:1.6;
     background:linear-gradient(100deg,var(--gold) 20%,var(--gold-b) 40%,#fff8e0 50%,var(--gold-b) 60%,var(--gold) 80%);
     background-size:220% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shimmer 6s linear infinite;
   }
   @keyframes shimmer{to{background-position:-220% center}}
-  .rule{width:110px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:10px auto 14px}
   .sub{color:var(--dim);font-size:13.5px;line-height:1.8;margin-bottom:8px}
   .doors{display:flex;gap:14px;margin-top:20px}
   .doors button{
-    flex:1;padding:30px 12px 26px;border-radius:18px;cursor:pointer;color:var(--ivory);font-family:inherit;
+    flex:1;padding:28px 12px 24px;border-radius:18px;cursor:pointer;color:var(--ivory);font-family:inherit;
     background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);
     box-shadow:0 10px 34px rgba(0,0,0,.35);transition:transform .18s;
   }
   .doors button:active{transform:scale(.97)}
-  .doors button .big{font-family:'Amiri',serif;font-size:26px;display:block;margin:8px 0 2px}
+  .doors button .big{font-family:'Amiri',serif;font-size:24px;display:block;margin:8px 0 2px}
   .doors button small{color:var(--dim);font-size:12.5px;font-weight:400}
   .doors button.b .big{color:var(--bride)} .doors button.g .big{color:var(--groom)}
   .doors button.b{border-top:3px solid var(--bride)} .doors button.g{border-top:3px solid var(--groom)}
-  .doors .heart{font-size:22px}
-
-  /* ── wizard ── */
-  .dots{display:flex;gap:8px;justify-content:center;margin:6px 0 26px}
+  .doors .heart{font-size:20px}
+  .mine-side{margin:2px 0 6px;font-size:13px;color:var(--dim)}
+  .mine-side b{color:var(--gold-b)}
+  .mine-side a{color:var(--dim);text-decoration:underline;cursor:pointer}
+  .dots{display:flex;gap:8px;justify-content:center;margin:6px 0 24px}
   .dots i{width:8px;height:8px;border-radius:50%;background:var(--line)}
   .dots i.on{background:var(--gold-b)}
-  .q{font-family:'Amiri',serif;font-size:27px;color:var(--ivory);line-height:1.7;margin-bottom:6px}
-  .qh{color:var(--dim);font-size:13.5px;margin-bottom:22px;line-height:1.7}
+  .q{font-family:'Amiri',serif;font-size:26px;color:var(--ivory);line-height:1.7;margin-bottom:6px}
+  .qh{color:var(--dim);font-size:13.5px;margin-bottom:20px;line-height:1.7}
   .wiz-in{
-    width:100%;padding:20px;border-radius:16px;border:1px solid var(--line);text-align:center;
-    background:rgba(9,18,32,.85);color:var(--ivory);font-size:23px;font-family:inherit;
+    width:100%;padding:19px;border-radius:16px;border:1px solid var(--line);text-align:center;
+    background:rgba(9,18,32,.85);color:var(--ivory);font-size:22px;font-family:inherit;
   }
   .wiz-in:focus{border-color:var(--gold);outline:none;box-shadow:0 0 0 4px rgba(201,162,39,.14)}
   .next{
-    width:100%;margin-top:22px;padding:19px;border:0;border-radius:16px;cursor:pointer;font-family:inherit;
-    background:linear-gradient(120deg,var(--gold),var(--gold-b));color:#0b1524;font-size:21px;font-weight:800;
-    box-shadow:0 8px 26px rgba(201,162,39,.32);
-  }
-  .next:active{transform:scale(.98)}
-  .skip{display:inline-block;margin-top:16px;color:var(--dim);font-size:15px;text-decoration:underline;cursor:pointer;background:none;border:0;font-family:inherit}
-  .back{position:absolute;top:0;inset-inline-start:0;background:none;border:0;color:var(--dim);font-size:15px;cursor:pointer;font-family:inherit;padding:6px}
-  .count-row{display:flex;align-items:center;gap:26px;justify-content:center;margin:14px 0 6px}
-  .count-row button{
-    width:78px;height:78px;border-radius:50%;border:1.5px solid var(--gold);cursor:pointer;
-    background:var(--card);color:var(--gold-b);font-size:38px;font-weight:700;
-  }
-  #count{font-family:'Cormorant Garamond',serif;font-size:64px;font-weight:600;color:var(--gold-b);min-width:80px}
-  .cc-toggle{display:flex;gap:0;margin:0 auto 14px;border:1px solid var(--line);border-radius:14px;overflow:hidden;max-width:280px;direction:ltr}
-  .cc-toggle button{flex:1;padding:14px 8px;border:0;background:var(--card);color:var(--dim);font-size:17px;font-weight:700;cursor:pointer;font-family:inherit}
-  .cc-toggle button.on{background:linear-gradient(120deg,var(--gold),var(--gold-b));color:#0b1524}
-  .phone-big{direction:ltr;text-align:center;letter-spacing:.04em}
-
-  /* success */
-  .check{
-    width:96px;height:96px;border-radius:50%;margin:6px auto 18px;display:flex;align-items:center;justify-content:center;
-    border:1.5px solid var(--gold);background:radial-gradient(circle at 35% 30%, #16273f, var(--deep));
-    font-size:44px;color:var(--gold-b);box-shadow:0 0 44px rgba(201,162,39,.35);
-  }
-  .done-name{font-family:'Amiri',serif;font-size:24px;color:var(--gold-b);margin-bottom:4px;overflow-wrap:anywhere}
-  .done-sub{color:var(--dim);font-size:14px;margin-bottom:24px}
-  .again{
-    width:100%;padding:19px;border:0;border-radius:16px;cursor:pointer;font-family:inherit;
+    width:100%;margin-top:20px;padding:18px;border:0;border-radius:16px;cursor:pointer;font-family:inherit;
     background:linear-gradient(120deg,var(--gold),var(--gold-b));color:#0b1524;font-size:20px;font-weight:800;
     box-shadow:0 8px 26px rgba(201,162,39,.32);
   }
-  .finish{display:block;margin:18px auto 0;background:none;border:0;color:var(--dim);font-size:15.5px;text-decoration:underline;cursor:pointer;font-family:inherit}
-
-  /* my families + advanced + organizer */
-  h2.sec{font-family:'Amiri',serif;font-size:19px;color:var(--gold-b);margin:30px 0 10px;text-align:center}
+  .next:active{transform:scale(.98)}
+  .skip{display:inline-block;margin-top:15px;color:var(--dim);font-size:15px;text-decoration:underline;cursor:pointer;background:none;border:0;font-family:inherit}
+  .back{position:absolute;top:0;inset-inline-start:0;background:none;border:0;color:var(--dim);font-size:15px;cursor:pointer;font-family:inherit;padding:6px}
+  .count-row{display:flex;align-items:center;gap:26px;justify-content:center;margin:12px 0 4px}
+  .count-row button{width:74px;height:74px;border-radius:50%;border:1.5px solid var(--gold);cursor:pointer;background:var(--card);color:var(--gold-b);font-size:36px;font-weight:700}
+  #count{font-family:'Cormorant Garamond',serif;font-size:60px;font-weight:600;color:var(--gold-b);min-width:76px}
+  .cc-toggle{display:flex;margin:0 auto 14px;border:1px solid var(--line);border-radius:14px;overflow:hidden;max-width:280px;direction:ltr}
+  .cc-toggle button{flex:1;padding:13px 8px;border:0;background:var(--card);color:var(--dim);font-size:16px;font-weight:700;cursor:pointer;font-family:inherit}
+  .cc-toggle button.on{background:linear-gradient(120deg,var(--gold),var(--gold-b));color:#0b1524}
+  .phone-big{direction:ltr;text-align:center;letter-spacing:.04em}
+  .check{
+    width:92px;height:92px;border-radius:50%;margin:4px auto 16px;display:flex;align-items:center;justify-content:center;
+    border:1.5px solid var(--gold);background:radial-gradient(circle at 35% 30%, #16273f, var(--deep));
+    font-size:42px;color:var(--gold-b);box-shadow:0 0 44px rgba(201,162,39,.35);
+  }
+  .done-name{font-family:'Amiri',serif;font-size:23px;color:var(--gold-b);margin-bottom:4px;overflow-wrap:anywhere}
+  .done-sub{color:var(--dim);font-size:14px;margin-bottom:22px}
+  .again{
+    width:100%;padding:18px;border:0;border-radius:16px;cursor:pointer;font-family:inherit;
+    background:linear-gradient(120deg,var(--gold),var(--gold-b));color:#0b1524;font-size:19px;font-weight:800;
+    box-shadow:0 8px 26px rgba(201,162,39,.32);
+  }
+  .finish{display:block;margin:16px auto 0;background:none;border:0;color:var(--dim);font-size:15px;text-decoration:underline;cursor:pointer;font-family:inherit}
+  h2.sec{font-family:'Amiri',serif;font-size:19px;color:var(--gold-b);margin:28px 0 10px;text-align:center}
   .fam{
     background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:14px;
     padding:12px 14px;margin-bottom:9px;display:flex;align-items:center;gap:10px;text-align:start;box-shadow:0 4px 16px rgba(0,0,0,.22);
@@ -106,15 +99,12 @@
   .fam .cnt button{width:32px;height:32px;border-radius:50%;border:1px solid var(--gold);background:none;color:var(--gold-b);font-size:17px;font-weight:700;cursor:pointer}
   .fam .cnt span{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--gold-b);min-width:20px;text-align:center}
   .fam .del{background:none;border:0;color:#c96a6a;font-size:20px;padding:4px 6px;cursor:pointer}
-  .empty{text-align:center;color:var(--dim);font-size:13.5px;padding:16px 0;font-family:'Amiri',serif}
-  details.adv{margin-top:34px;border:1px solid var(--line);border-radius:14px;background:rgba(18,32,58,.5);text-align:start}
+  .empty{text-align:center;color:var(--dim);font-size:13.5px;padding:14px 0;font-family:'Amiri',serif}
+  details.adv{margin-top:32px;border:1px solid var(--line);border-radius:14px;background:rgba(18,32,58,.5);text-align:start}
   details.adv summary{padding:13px 16px;color:var(--dim);font-size:13.5px;cursor:pointer;text-align:center;list-style:none}
   details.adv summary::-webkit-details-marker{display:none}
   details.adv .inner{padding:4px 14px 16px}
-  textarea{
-    width:100%;min-height:90px;padding:13px;border-radius:12px;border:1px solid rgba(201,162,39,.35);
-    background:rgba(9,18,32,.8);color:var(--ivory);font-size:15.5px;font-family:inherit;resize:vertical;
-  }
+  textarea{width:100%;min-height:90px;padding:13px;border-radius:12px;border:1px solid rgba(201,162,39,.35);background:rgba(9,18,32,.8);color:var(--ivory);font-size:15.5px;font-family:inherit;resize:vertical}
   textarea:focus{border-color:var(--gold);outline:none}
   .parse{width:100%;margin-top:10px;padding:13px;border:0;border-radius:12px;cursor:pointer;background:linear-gradient(120deg,var(--gold),var(--gold-b));color:#0b1524;font-size:15.5px;font-weight:800;font-family:inherit}
   .tip{font-size:11.5px;color:var(--dim);margin-top:9px;line-height:1.7}
@@ -139,6 +129,25 @@
   .org-actions button{flex:1;padding:14px;border:0;border-radius:12px;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer}
   .xl{background:#1d6f42;color:#fff}
   .wa{background:var(--green);color:#fff}
+  .photo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:start}
+  .photo-grid a{display:block;position:relative}
+  .photo-grid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;border:1px solid var(--line);background:#0b1524}
+  .photo-grid .tag{position:absolute;bottom:5px;inset-inline-start:5px;background:rgba(9,18,32,.85);border-radius:6px;padding:1px 7px;font-size:10px;color:var(--ivory)}
+  .admin-pill,.lang-pill{
+    position:fixed;top:12px;z-index:15;padding:9px 15px;border-radius:999px;cursor:pointer;
+    border:1px solid var(--line);background:rgba(18,32,58,.92);color:var(--gold-b);font-size:13.5px;font-weight:700;font-family:inherit;
+    box-shadow:0 4px 18px rgba(0,0,0,.35);backdrop-filter:blur(4px);
+  }
+  .admin-pill{inset-inline-end:14px}
+  .lang-pill{inset-inline-start:14px;color:var(--ivory)}
+  .org-back{display:block;margin:0 auto 8px;background:none;border:0;color:var(--dim);font-size:14.5px;text-decoration:underline;cursor:pointer;font-family:inherit}
+  .dup-row{background:rgba(122,44,44,.18);border:1px solid rgba(201,106,106,.4);border-radius:12px;padding:11px 13px;margin-bottom:9px;text-align:start}
+  .dup-row b{font-size:15px;display:block}
+  .dup-row .dmeta{color:var(--dim);font-size:12.5px;margin:2px 0 8px}
+  .dup-row label{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ivory);cursor:pointer}
+  .dup-row input{width:20px;height:20px;accent-color:#c96a6a}
+  .dupes-note{background:rgba(122,44,44,.15);border:1px solid rgba(201,106,106,.35);border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:13px;text-align:start;line-height:1.7}
+  .dupes-note b{color:#e08a8a}
   .modal-bg{position:fixed;inset:0;background:rgba(4,9,17,.85);z-index:20;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(3px)}
   .modal{background:var(--bg);border:1px solid var(--line);border-bottom:0;border-radius:22px 22px 0 0;max-width:560px;width:100%;max-height:86vh;overflow:auto;padding:22px 16px 28px}
   .modal h3{font-family:'Amiri',serif;color:var(--gold-b);font-size:19px;margin-bottom:4px}
@@ -148,182 +157,165 @@
   .m-ok{background:var(--green);color:#fff}
   .m-cancel{background:var(--card2);color:var(--ivory);border:1px solid var(--line)}
   .pin-in{width:210px;padding:16px;font-family:'Cormorant Garamond',serif;font-size:32px;text-align:center;letter-spacing:.4em;border-radius:14px;border:1px solid var(--line);background:rgba(9,18,32,.8);color:var(--gold-b);display:block;margin:12px auto}
-  .admin-pill{
-    position:fixed;top:14px;inset-inline-end:14px;z-index:15;padding:10px 16px;border-radius:999px;cursor:pointer;
-    border:1px solid var(--line);background:rgba(18,32,58,.9);color:var(--gold-b);font-size:14px;font-weight:700;font-family:inherit;
-    box-shadow:0 4px 18px rgba(0,0,0,.35);backdrop-filter:blur(4px);
-  }
-  .org-back{display:block;margin:0 auto 8px;background:none;border:0;color:var(--dim);font-size:14.5px;text-decoration:underline;cursor:pointer;font-family:inherit}
-  .dup-row{background:rgba(122,44,44,.18);border:1px solid rgba(201,106,106,.4);border-radius:12px;padding:11px 13px;margin-bottom:9px;text-align:start}
-  .dup-row b{font-size:15px;display:block}
-  .dup-row .dmeta{color:var(--dim);font-size:12.5px;margin:2px 0 8px}
-  .dup-row label{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ivory);cursor:pointer}
-  .dup-row input{width:20px;height:20px;accent-color:#c96a6a}
-  .dupes-note{background:rgba(122,44,44,.15);border:1px solid rgba(201,106,106,.35);border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:13px;text-align:start;line-height:1.7}
-  .dupes-note b{color:#e08a8a}
-  .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:#1f5c36;color:#fff;padding:11px 20px;border-radius:12px;font-size:14.5px;display:none;z-index:30;max-width:92vw;text-align:center;box-shadow:0 8px 26px rgba(0,0,0,.4)}
-  .toast.busy{background:#1a3a63}
+  .toast{position:fixed;top:60px;left:50%;transform:translateX(-50%);background:#1f5c36;color:#fff;padding:11px 20px;border-radius:12px;font-size:14.5px;display:none;z-index:30;max-width:92vw;text-align:center;box-shadow:0 8px 26px rgba(0,0,0,.4)}
   .toast.err{background:#7a2c2c}
+  .toast.busy{background:#1a3a63}
   .toast button{margin-inline-start:12px;padding:5px 14px;border:0;border-radius:8px;background:#fff;color:#123;font-weight:800;font-size:13.5px;cursor:pointer}
   [hidden]{display:none!important}
 </style>
 </head>
 <body>
 
-<!-- Side chooser -->
+<button class="lang-pill" id="langPill" onclick="toggleLang()">English</button>
+<button class="admin-pill" id="adminPill" onclick="askPin()" hidden></button>
+
 <div class="scr" id="sidePick" hidden>
-  <p class="kicker">قائمة العزومة</p>
-  <h1>يوستينا ومحب</h1>
-  <div class="rule"></div>
-  <p class="sub">أنتم من طرف مين؟</p>
+  <p class="kicker" id="k1"></p>
+  <h1>يوستينا ومحب · Youstina & Moheb</h1>
+  <p class="sub" id="sideQ"></p>
   <div class="doors">
-    <button class="b" onclick="setSide('bride')"><span class="heart">🤍</span><span class="big">طرف العروسة</span>يوستينا<br><small>Bride's side</small></button>
-    <button class="g" onclick="setSide('groom')"><span class="heart">🤍</span><span class="big">طرف العريس</span>محب<br><small>Groom's side</small></button>
+    <button class="b" onclick="setSide('bride')"><span class="heart">🤍</span><span class="big" id="doorB"></span>يوستينا · Youstina<br><small id="doorBs"></small></button>
+    <button class="g" onclick="setSide('groom')"><span class="heart">🤍</span><span class="big" id="doorG"></span>محب · Moheb<br><small id="doorGs"></small></button>
   </div>
 </div>
 
-<!-- Wizard: one question per screen -->
-<button class="admin-pill" id="adminPill" onclick="askPin()" hidden>🔒 المنظمين</button>
-
 <div class="scr" id="app" hidden style="position:relative">
-  <button class="back" id="backBtn" onclick="backStep()" hidden>‹ رجوع</button>
-  <p class="kicker">قائمة العزومة</p>
-  <h1 style="font-size:26px">يوستينا ومحب</h1>
-  <p class="mine-side" id="sideChip" style="margin:2px 0 6px;font-size:13px;color:var(--dim)">بتضيفوا على <b id="mySideLabel" style="color:var(--gold-b)"></b> · <a style="color:var(--dim);text-decoration:underline;cursor:pointer" onclick="changeSide()">تغيير</a></p>
+  <button class="back" id="backBtn" onclick="backStep()" hidden></button>
+  <p class="kicker" id="k2"></p>
+  <h1 style="font-size:24px">يوستينا ومحب</h1>
+  <p class="mine-side"><span id="onSideWord"></span> <b id="mySideLabel"></b> · <a onclick="changeSide()" id="changeLink"></a></p>
   <div class="dots"><i id="d1"></i><i id="d2"></i><i id="d3"></i></div>
 
   <div id="step1">
-    <p class="q">مين العيلة اللي بتعزموها؟</p>
-    <p class="qh">اكتبوا الاسم زي ما بتقولوه عادي</p>
-    <input class="wiz-in" id="wName" placeholder="عيلة عمو مجدي" autocomplete="off">
-    <button class="next" onclick="toStep(2)">التالي ←</button>
+    <p class="q" id="q1"></p>
+    <p class="qh" id="q1h"></p>
+    <input class="wiz-in" id="wName" autocomplete="off">
+    <button class="next" onclick="toStep(2)" id="next1"></button>
   </div>
 
   <div id="step2" hidden>
-    <p class="q">هما كام واحد؟</p>
+    <p class="q" id="q2"></p>
     <div class="count-row">
       <button type="button" onclick="bump(1)">+</button>
       <span id="count">2</span>
       <button type="button" onclick="bump(-1)">−</button>
     </div>
-    <button class="next" onclick="toStep(3)">التالي ←</button>
+    <button class="next" onclick="toStep(3)" id="next2"></button>
   </div>
 
   <div id="step3" hidden>
-    <p class="q">رقمهم على واتساب؟</p>
+    <p class="q" id="q3"></p>
     <div class="cc-toggle" id="ccToggle">
       <button type="button" id="ccEG" class="on" onclick="setCC('+20')">🇪🇬 مصر</button>
       <button type="button" id="ccUS" onclick="setCC('+1')">🇺🇸 USA</button>
     </div>
-    <input class="wiz-in phone-big" id="wPhone" inputmode="tel" placeholder="10 123 4567" autocomplete="off">
-    <button class="next" onclick="saveFamily()">سجّلوا العيلة 🤍</button>
-    <button class="skip" onclick="saveFamily(true)">مش معايا الرقم — كملوا من غيره</button>
+    <input class="wiz-in phone-big" id="wPhone" inputmode="tel" autocomplete="off">
+    <button class="next" onclick="saveFamily()" id="saveBtn"></button>
+    <button class="skip" onclick="saveFamily(true)" id="skipBtn"></button>
   </div>
 
   <div id="stepDone" hidden>
     <div class="check">✓</div>
     <p class="done-name" id="doneName"></p>
-    <p class="done-sub">اتسجلت — شكرًا 🤍</p>
-    <button class="again" onclick="toStep(1)">➕ ضيفوا عيلة تانية</button>
-    <button class="finish" onclick="showMine()">خلصنا — شوفوا اللي سجلناه</button>
+    <p class="done-sub" id="doneSub"></p>
+    <button class="again" onclick="toStep(1)" id="againBtn"></button>
+    <button class="finish" onclick="showMine()" id="mineBtn"></button>
   </div>
 
   <div id="mineWrap" hidden>
-    <h2 class="sec">اللي سجلتوه 🤍</h2>
+    <h2 class="sec" id="mineTitle"></h2>
     <div id="mineList"></div>
-    <button class="again" style="margin-top:10px" onclick="toStep(1)">➕ ضيفوا عيلة تانية</button>
+    <button class="again" style="margin-top:10px" onclick="toStep(1)" id="againBtn2"></button>
   </div>
 
   <details class="adv" id="advBox">
-    <summary>⚡ للشباب — طرق أسرع (لصق · جهات اتصال · ملفات)</summary>
+    <summary id="advSum"></summary>
     <div class="inner">
-      <p class="tip" style="margin:4px 0 8px">الصقوا أسماء من واتساب أو نص متصوّر من ورقة — هنرتبها ونعرضها قبل الحفظ.</p>
-      <textarea id="pasteArea" placeholder="عيلة عمو مجدي 4&#10;Tante Mona +20 100 123 4567"></textarea>
-      <button class="parse" type="button" onclick="parsePaste()">✨ رتّبوها</button>
+      <p class="tip" style="margin:4px 0 8px" id="advHint"></p>
+      <textarea id="pasteArea"></textarea>
+      <button class="parse" type="button" onclick="parsePaste()" id="sortBtn"></button>
       <div class="quick">
-        <button type="button" id="pickBtn" hidden onclick="pickContacts()">📇 من جهات الاتصال</button>
-        <button type="button" onclick="document.getElementById('file').click()">📎 ملف أو صورة</button>
+        <button type="button" id="pickBtn" hidden onclick="pickContacts()"></button>
+        <button type="button" onclick="document.getElementById('file').click()" id="fileBtn"></button>
       </div>
       <input type="file" id="file" hidden multiple accept="image/*,.vcf,.txt,.csv,text/vcard,text/x-vcard" onchange="handleFiles(this.files)">
       <p class="tip" id="platformTip"></p>
     </div>
   </details>
 
-  <div class="org-bar"><button type="button" onclick="askPin()">🔒 للمنظمين</button></div>
+  <div class="org-bar"><button type="button" onclick="askPin()" id="orgBarBtn"></button></div>
 
   <div id="orgView" hidden>
-    <button class="org-back" onclick="closeOrg()">‹ رجوع لتسجيل العائلات</button>
-    <h2 class="sec">القائمة الكاملة لايف<span class="pulse"></span></h2>
+    <button class="org-back" onclick="closeOrg()" id="orgBack"></button>
+    <h2 class="sec"><span id="orgTitle"></span><span class="pulse"></span></h2>
     <div id="dupesNote"></div>
     <div class="totals">
-      <div class="tot b"><b id="tB">0</b><span>طرف العروسة · فرد</span></div>
-      <div class="tot g"><b id="tG">0</b><span>طرف العريس · فرد</span></div>
-      <div class="tot a"><b id="tA">0</b><span>الإجمالي · فرد</span></div>
+      <div class="tot b"><b id="tB">0</b><span id="lB"></span></div>
+      <div class="tot g"><b id="tG">0</b><span id="lG"></span></div>
+      <div class="tot a"><b id="tA">0</b><span id="lA"></span></div>
     </div>
     <div class="filters">
-      <button id="fAll" class="on" onclick="setFilter('all')">الكل</button>
-      <button id="fB" onclick="setFilter('bride')">العروسة</button>
-      <button id="fG" onclick="setFilter('groom')">العريس</button>
+      <button id="fAll" class="on" onclick="setFilter('all')"></button>
+      <button id="fB" onclick="setFilter('bride')"></button>
+      <button id="fG" onclick="setFilter('groom')"></button>
     </div>
-    <input class="search" id="search" placeholder="🔍 دوروا على اسم" oninput="renderAll()">
+    <input class="search" id="search" oninput="renderAll()">
     <div id="fullList" style="text-align:start"></div>
+    <h2 class="sec" id="photosTitle"></h2>
+    <div class="photo-grid" id="photoGrid"></div>
     <div class="org-actions">
       <button class="xl" type="button" onclick="exportExcel()">⬇️ Excel</button>
-      <button class="wa" type="button" onclick="sendSnapshot()">📤 واتساب</button>
+      <button class="wa" type="button" onclick="sendSnapshot()">📤 WhatsApp</button>
     </div>
   </div>
 
-  <p class="ver">٨</p>
+  <p class="ver">٩ · 9</p>
 </div>
 
-<!-- Paste preview modal -->
 <div class="modal-bg" id="previewBg" hidden>
   <div class="modal">
-    <h3>لقينا العائلات دي 👇</h3>
-    <p class="mp">عدّلوا العدد بـ + و − أو شيلوا اللي مش مظبوط، وبعدين احفظوا.</p>
+    <h3 id="prevTitle"></h3>
+    <p class="mp" id="prevSub"></p>
     <div id="previewList"></div>
     <div class="m-actions">
-      <button class="m-ok" onclick="confirmPreview()" id="previewOk">احفظوا الكل ✓</button>
-      <button class="m-cancel" onclick="closePreview()">إلغاء</button>
+      <button class="m-ok" onclick="confirmPreview()" id="previewOk"></button>
+      <button class="m-cancel" onclick="closePreview()" id="prevCancel"></button>
     </div>
   </div>
 </div>
 
-<!-- Duplicate check modal -->
 <div class="modal-bg" id="dupBg" hidden>
   <div class="modal">
-    <h3>⚠️ في عائلات شبهها متسجلة</h3>
-    <p class="mp">ممكن تكون نفس العيلة اتسجلت من الطرف التاني — شيلوا العلامة لو دي عيلة مختلفة فعلًا.</p>
+    <h3 id="dupTitle"></h3>
+    <p class="mp" id="dupSub"></p>
     <div id="dupList"></div>
     <div class="m-actions">
-      <button class="m-ok" onclick="resolveDups()">تمام — كملوا ✓</button>
-      <button class="m-cancel" onclick="cancelDups()">إلغاء الكل</button>
+      <button class="m-ok" onclick="resolveDups()" id="dupGo"></button>
+      <button class="m-cancel" onclick="cancelDups()" id="dupCancel"></button>
     </div>
   </div>
 </div>
 
-<!-- Photo AI fallback modal -->
 <div class="modal-bg" id="photoFbBg" hidden>
   <div class="modal" style="text-align:center">
-    <h3>📷 الذكاء الاصطناعي لسه مش متوصل</h3>
-    <p class="mp">مش هنقدر نقرأ الصورة تلقائي دلوقتي — ابعتوها لجوزيف وهو هيسجلها لكم في دقايق.</p>
+    <h3 id="fbTitle"></h3>
+    <p class="mp" id="fbSub"></p>
     <div class="m-actions">
-      <button class="m-ok" id="photoShareBtn">📤 ابعتوا الصورة على واتساب</button>
-      <button class="m-cancel" onclick="document.getElementById('photoFbBg').hidden=true">رجوع</button>
+      <button class="m-ok" id="photoShareBtn"></button>
+      <button class="m-cancel" onclick="document.getElementById('photoFbBg').hidden=true" id="fbBack"></button>
     </div>
   </div>
 </div>
 
-<!-- PIN modal -->
 <div class="modal-bg" id="pinBg" hidden>
   <div class="modal" style="text-align:center">
-    <h3>🔒 للمنظمين بس</h3>
-    <p class="mp">ادخلوا الرقم السري</p>
+    <h3 id="pinTitle"></h3>
+    <p class="mp" id="pinSub"></p>
     <input class="pin-in" id="pinIn" inputmode="numeric" maxlength="4" placeholder="• • • •">
-    <p class="mp" id="pinErr" style="color:#e08a8a;display:none">الرقم مش صح</p>
+    <p class="mp" id="pinErr" style="color:#e08a8a;display:none"></p>
     <div class="m-actions">
-      <button class="m-ok" onclick="tryPin()">افتحوا</button>
-      <button class="m-cancel" onclick="document.getElementById('pinBg').hidden=true">رجوع</button>
+      <button class="m-ok" onclick="tryPin()" id="pinOpen"></button>
+      <button class="m-cancel" onclick="document.getElementById('pinBg').hidden=true" id="pinBack"></button>
     </div>
   </div>
 </div>
@@ -332,31 +324,144 @@
 
 <script>
 const SUPA = "https://wydodvbkqhpoyefcwpnf.supabase.co/rest/v1/wedding_families";
+const STORAGE = "https://wydodvbkqhpoyefcwpnf.supabase.co/storage/v1";
+const FN_URL = "https://wydodvbkqhpoyefcwpnf.supabase.co/functions/v1/parse-guest-photo";
 const KEY = "sb_publishable_TSmh8zzk8gvPL5uIrcNbwA_HK45ASUe";
+const ANON_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5ZG9kdmJrcWhwb3llZmN3cG5mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxOTYxNjcsImV4cCI6MjA4ODc3MjE2N30.x65toIsFqhKnSDK8n6dXEYg64dLz8idG6r-T9KxijaE";
 const PIN = "1360";
 const H = { "apikey": KEY, "Authorization": "Bearer " + KEY, "Content-Type": "application/json" };
+
+/* ═══ i18n ═══ */
+const STR = {
+  ar: {
+    kicker:"قائمة العزومة", sideQ:"أنتم من طرف مين؟ — دقيقة واحدة وتسجلوا عائلتكم",
+    doorB:"طرف العروسة", doorG:"طرف العريس", doorBs:"Bride's side", doorGs:"Groom's side",
+    onSide:"بتضيفوا على", sideB:"طرف العروسة 🤍", sideG:"طرف العريس 🤍", change:"تغيير",
+    q1:"مين العيلة اللي بتعزموها؟", q1h:"اكتبوا الاسم زي ما بتقولوه عادي", q1ph:"عيلة عمو مجدي",
+    next:"التالي ←", q2:"هما كام واحد؟", q3:"رقمهم على واتساب؟",
+    phEG:"10 123 4567", phUS:"(973) 555 0100",
+    save:"سجّلوا العيلة 🤍", skip:"مش معايا الرقم — كملوا من غيره",
+    doneSub:"اتسجلت — شكرًا 🤍", again:"➕ ضيفوا عيلة تانية", seeMine:"خلصنا — شوفوا اللي سجلناه",
+    mineTitle:"اللي سجلتوه 🤍", mineEmpty:"لسه مسجلتوش حد",
+    advSum:"⚡ للشباب — طرق أسرع (لصق · جهات اتصال · صور)",
+    advHint:"الصقوا أسماء من واتساب أو ارفعوا صورة الورقة — هنرتبها ونعرضها قبل الحفظ.",
+    pastePh:"عيلة عمو مجدي 4\nTante Mona +20 100 123 4567",
+    sort:"✨ رتّبوها", pick:"📇 من جهات الاتصال", fileB:"📎 صورة أو ملف",
+    tipIOS:"💡 <b>صورة الورقة؟</b> ارفعوها بزرار الصورة فوق — بتتحفظ لجوزيف حتى لو القراءة الآلية مش شغالة.",
+    tipAnd:"💡 <b>صورة الورقة؟</b> ارفعوها بزرار الصورة فوق — بتتحفظ لجوزيف حتى لو القراءة الآلية مش شغالة.",
+    orgBar:"🔒 للمنظمين", orgPill:"🔒 المنظمين", orgPillOn:"📊 المنظمين",
+    orgBack:"‹ رجوع لتسجيل العائلات", orgTitle:"القائمة الكاملة لايف",
+    lB:"طرف العروسة · فرد", lG:"طرف العريس · فرد", lA:"الإجمالي · فرد",
+    fAll:"الكل", fB:"العروسة", fG:"العريس", searchPh:"🔍 دوروا على اسم",
+    listEmpty:"لسه مفيش حد هنا", photosTitle:"📷 الصور المرفوعة", photosEmpty:"مفيش صور لسه",
+    prevTitle:"لقينا العائلات دي 👇", prevSub:"عدّلوا العدد بـ + و − أو شيلوا اللي مش مظبوط، وبعدين احفظوا.",
+    saveAll:n=>`احفظوا ${n} عيلة ✓`, cancel:"إلغاء",
+    dupTitle:"⚠️ في عائلات شبهها متسجلة", dupSub:"ممكن تكون نفس العيلة اتسجلت قبل كده — شيلوا العلامة لو دي عيلة مختلفة فعلًا.",
+    dupReg:(n,s,c)=>`متسجلة خلاص: "${n}" — ${s} · ${c} أفراد`, dupSame:"نفس العيلة — متسجلوهاش تاني",
+    dupGo:"تمام — كملوا ✓", dupCancel:"إلغاء الكل",
+    fbTitle:"📷 الصورة اتحفظت لجوزيف ✅", fbSub:"القراءة الآلية مش متاحة دلوقتي — بس الصورة وصلت وجوزيف هيسجل اللي فيها. تحبوا تبعتوهاله كمان على واتساب؟",
+    fbShare:"📤 ابعتوها على واتساب", fbBack:"تمام",
+    pinTitle:"🔒 للمنظمين بس", pinSub:"ادخلوا الرقم السري", pinOpen:"افتحوا", pinBack:"رجوع", pinErr:"الرقم مش صح",
+    sideWordB:"طرف العروسة", sideWordG:"طرف العريس", noPhone:"بدون رقم",
+    removed:n=>`اتشالت "${n}"`, undo:"تراجع ↩", restored:"رجعناها ✅", netErr:"النت قطع — حاولوا تاني",
+    addedOk:"اتضافت ✅ شكرًا 🤍", addedN:n=>`اتسجل ${n} عيلة ✅ 🤍`, allDup:"تمام — كله كان متسجل خلاص ✅",
+    photoSaved:"📷 الصورة اتحفظت ✅", reading:"📖 بنقرأ الصورة… ثواني", noNames:"مش لاقيين أسماء واضحة — بس الصورة اتحفظت لجوزيف ✅",
+    pasteNone:"مش لاقيين أسماء — جربوا سطر سطر", dupsBanner:n=>`⚠️ ${n} تكرار محتمل:`, dupsHint:"— دوروا بالاسم وشيلوا الزيادة.",
+    xls:"اتنزلت — تفتح في Excel ✅", people:"أفراد", picked:n=>`اتضاف ${n} عيلة ✅ — ظبطوا العدد بـ + و −`, lang:"English",
+  },
+  en: {
+    kicker:"Guest List", sideQ:"Which side are you from? One minute to add your families.",
+    doorB:"Bride's side", doorG:"Groom's side", doorBs:"طرف العروسة", doorGs:"طرف العريس",
+    onSide:"Adding to", sideB:"Bride's side 🤍", sideG:"Groom's side 🤍", change:"change",
+    q1:"Which family are you inviting?", q1h:"Write the name the way you normally say it", q1ph:"Uncle Magdy's family",
+    next:"Next →", q2:"How many of them are coming?", q3:"Their WhatsApp number?",
+    phEG:"10 123 4567", phUS:"(973) 555 0100",
+    save:"Save family 🤍", skip:"I don't have the number — continue without it",
+    doneSub:"Saved — thank you 🤍", again:"➕ Add another family", seeMine:"Done — see what we added",
+    mineTitle:"Your additions 🤍", mineEmpty:"Nothing added yet",
+    advSum:"⚡ Faster ways (paste · contacts · photos)",
+    advHint:"Paste names from WhatsApp or upload a photo of the paper list — we sort it and show you before saving.",
+    pastePh:"Uncle Magdy's family 4\nTante Mona +20 100 123 4567",
+    sort:"✨ Sort it out", pick:"📇 From contacts", fileB:"📎 Photo or file",
+    tipIOS:"💡 <b>Photo of the paper?</b> Upload it with the photo button above — it's saved for Joseph even if auto-reading is offline.",
+    tipAnd:"💡 <b>Photo of the paper?</b> Upload it with the photo button above — it's saved for Joseph even if auto-reading is offline.",
+    orgBar:"🔒 Organizers", orgPill:"🔒 Organizers", orgPillOn:"📊 Organizers",
+    orgBack:"‹ Back to adding families", orgTitle:"Full list — live",
+    lB:"Bride side · people", lG:"Groom side · people", lA:"Total · people",
+    fAll:"All", fB:"Bride", fG:"Groom", searchPh:"🔍 Search a name",
+    listEmpty:"Nobody here yet", photosTitle:"📷 Uploaded photos", photosEmpty:"No photos yet",
+    prevTitle:"We found these families 👇", prevSub:"Adjust counts with + and −, remove anything wrong, then save.",
+    saveAll:n=>`Save ${n} families ✓`, cancel:"Cancel",
+    dupTitle:"⚠️ Possible duplicates", dupSub:"These may already be registered — uncheck only if it's truly a different family.",
+    dupReg:(n,s,c)=>`Already registered: "${n}" — ${s} · ${c} people`, dupSame:"Same family — don't add again",
+    dupGo:"OK — continue ✓", dupCancel:"Cancel all",
+    fbTitle:"📷 Photo saved for Joseph ✅", fbSub:"Auto-reading is offline right now — but the photo went through and Joseph will add what's on it. Want to also send it to him on WhatsApp?",
+    fbShare:"📤 Send on WhatsApp", fbBack:"OK",
+    pinTitle:"🔒 Organizers only", pinSub:"Enter the PIN", pinOpen:"Open", pinBack:"Back", pinErr:"Wrong PIN",
+    sideWordB:"Bride side", sideWordG:"Groom side", noPhone:"no number",
+    removed:n=>`Removed "${n}"`, undo:"Undo ↩", restored:"Restored ✅", netErr:"Connection lost — try again",
+    addedOk:"Added ✅ thank you 🤍", addedN:n=>`Saved ${n} families ✅ 🤍`, allDup:"All of them were already registered ✅",
+    photoSaved:"📷 Photo saved ✅", reading:"📖 Reading the photo… seconds", noNames:"No clear names found — but the photo is saved for Joseph ✅",
+    pasteNone:"No names found — try one per line", dupsBanner:n=>`⚠️ ${n} possible duplicates:`, dupsHint:"— search the name and remove extras.",
+    xls:"Downloaded — opens in Excel ✅", people:"people", picked:n=>`Added ${n} families ✅ — adjust counts with + and −`, lang:"بالعربي",
+  }
+};
+let L = localStorage.getItem("wedLang") || "ar";
+const t = k => STR[L][k];
+function toggleLang(){ L = L === "ar" ? "en" : "ar"; localStorage.setItem("wedLang", L); applyLang(); }
+function applyLang(){
+  document.documentElement.lang = L;
+  document.documentElement.dir = L === "ar" ? "rtl" : "ltr";
+  $("langPill").textContent = t("lang");
+  const set = (id, k, html) => { const el = $(id); if (el) html ? el.innerHTML = t(k) : el.textContent = t(k); };
+  set("k1","kicker"); set("k2","kicker"); set("sideQ","sideQ");
+  set("doorB","doorB"); set("doorG","doorG"); set("doorBs","doorBs"); set("doorGs","doorGs");
+  set("onSideWord","onSide"); set("changeLink","change");
+  set("q1","q1"); set("q1h","q1h"); $("wName").placeholder = t("q1ph");
+  set("next1","next"); set("q2","q2"); set("next2","next"); set("q3","q3");
+  set("saveBtn","save"); set("skipBtn","skip");
+  set("doneSub","doneSub"); set("againBtn","again"); set("mineBtn","seeMine");
+  set("mineTitle","mineTitle"); set("againBtn2","again");
+  set("advSum","advSum"); set("advHint","advHint"); $("pasteArea").placeholder = t("pastePh");
+  set("sortBtn","sort"); set("pickBtn","pick"); set("fileBtn","fileB");
+  set("orgBarBtn","orgBar"); set("orgBack","orgBack"); set("orgTitle","orgTitle");
+  set("lB","lB"); set("lG","lG"); set("lA","lA");
+  set("fAll","fAll"); set("fB","fB"); set("fG","fG"); $("search").placeholder = t("searchPh");
+  set("photosTitle","photosTitle");
+  set("prevTitle","prevTitle"); set("prevSub","prevSub"); set("prevCancel","cancel");
+  set("dupTitle","dupTitle"); set("dupSub","dupSub"); set("dupGo","dupGo"); set("dupCancel","dupCancel");
+  set("fbTitle","fbTitle"); set("fbSub","fbSub"); set("photoShareBtn","fbShare"); set("fbBack","fbBack");
+  set("pinTitle","pinTitle"); set("pinSub","pinSub"); set("pinOpen","pinOpen"); set("pinBack","pinBack"); set("pinErr","pinErr");
+  $("backBtn").textContent = L === "ar" ? "‹ رجوع" : "‹ Back";
+  $("platformTip").innerHTML = /iPhone|iPad|iPod/.test(navigator.userAgent) ? t("tipIOS") : t("tipAnd");
+  if (mySide) {
+    $("mySideLabel").textContent = mySide === "bride" ? t("sideB") : t("sideG");
+    $("adminPill").textContent = isOrg() ? t("orgPillOn") : t("orgPill");
+  }
+  renderMine(); renderAll();
+}
 
 let device = localStorage.getItem("wedDevice");
 if (!device) { device = "d" + Math.random().toString(36).slice(2, 10); localStorage.setItem("wedDevice", device); }
 let mySide = localStorage.getItem("wedSide") || "";
-let cc = localStorage.getItem("wedCC") || "+20";   // sticky Egypt/US toggle
-let mine = [], all = [], filter = "all", n = 2, orgTimer = null, pending = [], step = 1;
+let cc = localStorage.getItem("wedCC") || "+20";
+let mine = [], all = [], filter = "all", n = 2, orgTimer = null, pending = [], step = 1, photoTick = 0;
 
 const $ = id => document.getElementById(id);
 const isOrg = () => localStorage.getItem("wedOrg") === "ok";
 function toast(msg, err, action){
-  const t = $("toast");
-  t.innerHTML = "";
-  t.append(document.createTextNode(msg));
+  const el = $("toast");
+  el.innerHTML = "";
+  el.append(document.createTextNode(msg));
   if (action) {
     const b = document.createElement("button");
     b.textContent = action.label;
-    b.onclick = () => { t.style.display = "none"; action.fn(); };
-    t.append(b);
+    b.onclick = () => { el.style.display = "none"; action.fn(); };
+    el.append(b);
   }
-  t.className = "toast" + (err ? " err" : "");
-  t.style.display = "block";
-  clearTimeout(t._h); t._h = setTimeout(()=> t.style.display = "none", action ? 8000 : 2600);
+  el.className = "toast" + (err ? " err" : "");
+  el.style.display = "block";
+  clearTimeout(el._h); el._h = setTimeout(()=> el.style.display = "none", action ? 8000 : 2600);
 }
 function esc(s){ const d = document.createElement("span"); d.textContent = s; return d.innerHTML; }
 function bump(d){ n = Math.min(30, Math.max(1, n + d)); $("count").textContent = n; }
@@ -368,11 +473,8 @@ function route(){
   $("sidePick").hidden = !!mySide;
   $("app").hidden = !mySide;
   $("adminPill").hidden = !mySide;
-  if (mySide) {
-    $("mySideLabel").textContent = mySide === "bride" ? "طرف العروسة 🤍" : "طرف العريس 🤍";
-    $("adminPill").textContent = isOrg() ? "📊 المنظمين" : "🔒 المنظمين";
-    toStep(1); refreshMine();
-  }
+  applyLang();
+  if (mySide) { toStep(1); refreshMine(); }
 }
 const WIZ_IDS = ["step1","step2","step3","stepDone","mineWrap","advBox"];
 
@@ -381,13 +483,12 @@ function toStep(s){
   step = s;
   $("advBox").hidden = false;
   ["step1","step2","step3","stepDone","mineWrap"].forEach(id => $(id).hidden = true);
-  if (s === 1) { $("step1").hidden = false; setTimeout(()=> $("wName").focus(), 60); }
+  if (s === 1) { $("step1").hidden = false; }
   if (s === 2) $("step2").hidden = false;
   if (s === 3) { $("step3").hidden = false; setTimeout(()=> $("wPhone").focus(), 60); }
-  [1,2,3].forEach(i => $("d"+i).className = (s >= i && s <= 3) ? (s === i ? "on" : "") : "");
+  [1,2,3].forEach(i => $("d"+i).className = "");
   $("d"+Math.min(s,3)).className = "on";
   $("backBtn").hidden = (s === 1 || s > 3);
-  $("dots") && null;
   if (s === 2 && !$("wName").value.trim()) { toStep(1); return; }
 }
 function backStep(){ if (step === 3) toStep(2); else if (step === 2) toStep(1); }
@@ -395,7 +496,7 @@ function setCC(v){
   cc = v; localStorage.setItem("wedCC", v);
   $("ccEG").className = v === "+20" ? "on" : "";
   $("ccUS").className = v === "+1" ? "on" : "";
-  $("wPhone").placeholder = v === "+20" ? "10 123 4567" : "(973) 555 0100";
+  $("wPhone").placeholder = v === "+20" ? t("phEG") : t("phUS");
 }
 async function saveFamily(skipPhone){
   const name = $("wName").value.trim();
@@ -417,15 +518,6 @@ function showMine(){
   $("mineWrap").hidden = false;
   refreshMine();
 }
-
-/* ── platform tip ── */
-(function(){
-  const ios = /iPhone|iPad|iPod/.test(navigator.userAgent);
-  $("platformTip").innerHTML = ios
-    ? "💡 <b>صورة الورقة؟</b> افتحوها في الصور، دوسوا على الكلام (Live Text)، انسخوه، والصقوه فوق."
-    : "💡 <b>صورة الورقة؟</b> افتحوها ودوسوا على أيقونة Lens، انسخوا النص، والصقوه فوق.";
-  setCC(cc);
-})();
 
 /* ── phone normalization ── */
 function normalizePhone(raw, ccSel){
@@ -462,8 +554,8 @@ function parseVcf(text){
         if (/QUOTED-PRINTABLE/i.test(m[2])) v = decodeQP(v);
         name = (m[1].toUpperCase() === "N") ? v.split(";").filter(Boolean).reverse().join(" ").trim() : v.trim();
       }
-      const t = line.match(/^TEL[^:]*:(.+)$/i);
-      if (t && !tel) tel = normalizePhone(t[1].trim(), "");
+      const tl = line.match(/^TEL[^:]*:(.+)$/i);
+      if (tl && !tel) tel = normalizePhone(tl[1].trim(), "");
     }
     if (name) out.push({ name, count: 2, phone: tel });
   }
@@ -500,12 +592,12 @@ function parseFree(text){
   return out;
 }
 
-/* ── paste flow ── */
+/* ── paste preview ── */
 function parsePaste(){
   const text = $("pasteArea").value.trim();
   if (!text) { $("pasteArea").focus(); return; }
   pending = parseFree(text);
-  if (!pending.length) { toast("مش لاقيين أسماء — جربوا سطر سطر", true); return; }
+  if (!pending.length) { toast(t("pasteNone"), true); return; }
   renderPreview();
   $("previewBg").hidden = false;
 }
@@ -517,7 +609,7 @@ function renderPreview(){
     row.className = "fam " + (mySide === "bride" ? "b" : "g");
     const info = document.createElement("div");
     info.className = "info";
-    info.innerHTML = `<b>${esc(r.name)}</b><div class="meta">${r.phone ? `<span dir="ltr">${esc(r.phone)}</span>` : "بدون رقم"}</div>`;
+    info.innerHTML = `<b>${esc(r.name)}</b><div class="meta">${r.phone ? `<span dir="ltr">${esc(r.phone)}</span>` : t("noPhone")}</div>`;
     const cnt = document.createElement("div");
     cnt.className = "cnt";
     const minus = document.createElement("button"); minus.textContent = "−";
@@ -532,14 +624,14 @@ function renderPreview(){
     row.append(info, cnt, del);
     el.appendChild(row);
   });
-  $("previewOk").textContent = `احفظوا ${pending.length} عيلة ✓`;
+  $("previewOk").textContent = t("saveAll")(pending.length);
 }
 async function confirmPreview(){
   const items = pending.slice();
   closePreview();
   if (await insertRows(items)) {
     $("pasteArea").value = "";
-    toast(`اتسجل ${items.length} عيلة ✅ 🤍`);
+    toast(t("addedN")(items.length));
   }
 }
 function closePreview(){ $("previewBg").hidden = true; }
@@ -572,9 +664,10 @@ function showDupModal(conflicts){
   conflicts.forEach((c, i) => {
     const row = document.createElement("div");
     row.className = "dup-row";
+    const sideWord = c.existing.side === "bride" ? t("sideWordB") : t("sideWordG");
     row.innerHTML = `<b>${esc(c.item.name)}</b>
-      <div class="dmeta">متسجلة خلاص: "${esc(c.existing.name)}" — ${c.existing.side === "bride" ? "طرف العروسة" : "طرف العريس"} · ${c.existing.count} أفراد${c.existing.phone ? ` · <span dir="ltr">${esc(c.existing.phone)}</span>` : ""}</div>
-      <label><input type="checkbox" checked data-i="${i}"> نفس العيلة — متسجلوهاش تاني</label>`;
+      <div class="dmeta">${t("dupReg")(esc(c.existing.name), sideWord, c.existing.count)}${c.existing.phone ? ` · <span dir="ltr">${esc(c.existing.phone)}</span>` : ""}</div>
+      <label><input type="checkbox" checked data-i="${i}"> ${t("dupSame")}</label>`;
     el.appendChild(row);
   });
   $("dupBg").hidden = false;
@@ -590,7 +683,6 @@ function cancelDups(){ $("dupBg").hidden = true; if (dupResolver) dupResolver({ 
 
 /* ── cloud ── */
 async function insertRows(items){
-  // duplicate gate: compare against the whole live list before writing
   try {
     const r0 = await fetch(SUPA + "?select=id,name,phone,side,count", { headers: H });
     if (r0.ok) {
@@ -600,19 +692,17 @@ async function insertRows(items){
         const res = await showDupModal(conflicts);
         if (res.cancelled) return false;
         items = clean.concat(res.keepIdx.map(i => conflicts[i].item));
-        if (!items.length) { toast("تمام — كله كان متسجل خلاص ✅"); refreshMine(); return true; }
-      } else {
-        items = clean;
-      }
+        if (!items.length) { toast(t("allDup")); refreshMine(); return true; }
+      } else items = clean;
     }
-  } catch(e) { /* dedup is best-effort; never block adding */ }
+  } catch(e) { /* best effort */ }
   const payload = items.map(i => ({ name: i.name, count: i.count, phone: i.phone || "", side: mySide, added_by: device }));
   try {
     const r = await fetch(SUPA, { method: "POST", headers: H, body: JSON.stringify(payload) });
     if (!r.ok) throw 0;
     refreshMine(); if (isOrg()) refreshAll();
     return true;
-  } catch(e) { toast("النت قطع — حاولوا تاني", true); return false; }
+  } catch(e) { toast(t("netErr"), true); return false; }
 }
 async function refreshMine(){
   try {
@@ -625,6 +715,7 @@ async function refreshAll(){
     const r = await fetch(SUPA + "?select=*&order=created_at.desc", { headers: H });
     if (r.ok) { all = await r.json(); renderAll(); }
   } catch(e) {}
+  if (photoTick++ % 3 === 0) loadPhotos();
 }
 async function patchCount(row, newCount){
   row.count = newCount; renderMine(); renderAll();
@@ -636,12 +727,12 @@ async function removeRow(row){
   renderMine(); renderAll();
   try { await fetch(`${SUPA}?id=eq.${row.id}`, { method: "DELETE", headers: H }); } catch(e) {}
   refreshMine(); if (isOrg()) refreshAll();
-  toast(`اتشالت "${row.name}"`, false, { label: "تراجع ↩", fn: async () => {
+  toast(t("removed")(row.name), false, { label: t("undo"), fn: async () => {
     try {
       await fetch(SUPA, { method: "POST", headers: H, body: JSON.stringify([{ name: row.name, count: row.count, phone: row.phone, side: row.side, added_by: row.added_by }]) });
       refreshMine(); if (isOrg()) refreshAll();
-      toast("رجعناها ✅");
-    } catch(e) { toast("النت قطع — ضيفوها تاني", true); }
+      toast(t("restored"));
+    } catch(e) { toast(t("netErr"), true); }
   }});
 }
 function famRow(r, canDelete){
@@ -649,7 +740,8 @@ function famRow(r, canDelete){
   row.className = "fam " + (r.side === "bride" ? "b" : "g");
   const info = document.createElement("div");
   info.className = "info";
-  info.innerHTML = `<b>${esc(r.name)}</b><div class="meta">${r.side === "bride" ? "طرف العروسة" : "طرف العريس"}${r.phone ? ` · <span dir="ltr">${esc(r.phone)}</span>` : ""}</div>`;
+  const sideWord = r.side === "bride" ? t("sideWordB") : t("sideWordG");
+  info.innerHTML = `<b>${esc(r.name)}</b><div class="meta">${sideWord}${r.phone ? ` · <span dir="ltr">${esc(r.phone)}</span>` : ""}</div>`;
   const cnt = document.createElement("div");
   cnt.className = "cnt";
   const minus = document.createElement("button"); minus.textContent = "−";
@@ -671,7 +763,7 @@ function renderMine(){
   const el = $("mineList");
   if (!el) return;
   el.innerHTML = "";
-  if (!mine.length) { el.innerHTML = '<p class="empty">لسه مسجلتوش حد</p>'; return; }
+  if (!mine.length) { el.innerHTML = `<p class="empty">${t("mineEmpty")}</p>`; return; }
   mine.forEach(r => el.appendChild(famRow(r, true)));
 }
 function renderAll(){
@@ -679,18 +771,17 @@ function renderAll(){
   const bp = all.filter(r => r.side === "bride").reduce((s, r) => s + r.count, 0);
   const gp = all.filter(r => r.side === "groom").reduce((s, r) => s + r.count, 0);
   $("tB").textContent = bp; $("tG").textContent = gp; $("tA").textContent = bp + gp;
-  // possible duplicates across the whole list (same normalized name or phone)
   const groups = {};
-  all.forEach(r => { const k = normName(r.name) || ("ph:" + (r.phone||r.id)); (groups[k] = groups[k] || []).push(r); });
+  all.forEach(r => { const k = normName(r.name) || ("ph:" + (r.phone || r.id)); (groups[k] = groups[k] || []).push(r); });
   const dupes = Object.values(groups).filter(g => g.length > 1);
   $("dupesNote").innerHTML = dupes.length
-    ? `<div class="dupes-note"><b>⚠️ ${dupes.length} تكرار محتمل:</b> ${dupes.map(g => `"${esc(g[0].name)}" (${g.map(x => x.side === "bride" ? "عروسة" : "عريس").join(" + ")})`).join(" · ")} — دوروا بالاسم وشيلوا الزيادة.</div>`
+    ? `<div class="dupes-note"><b>${t("dupsBanner")(dupes.length)}</b> ${dupes.map(g => `"${esc(g[0].name)}" (${g.map(x => x.side === "bride" ? t("fB") : t("fG")).join(" + ")})`).join(" · ")} ${t("dupsHint")}</div>`
     : "";
   const el = $("fullList");
   const q = ($("search").value || "").trim().toLowerCase();
   const show = all.filter(r => (filter === "all" || r.side === filter) && (!q || r.name.toLowerCase().includes(q) || (r.phone || "").includes(q)));
   el.innerHTML = "";
-  if (!show.length) { el.innerHTML = '<p class="empty">لسه مفيش حد هنا</p>'; return; }
+  if (!show.length) { el.innerHTML = `<p class="empty">${t("listEmpty")}</p>`; return; }
   show.forEach(r => el.appendChild(famRow(r, true)));
 }
 function setFilter(f){
@@ -716,8 +807,8 @@ function openOrg(){
   document.querySelector(".org-bar").hidden = true;
   $("backBtn").hidden = true;
   $("orgView").hidden = false;
-  $("adminPill").textContent = "📊 المنظمين";
-  refreshAll();
+  $("adminPill").textContent = t("orgPillOn");
+  refreshAll(); loadPhotos();
   if (!orgTimer) orgTimer = setInterval(() => { if (!document.hidden) refreshAll(); }, 4000);
   window.scrollTo({ top: 0 });
 }
@@ -740,9 +831,7 @@ async function pickContacts(){
   } catch(e) { /* cancelled */ }
 }
 
-/* ── photo AI ── */
-const FN_URL = "https://wydodvbkqhpoyefcwpnf.supabase.co/functions/v1/parse-guest-photo";
-const ANON_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5ZG9kdmJrcWhwb3llZmN3cG5mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxOTYxNjcsImV4cCI6MjA4ODc3MjE2N30.x65toIsFqhKnSDK8n6dXEYg64dLz8idG6r-T9KxijaE";
+/* ── photos: always save to storage, then try AI ── */
 function shrinkToJpeg(file){
   return new Promise((res, rej) => {
     const img = new Image();
@@ -751,33 +840,62 @@ function shrinkToJpeg(file){
       const c = document.createElement("canvas");
       c.width = Math.round(img.width * sc); c.height = Math.round(img.height * sc);
       c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
-      res(c.toDataURL("image/jpeg", 0.82).split(",")[1]);
+      res(c.toDataURL("image/jpeg", 0.82));
     };
     img.onerror = rej;
     img.src = URL.createObjectURL(file);
   });
 }
-let fbPhotos = [];
-function showPhotoFallback(photos){
-  fbPhotos = photos;
-  $("photoFbBg").hidden = false;
+async function uploadPhoto(dataUrl, idx){
+  const blob = await (await fetch(dataUrl)).blob();
+  const name = `${mySide}-${device}-${Date.now()}-${idx}.jpg`;
+  const r = await fetch(`${STORAGE}/object/guest-photos/${name}`, {
+    method: "POST",
+    headers: { "apikey": KEY, "Authorization": "Bearer " + KEY, "Content-Type": "image/jpeg" },
+    body: blob,
+  });
+  return r.ok;
 }
+async function loadPhotos(){
+  try {
+    const r = await fetch(`${STORAGE}/object/list/guest-photos`, {
+      method: "POST",
+      headers: H,
+      body: JSON.stringify({ prefix: "", limit: 60, sortBy: { column: "created_at", order: "desc" } }),
+    });
+    if (!r.ok) return;
+    const objs = (await r.json()).filter(o => o.name && o.name.endsWith(".jpg"));
+    const el = $("photoGrid");
+    if (!el) return;
+    el.innerHTML = "";
+    if (!objs.length) { el.innerHTML = `<p class="empty" style="grid-column:1/-1">${t("photosEmpty")}</p>`; return; }
+    objs.forEach(o => {
+      const url = `${STORAGE}/object/public/guest-photos/${o.name}`;
+      const a = document.createElement("a");
+      a.href = url; a.target = "_blank"; a.rel = "noopener";
+      const side = o.name.startsWith("bride") ? t("fB") : o.name.startsWith("groom") ? t("fG") : "";
+      a.innerHTML = `<img loading="lazy" src="${url}"><span class="tag">${side}</span>`;
+      el.appendChild(a);
+    });
+  } catch(e) {}
+}
+let fbPhotos = [];
+function showPhotoFallback(photos){ fbPhotos = photos; $("photoFbBg").hidden = false; }
 $("photoShareBtn").addEventListener("click", async () => {
   $("photoFbBg").hidden = true;
   if (navigator.canShare && navigator.canShare({ files: fbPhotos })) {
     try { await navigator.share({ files: fbPhotos, text: "صور قائمة عزومة فرح يوستينا ومحب 🤍" }); } catch(e) {}
-  } else toast("الصور ابعتوها لجوزيف على واتساب 🤍");
+  }
 });
-async function photosToFamilies(photos){
-  toast("📖 بنقرأ الصورة… ثواني", false); $("toast").className = "toast busy";
+async function photosToFamilies(dataUrls){
+  toast(t("reading")); $("toast").className = "toast busy";
   let fams = [], hardError = null;
-  for (const f of photos.slice(0, 3)) {
+  for (const d of dataUrls.slice(0, 3)) {
     try {
-      const b64 = await shrinkToJpeg(f);
       const r = await fetch(FN_URL, {
         method: "POST",
         headers: { "Authorization": "Bearer " + ANON_JWT, "apikey": ANON_JWT, "Content-Type": "application/json" },
-        body: JSON.stringify({ image: b64, media_type: "image/jpeg" }),
+        body: JSON.stringify({ image: d.split(",")[1], media_type: "image/jpeg" }),
       });
       const body = await r.json().catch(() => ({}));
       if (r.status === 503) { hardError = body.error || "no_key"; break; }
@@ -791,7 +909,6 @@ async function photosToFamilies(photos){
   $("toast").style.display = "none";
   return { fams, hardError };
 }
-/* ── files ── */
 async function handleFiles(files){
   const photos = [];
   let items = [];
@@ -800,10 +917,19 @@ async function handleFiles(files){
     items = items.concat(parseFree(await f.text()));
   }
   if (photos.length) {
-    const { fams, hardError } = await photosToFamilies(photos);
+    const dataUrls = [];
+    for (let i = 0; i < photos.length; i++) {
+      try {
+        const d = await shrinkToJpeg(photos[i]);
+        dataUrls.push(d);
+        await uploadPhoto(d, i);
+      } catch(e) {}
+    }
+    if (dataUrls.length) toast(t("photoSaved"));
+    const { fams, hardError } = await photosToFamilies(dataUrls);
     if (fams.length) items = items.concat(fams);
     else if (hardError) showPhotoFallback(photos);
-    else toast("مش لاقيين أسماء واضحة في الصورة — جربوا صورة أقرب", true);
+    else toast(t("noNames"));
   }
   if (items.length) { pending = items; renderPreview(); $("previewBg").hidden = false; }
   $("file").value = "";
@@ -818,7 +944,7 @@ function exportExcel(){
   a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
   a.download = "Youstina & Moheb — Guest List.csv";
   a.click();
-  toast("اتنزلت — تفتح في Excel ✅");
+  toast(t("xls"));
 }
 function sendSnapshot(){
   const part = side => all.filter(r => r.side === side);
@@ -829,10 +955,10 @@ function sendSnapshot(){
   location.href = "https://wa.me/?text=" + encodeURIComponent(msg);
 }
 
-/* enter key moves the wizard forward */
 $("wName").addEventListener("keydown", e => { if (e.key === "Enter") toStep(2); });
 $("wPhone").addEventListener("keydown", e => { if (e.key === "Enter") saveFamily(); });
 
+setCC(cc);
 route();
 </script>
 </body>
