@@ -133,6 +133,7 @@
   .photo-grid a{display:block;position:relative}
   .photo-grid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;border:1px solid var(--line);background:#0b1524}
   .photo-grid .tag{position:absolute;bottom:5px;inset-inline-start:5px;background:rgba(9,18,32,.85);border-radius:6px;padding:1px 7px;font-size:10px;color:var(--ivory)}
+  .photo-grid .pdel{position:absolute;top:5px;inset-inline-end:5px;width:26px;height:26px;border-radius:50%;border:0;background:rgba(122,44,44,.92);color:#fff;font-size:14px;font-weight:800;cursor:pointer;line-height:1}
   .cap-card{
     background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:14px;
     padding:12px 16px 14px;margin:0 0 18px;text-align:start;
@@ -303,7 +304,7 @@
     </div>
   </div>
 
-  <p class="ver">١٤ · 14</p>
+  <p class="ver">١٥ · 15</p>
 </div>
 
 <div class="modal-bg" id="previewBg" hidden>
@@ -424,6 +425,7 @@ const STR = {
     capNear:"⚠️ قربتوا من العدد الكامل", person:"فرد",
     myFams:n=>`🤍 اللي سجلتوه (${n}) — شوفوا وعدّلوا`, switchPin:"🔓 تبديل الرمز",
     samePhone:"📱 نفس رقم الواتساب — غالبًا نفس العيلة حتى لو الاسم مختلف",
+    photoGone:"اتشالت الصورة",
   },
   en: {
     kicker:"Guest List", sideQ:"Which side are you from? One minute to add your families.",
@@ -465,6 +467,7 @@ const STR = {
     capNear:"⚠️ Getting close to capacity", person:"people",
     myFams:n=>`🤍 Your additions (${n}) — view & edit`, switchPin:"🔓 Switch PIN",
     samePhone:"📱 Same WhatsApp number — likely the same household even if the name differs",
+    photoGone:"Photo removed",
   }
 };
 let L = localStorage.getItem("wedLang") || "ar";
@@ -1057,9 +1060,26 @@ async function loadPhotos(){
       a.href = url; a.target = "_blank"; a.rel = "noopener";
       const side = o.name.startsWith("bride") ? t("fB") : o.name.startsWith("groom") ? t("fG") : "";
       a.innerHTML = `<img loading="lazy" src="${url}"><span class="tag">${side}</span>`;
+      const del = document.createElement("button");
+      del.className = "pdel"; del.textContent = "✕";
+      del.onclick = (e) => { e.preventDefault(); e.stopPropagation(); deletePhoto(o.name, url, a); };
+      a.appendChild(del);
       el.appendChild(a);
     });
   } catch(e) {}
+}
+async function deletePhoto(name, url, tile){
+  let blob = null;
+  try { blob = await (await fetch(url)).blob(); } catch(e) {}
+  tile.remove();
+  try { await fetch(`${STORAGE}/object/guest-photos/${name}`, { method: "DELETE", headers: { "apikey": KEY, "Authorization": "Bearer " + KEY } }); } catch(e) {}
+  toast(t("photoGone"), false, blob ? { label: t("undo"), fn: async () => {
+    try {
+      await fetch(`${STORAGE}/object/guest-photos/${name}`, { method: "POST", headers: { "apikey": KEY, "Authorization": "Bearer " + KEY, "Content-Type": "image/jpeg" }, body: blob });
+      loadPhotos();
+      toast(t("restored"));
+    } catch(e) { toast(t("netErr"), true); }
+  } : undefined);
 }
 let fbPhotos = [];
 function showPhotoFallback(photos){ fbPhotos = photos; $("photoFbBg").hidden = false; }
