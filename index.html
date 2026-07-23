@@ -313,7 +313,7 @@
     </div>
   </div>
 
-  <p class="ver">١٦ · 16</p>
+  <p class="ver">١٧ · 17</p>
 </div>
 
 <div class="modal-bg" id="previewBg" hidden>
@@ -661,7 +661,7 @@ function showMine(){
 /* ── phone normalization ── */
 function normalizePhone(raw, ccSel){
   if (!raw) return "";
-  let p = raw.replace(/[\s\-().]/g, "");
+  let p = normDigits(String(raw)).replace(/[\s\-().]/g, "");
   if (p.startsWith("00")) p = "+" + p.slice(2);
   if (p.startsWith("+")) return p;
   if (ccSel) {
