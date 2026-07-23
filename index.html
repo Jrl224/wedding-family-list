@@ -79,6 +79,9 @@
   .fam .ev2badge{font-size:13px;margin-inline-start:4px}
   .fam .ev2t{background:none;border:1px solid var(--line);border-radius:50%;width:32px;height:32px;font-size:15px;cursor:pointer;opacity:.35}
   .fam .ev2t.on{opacity:1;border-color:#5aa66c;background:rgba(90,166,108,.15)}
+  .fam .co-badge{font-size:11px;margin-inline-start:5px;padding:1px 6px;border-radius:6px;background:rgba(150,130,220,.18);border:1px solid rgba(150,130,220,.5);color:#c3b3f0;vertical-align:middle}
+  .fam .cot{background:none;border:1px solid var(--line);border-radius:50%;width:32px;height:32px;font-size:15px;cursor:pointer;opacity:.35}
+  .fam .cot.on{opacity:1;border-color:#9a82dc;background:rgba(150,130,220,.15)}
   .check{
     width:92px;height:92px;border-radius:50%;margin:4px auto 16px;display:flex;align-items:center;justify-content:center;
     border:1.5px solid var(--gold);background:radial-gradient(circle at 35% 30%, #16273f, var(--deep));
@@ -148,6 +151,7 @@
   .cap-card .cap-line{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:var(--dim);margin-bottom:7px}
   .cap-card .cap-line b{color:var(--ivory);font-size:14.5px}
   .cap-card .cap-left{font-weight:700;color:var(--gold-b)}
+  .cap-church{font-size:11px;color:#c3b3f0;margin-inline-start:6px;white-space:nowrap}
   .cap-bar{height:12px;border-radius:999px;background:rgba(9,18,32,.9);border:1px solid var(--line);overflow:hidden}
   .cap-fill{height:100%;border-radius:999px;width:0%;transition:width .8s ease, background .5s ease}
   .cap-fill.ok{background:linear-gradient(90deg,var(--gold),var(--gold-b))}
@@ -212,7 +216,7 @@
   <div class="dots"><i id="d1"></i><i id="d2"></i><i id="d3"></i></div>
 
   <div class="cap-card" id="capCard" hidden>
-    <div class="cap-line"><b id="capName"></b><span><span id="capUsed">0</span> / <span id="capMax">200</span> · <span class="cap-left" id="capLeft"></span></span></div>
+    <div class="cap-line"><b id="capName"></b><span><span id="capUsed">0</span> / <span id="capMax">200</span> · <span class="cap-left" id="capLeft"></span><span class="cap-church" id="capChurch"></span></span></div>
     <div class="cap-bar"><div class="cap-fill ok" id="capFill"></div></div>
     <p class="cap-full-msg" id="capMsg"></p>
   </div>
@@ -242,6 +246,7 @@
     </div>
     <input class="wiz-in phone-big" id="wPhone" inputmode="tel" autocomplete="off">
     <div class="ev2-row"><span id="ev2Label"></span><div class="chips"><button type="button" id="ev2No" class="on" onclick="setEv2(false)"></button><button type="button" id="ev2Yes" onclick="setEv2(true)"></button></div></div>
+    <div class="ev2-row"><span id="churchLabel"></span><div class="chips"><button type="button" id="churchNo" class="on" onclick="setChurch(false)"></button><button type="button" id="churchYes" onclick="setChurch(true)"></button></div></div>
     <button class="next" onclick="saveFamily()" id="saveBtn"></button>
     <button class="skip" onclick="saveFamily(true)" id="skipBtn"></button>
   </div>
@@ -290,11 +295,11 @@
       <div class="tot a"><b id="tA">0</b><span id="lA"></span></div>
     </div>
     <div class="cap-card" id="orgCapB">
-      <div class="cap-line"><b id="orgCapBName"></b><span><span id="orgCapBUsed">0</span> / <span id="orgCapBMax">200</span> · <span class="cap-left" id="orgCapBLeft"></span></span></div>
+      <div class="cap-line"><b id="orgCapBName"></b><span><span id="orgCapBUsed">0</span> / <span id="orgCapBMax">200</span> · <span class="cap-left" id="orgCapBLeft"></span><span class="cap-church" id="orgCapBChurch"></span></span></div>
       <div class="cap-bar"><div class="cap-fill ok" id="orgCapBFill"></div></div>
     </div>
     <div class="cap-card" id="orgCapG">
-      <div class="cap-line"><b id="orgCapGName"></b><span><span id="orgCapGUsed">0</span> / <span id="orgCapGMax">200</span> · <span class="cap-left" id="orgCapGLeft"></span></span></div>
+      <div class="cap-line"><b id="orgCapGName"></b><span><span id="orgCapGUsed">0</span> / <span id="orgCapGMax">200</span> · <span class="cap-left" id="orgCapGLeft"></span><span class="cap-church" id="orgCapGChurch"></span></span></div>
       <div class="cap-bar"><div class="cap-fill ok" id="orgCapGFill"></div></div>
     </div>
     <div class="filters">
@@ -302,6 +307,7 @@
       <button id="fB" onclick="setFilter('bride')"></button>
       <button id="fG" onclick="setFilter('groom')"></button>
       <button id="fE2" onclick="setFilter('ev2')">🌿</button>
+      <button id="fCo" onclick="setFilter('church')">⛪</button>
     </div>
     <input class="search" id="search" oninput="renderAll()">
     <div id="fullList" style="text-align:start"></div>
@@ -313,7 +319,7 @@
     </div>
   </div>
 
-  <p class="ver">١٧ · 17</p>
+  <p class="ver">١٨ · 18</p>
 </div>
 
 <div class="modal-bg" id="previewBg" hidden>
@@ -361,6 +367,7 @@
       <button type="button" onclick="eBump(-1)" style="width:52px;height:52px;font-size:26px">−</button>
     </div>
     <div class="ev2-row"><span id="eEv2Label"></span><div class="chips"><button type="button" id="eEv2No" class="on" onclick="setEEv2(false)"></button><button type="button" id="eEv2Yes" onclick="setEEv2(true)"></button></div></div>
+    <div class="ev2-row"><span id="eChurchLabel"></span><div class="chips"><button type="button" id="eChurchNo" class="on" onclick="setEChurch(false)"></button><button type="button" id="eChurchYes" onclick="setEChurch(true)"></button></div></div>
     <input class="wiz-in phone-big" id="ePhone" inputmode="tel" style="font-size:17px" autocomplete="off">
     <div class="m-actions">
       <button class="m-ok" onclick="saveEdit()" id="editSave"></button>
@@ -437,6 +444,7 @@ const STR = {
     samePhone:"📱 نفس رقم الواتساب — غالبًا نفس العيلة حتى لو الاسم مختلف",
     photoGone:"اتشالت الصورة",
     ev2Q:n=>`🌿 هيتعزموا على ${n} كمان؟`, yes:"أيوة", no:"لأ", ev2Count:(f,p)=>`🌿 ${f} عيلة · ${p} فرد`,
+    churchQ:"⛪ الكنيسة فقط (بدون الحفلة)", capChurch:n=>`⛪ ${n}`,
   },
   en: {
     kicker:"Guest List", sideQ:"Which side are you from? One minute to add your families.",
@@ -480,6 +488,7 @@ const STR = {
     samePhone:"📱 Same WhatsApp number — likely the same household even if the name differs",
     photoGone:"Photo removed",
     ev2Q:n=>`🌿 Also invited to the ${n}?`, yes:"Yes", no:"No", ev2Count:(f,p)=>`🌿 ${f} families · ${p} people`,
+    churchQ:"⛪ Church only (no reception)", capChurch:n=>`⛪ ${n}`,
   }
 };
 let L = localStorage.getItem("wedLang") || "ar";
@@ -510,6 +519,8 @@ function applyLang(){
   set("pinTitle","pinTitle"); set("pinSub","pinSub"); set("pinOpen","pinOpen"); set("pinBack","pinBack"); set("pinErr","pinErr");
   set("editTitle","editTitle"); set("editSave","editSave"); set("editCancel","cancel");
   set("switchPinBtn","switchPin");
+  set("churchLabel","churchQ"); set("eChurchLabel","churchQ");
+  set("churchNo","no"); set("churchYes","yes"); set("eChurchNo","no"); set("eChurchYes","yes");
   $("eName").placeholder = t("q1ph"); $("ePhone").placeholder = t("phoneOpt");
   $("backBtn").textContent = L === "ar" ? "‹ رجوع" : "‹ Back";
   $("platformTip").innerHTML = /iPhone|iPad|iPod/.test(navigator.userAgent) ? t("tipIOS") : t("tipAnd");
@@ -525,6 +536,7 @@ let CAPS = { bride: 200, groom: 200 };
 let EV2 = { ar: "حفلة الحنة", en: "Henna Party" };
 const ev2Name = () => L === "ar" ? EV2.ar : EV2.en;
 let sideTotals = { bride: 0, groom: 0 };
+let churchTotals = { bride: 0, groom: 0 };
 async function loadCaps(){
   try {
     const r = await fetch("https://wydodvbkqhpoyefcwpnf.supabase.co/rest/v1/wedding_settings?select=bride_cap,groom_cap,event2_name_ar,event2_name_en&id=eq.1", { headers: H });
@@ -539,13 +551,21 @@ async function loadCaps(){
 let wEv2 = false, eEv2 = false;
 function setEv2(v){ wEv2 = v; $("ev2Yes").className = v ? "on" : ""; $("ev2No").className = v ? "" : "on"; }
 function setEEv2(v){ eEv2 = v; $("eEv2Yes").className = v ? "on" : ""; $("eEv2No").className = v ? "" : "on"; }
+let wChurch = false, eChurch = false;
+function setChurch(v){ wChurch = v; $("churchYes").className = v ? "on" : ""; $("churchNo").className = v ? "" : "on"; }
+function setEChurch(v){ eChurch = v; $("eChurchYes").className = v ? "on" : ""; $("eChurchNo").className = v ? "" : "on"; }
 async function refreshSideTotals(){
   try {
-    const r = await fetch(SUPA + "?select=side,count", { headers: H });
+    const r = await fetch(SUPA + "?select=side,count,church_only", { headers: H });
     if (!r.ok) return;
     const rows = await r.json();
     sideTotals = { bride: 0, groom: 0 };
-    rows.forEach(x => { if (sideTotals[x.side] !== undefined) sideTotals[x.side] += x.count; });
+    churchTotals = { bride: 0, groom: 0 };
+    rows.forEach(x => {
+      if (sideTotals[x.side] === undefined) return;
+      if (x.church_only) churchTotals[x.side] += x.count;
+      else sideTotals[x.side] += x.count;
+    });
     renderCaps();
   } catch(e) {}
 }
@@ -556,6 +576,8 @@ function paintCap(prefix, side){
   $(prefix + "Used").textContent = used;
   $(prefix + "Max").textContent = cap;
   $(prefix + "Left").textContent = used > cap ? t("capOver")(used - cap) : t("capLeft")(cap - used);
+  const chEl = $(prefix + "Church");
+  if (chEl) { const ch = churchTotals[side] || 0; chEl.textContent = ch ? t("capChurch")(ch) : ""; }
   fill.style.width = pct + "%";
   fill.className = "cap-fill " + (pct >= 90 ? "full" : pct >= 70 ? "warn" : "ok");
   card.classList.toggle("maxed", used >= cap);
@@ -641,8 +663,8 @@ async function saveFamily(skipPhone){
   if (!name) { toStep(1); return; }
   const rawPhone = skipPhone ? "" : $("wPhone").value.trim();
   const phone = rawPhone ? normalizePhone(rawPhone, cc) : "";
-  if (await insertRows([{ name, count: n, phone, event2: wEv2 }])) {
-    setEv2(false);
+  if (await insertRows([{ name, count: n, phone, event2: wEv2, church_only: wChurch }])) {
+    setEv2(false); setChurch(false);
     $("doneName").textContent = name;
     $("wName").value = ""; $("wPhone").value = "";
     n = 2; $("count").textContent = n;
@@ -846,7 +868,7 @@ async function insertRows(items){
       } else items = clean;
     }
   } catch(e) { /* best effort */ }
-  const payload = items.map(i => ({ name: i.name, count: i.count, phone: i.phone || "", side: mySide, added_by: device, event2: !!i.event2 }));
+  const payload = items.map(i => ({ name: i.name, count: i.count, phone: i.phone || "", side: mySide, added_by: device, event2: !!i.event2, church_only: !!i.church_only }));
   try {
     const r = await fetch(SUPA, { method: "POST", headers: H, body: JSON.stringify(payload) });
     if (!r.ok) throw 0;
@@ -880,7 +902,7 @@ async function removeRow(row){
   refreshMine(); if (isOrg()) refreshAll();
   toast(t("removed")(row.name), false, { label: t("undo"), fn: async () => {
     try {
-      await fetch(SUPA, { method: "POST", headers: H, body: JSON.stringify([{ name: row.name, count: row.count, phone: row.phone, side: row.side, added_by: row.added_by }]) });
+      await fetch(SUPA, { method: "POST", headers: H, body: JSON.stringify([{ name: row.name, count: row.count, phone: row.phone, side: row.side, added_by: row.added_by, event2: !!row.event2, church_only: !!row.church_only }]) });
       refreshMine(); if (isOrg()) refreshAll();
       toast(t("restored"));
     } catch(e) { toast(t("netErr"), true); }
@@ -892,7 +914,7 @@ function famRow(r, canDelete){
   const info = document.createElement("div");
   info.className = "info";
   const sideWord = r.side === "bride" ? t("sideWordB") : t("sideWordG");
-  info.innerHTML = `<b>${esc(r.name)}${r.event2 ? '<span class="ev2badge">🌿</span>' : ""}</b><div class="meta">${sideWord}${r.phone ? ` · <span dir="ltr">${esc(r.phone)}</span>` : ""}</div>`;
+  info.innerHTML = `<b>${esc(r.name)}${r.event2 ? '<span class="ev2badge">🌿</span>' : ""}${r.church_only ? '<span class="co-badge">⛪</span>' : ""}</b><div class="meta">${sideWord}${r.phone ? ` · <span dir="ltr">${esc(r.phone)}</span>` : ""}</div>`;
   const cnt = document.createElement("div");
   cnt.className = "cnt";
   const minus = document.createElement("button"); minus.textContent = "−";
@@ -911,6 +933,15 @@ function famRow(r, canDelete){
       try { await fetch(`${SUPA}?id=eq.${r.id}`, { method: "PATCH", headers: H, body: JSON.stringify({ event2: r.event2 }) }); } catch(e) {}
     };
     row.append(ev);
+    const co = document.createElement("button");
+    co.className = "cot" + (r.church_only ? " on" : "");
+    co.textContent = "⛪";
+    co.onclick = async () => {
+      r.church_only = !r.church_only; renderAll(); renderMine();
+      try { await fetch(`${SUPA}?id=eq.${r.id}`, { method: "PATCH", headers: H, body: JSON.stringify({ church_only: r.church_only }) }); } catch(e) {}
+      refreshSideTotals();
+    };
+    row.append(co);
   }
   if (canDelete) {
     const ed = document.createElement("button");
@@ -929,7 +960,7 @@ let editing = null, eCount = 2;
 function eBump(d){ eCount = Math.min(30, Math.max(1, eCount + d)); $("eCount").textContent = eCount; }
 function openEdit(r){
   editing = r; eCount = r.count;
-  setEEv2(!!r.event2);
+  setEEv2(!!r.event2); setEChurch(!!r.church_only);
   $("eName").value = r.name; $("ePhone").value = r.phone || ""; $("eCount").textContent = eCount;
   $("editBg").hidden = false;
   setTimeout(()=> $("eName").focus(), 60);
@@ -940,10 +971,10 @@ async function saveEdit(){
   if (!name) { $("eName").focus(); return; }
   const phone = $("ePhone").value.trim() ? normalizePhone($("ePhone").value.trim(), "") : "";
   $("editBg").hidden = true;
-  editing.name = name; editing.count = eCount; editing.phone = phone; editing.event2 = eEv2;
+  editing.name = name; editing.count = eCount; editing.phone = phone; editing.event2 = eEv2; editing.church_only = eChurch;
   renderMine(); renderAll();
   try {
-    await fetch(`${SUPA}?id=eq.${editing.id}`, { method: "PATCH", headers: H, body: JSON.stringify({ name, count: eCount, phone, event2: eEv2 }) });
+    await fetch(`${SUPA}?id=eq.${editing.id}`, { method: "PATCH", headers: H, body: JSON.stringify({ name, count: eCount, phone, event2: eEv2, church_only: eChurch }) });
     toast(t("edited"));
   } catch(e) { toast(t("netErr"), true); }
   refreshMine(); if (isOrg()) refreshAll();
@@ -972,9 +1003,11 @@ function renderAll(){
   $("orgCapG").hidden = role === "bride";
   document.querySelector(".filters").hidden = false;
   $("fAll").hidden = $("fB").hidden = $("fG").hidden = role !== "master";
-  if (role !== "master" && filter !== "ev2") filter = role;
+  if (role !== "master" && filter !== "ev2" && filter !== "church") filter = role;
   const e2f = vis.filter(x => x.event2);
   $("fE2").textContent = "🌿 " + e2f.length + " · " + e2f.reduce((s, x) => s + x.count, 0);
+  const cof = vis.filter(x => x.church_only);
+  $("fCo").textContent = "⛪ " + cof.length + " · " + cof.reduce((s, x) => s + x.count, 0);
   const nameGroups = {}, phoneGroups = {};
   vis.forEach(r => {
     const nk = normName(r.name); if (nk) (nameGroups[nk] = nameGroups[nk] || []).push(r);
@@ -991,7 +1024,7 @@ function renderAll(){
     : "";
   const el = $("fullList");
   const q = ($("search").value || "").trim().toLowerCase();
-  const show = vis.filter(r => (filter === "all" || (filter === "ev2" ? r.event2 : r.side === filter)) && (!q || r.name.toLowerCase().includes(q) || (r.phone || "").includes(q)));
+  const show = vis.filter(r => (filter === "all" || (filter === "ev2" ? r.event2 : filter === "church" ? r.church_only : r.side === filter)) && (!q || r.name.toLowerCase().includes(q) || (r.phone || "").includes(q)));
   el.innerHTML = "";
   if (!show.length) { el.innerHTML = `<p class="empty">${t("listEmpty")}</p>`; return; }
   show.forEach(r => el.appendChild(famRow(r, true)));
@@ -1001,6 +1034,7 @@ function setFilter(f){
   filter = f;
   $("fAll").className = f === "all" ? "on" : ""; $("fB").className = f === "bride" ? "on" : ""; $("fG").className = f === "groom" ? "on" : "";
   $("fE2").className = f === "ev2" ? "on" : "";
+  $("fCo").className = f === "church" ? "on" : "";
   renderAll();
 }
 
@@ -1177,10 +1211,10 @@ async function handleFiles(files){
 
 /* ── exports ── */
 function exportExcel(){
-  const head = ["Name (الاسم)", "Side (الطرف)", "People (الأفراد)", "WhatsApp", ev2Name(), "Added"];
+  const head = ["Name (الاسم)", "Side (الطرف)", "People (الأفراد)", "WhatsApp", ev2Name(), "Church Only (الكنيسة فقط)", "Added"];
   const xrole = orgRole() || "master";
   const xrows = xrole === "master" ? all : all.filter(r => r.side === xrole);
-  const rows_ = xrows.map(r => [r.name, r.side === "bride" ? "Bride عروسة" : "Groom عريس", r.count, r.phone || "", r.event2 ? "YES" : "", (r.created_at || "").slice(0, 10)]);
+  const rows_ = xrows.map(r => [r.name, r.side === "bride" ? "Bride عروسة" : "Groom عريس", r.count, r.phone || "", r.event2 ? "YES" : "", r.church_only ? "YES" : "", (r.created_at || "").slice(0, 10)]);
   const csv = "﻿" + [head, ...rows_].map(row => row.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\r\n");
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
@@ -1195,7 +1229,9 @@ function sendSnapshot(){
   const fmt = list => list.map((r, i) => `${i+1}. ${r.name} — ${r.count} أفراد${r.phone ? " — " + r.phone : ""}`).join("\n");
   const bp = part("bride"), gp = part("groom");
   const total = src.reduce((s, r) => s + r.count, 0);
-  const msg = `قائمة عزومة فرح يوستينا ومحب 🤍\n${src.length} عيلة · ${total} فرد\n\n🤍 طرف العروسة (${bp.reduce((s,r)=>s+r.count,0)} فرد):\n${fmt(bp) || "—"}\n\n🤍 طرف العريس (${gp.reduce((s,r)=>s+r.count,0)} فرد):\n${fmt(gp) || "—"}`;
+  const church = src.filter(r => r.church_only);
+  const churchP = church.reduce((s, r) => s + r.count, 0);
+  const msg = `قائمة عزومة فرح يوستينا ومحب 🤍\n${src.length} عيلة · ${total} فرد\n⛪ الكنيسة فقط: ${church.length} عيلة · ${churchP} فرد\n\n🤍 طرف العروسة (${bp.reduce((s,r)=>s+r.count,0)} فرد):\n${fmt(bp) || "—"}\n\n🤍 طرف العريس (${gp.reduce((s,r)=>s+r.count,0)} فرد):\n${fmt(gp) || "—"}`;
   location.href = "https://wa.me/?text=" + encodeURIComponent(msg);
 }
 
