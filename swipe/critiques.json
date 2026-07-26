@@ -1,0 +1,979 @@
+{
+ "pressed-herbarium--invite": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Lush, authentically textured pressed lilac-and-wisteria border with letter-perfect bilingual text is genuinely send-worthy, but the promised handwritten-label scientific-romance never appears — the gold ornaments and plain typeset center read slightly stock-template instead of botanist's album.",
+  "tags": [
+   "romantic",
+   "delicate",
+   "elegant",
+   "ornate"
+  ]
+ },
+ "porcelain-chinoiserie--invite": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The hand-painted porcelain border and scalloped gold quatrefoil frame are exquisite and both scripts are letter-perfect, but the generic Times-like English serif sits flat and characterless against all that painterly craft.",
+  "tags": [
+   "elegant",
+   "ornate",
+   "delicate",
+   "romantic"
+  ]
+ },
+ "manuscript-illumination--invite": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The lavish Coptic illuminated border with paired birds, ogee arch, and letter-perfect bilingual Naskh calligraphy is museum-grade, but the bottom border row is truncated at the image edge, leaving a thin plum strip that breaks the frame's vertical symmetry.",
+  "tags": [
+   "ornate",
+   "elegant",
+   "luminous",
+   "romantic"
+  ]
+ },
+ "wisteria-cathedral--invite": {
+  "verdict": "pass",
+  "score": 8.5,
+  "critique": "The gold Theotokos tympanum with twin crowns and letter-perfect Naskh cascading through a wisteria-draped Coptic arch is genuinely send-worthy, but the left-flank wisteria runs denser than the right and turns slightly muddy at the lower-left capital while the crowns read a touch stiffer than the painterly surround.",
+  "tags": [
+   "romantic",
+   "ornate",
+   "luminous",
+   "elegant"
+  ]
+ },
+ "art-deco-gatsby--invite": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The gold stepped frame with its sunburst crown, marble lilac panels, and letter-perfect bilingual hierarchy deliver genuine Gatsby luxe, but the Times-adjacent English serif reads default-bookface against the lush Naskh and keeps the card just shy of flawless.",
+  "tags": [
+   "ornate",
+   "elegant",
+   "luminous",
+   "dramatic"
+  ]
+ },
+ "velvet-foil--invite": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The embossed gold-foil florals on deep plum velvet deliver genuine tactile opulence with letter-perfect bilingual text, but the generic Times-like English serif undercuts the lush Naskh calligraphy and the bottom blocks crowd the border.",
+  "tags": [
+   "ornate",
+   "elegant",
+   "romantic",
+   "dramatic"
+  ]
+ },
+ "marble-vein--invite": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The luminous lilac-and-gold marble field framing a letter-perfect bilingual hierarchy in an ivory diamond reserve is genuinely luxurious, but the font-like Naskh with its faintly heavy drop shadow reads typeset rather than hand-calligraphed, and the four near-identical divider flourishes repeat instead of build.",
+  "tags": [
+   "elegant",
+   "luminous",
+   "romantic",
+   "delicate"
+  ]
+ },
+ "watercolor-jardin--invite": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The palette-true wisteria-and-rose watercolor border with its garden-gate vignette is genuinely luxurious and every Arabic letter survives intact, but the generic Times-like English serif and timid gold filigree frame undersell the calligraphy they accompany.",
+  "tags": [
+   "romantic",
+   "airy",
+   "elegant",
+   "delicate"
+  ]
+ },
+ "moonlit-garden--invite": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Letter-perfect bilingual Naskh-over-serif typography floating in a genuinely painterly moonlit arch with luminous orchid corners is send-worthy luxury; the flaw is the gold arch frame dissolving into the botanicals below the midpoint, robbing the composition of bottom closure.",
+  "tags": [
+   "romantic",
+   "luminous",
+   "elegant",
+   "delicate"
+  ]
+ },
+ "lace-veil--invite": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The letter-perfect bilingual typesetting nested in a genuinely sumptuous pearl-and-lace veil vignette is the card's triumph, but the embroidery is packed so densely along every edge that it flirts with bridal-catalog sweetness instead of restrained luxury.",
+  "tags": [
+   "romantic",
+   "ornate",
+   "delicate",
+   "elegant"
+  ]
+ },
+ "embroidered-linen--invite": {
+  "verdict": "regenerated-pass",
+  "score": 8,
+  "critique": "The satin-stitched wisteria frame with its picot-edge border and disciplined lilac-gold palette is genuinely luxurious and letter-perfect in both scripts, but the smooth Naskh and serif text sit as clean flat print on the linen instead of committing to the embroidered-thread conceit the florals promise.",
+  "tags": [
+   "romantic",
+   "delicate",
+   "elegant",
+   "ornate"
+  ]
+ },
+ "english-rose-garden--invite": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The RHS-precision rose border with flawless bilingual Naskh typography is the strongest asset, but the perimeter blooms crowd so densely that the white trellis arch — the theme's structural signature — is nearly swallowed, with the bottom gold urn finials reading as pasted-in Victorian stock.",
+  "tags": [
+   "romantic",
+   "ornate",
+   "elegant",
+   "delicate"
+  ]
+ },
+ "dawn-mist--invite": {
+  "verdict": "regenerated-pass",
+  "score": 8,
+  "critique": "The luminous sunrise-over-water lower third gives Dawn Mist a genuine horizon and serene depth beneath letter-perfect bilingual type, but the antique gold accent has retreated to just the ampersand and hairline dividers, leaving the palette a touch more monochrome-lilac than the luxury brief calls for.",
+  "tags": [
+   "romantic",
+   "airy",
+   "luminous",
+   "elegant"
+  ]
+ },
+ "andalusian-courtyard--invite": {
+  "verdict": "regenerated-pass",
+  "score": 8,
+  "critique": "The flowing purple Naskh of the couple's names under the illuminated Moorish arch is genuinely luxurious, but the cypress-and-lavender courtyard crowds the reception text block and robs the lower half of the airiness the top enjoys.",
+  "tags": [
+   "elegant",
+   "ornate",
+   "romantic",
+   "luminous"
+  ]
+ },
+ "venetian-glass--invite": {
+  "verdict": "regenerated-pass",
+  "score": 8,
+  "critique": "The jewel-like Murano glass florals with genuine refraction and gold-cane filigree are luxury-grade and the bilingual text is now letter-perfect after regeneration removed invented diacritics from the names headline, but the frame's asymmetry — an unmatched left-side glass amphora and tight clearance where the church lines nearly touch the right filigree — reads assembled rather than composed.",
+  "tags": [
+   "ornate",
+   "luminous",
+   "elegant",
+   "romantic"
+  ]
+ },
+ "gilded-birdcage--invite": {
+  "verdict": "regenerated-pass",
+  "score": 8,
+  "critique": "Letter-perfect bilingual typography beneath a gorgeous open-cage-and-doves crown is the strongest asset, but the duplicated miniature gate motifs and cage fragment cluttering the lower half dilute the single-birdcage poetry.",
+  "tags": [
+   "romantic",
+   "ornate",
+   "luminous",
+   "elegant"
+  ]
+ },
+ "parisian-atelier--invite": {
+  "verdict": "regenerated-pass",
+  "score": 7.5,
+  "critique": "The watercolor couture gown and disciplined lilac-and-gold framing are genuinely luxurious and every Arabic line is now letter-correct, but the Arabic name is set in a plain, bookish Naskh that falls flat beside the lush English script it should outshine — and both مساءً instances lost their tanwin.",
+  "tags": [
+   "romantic",
+   "elegant",
+   "ornate",
+   "delicate"
+  ]
+ },
+ "paper-quilling--invite": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The dimensional quilled-paper border is genuinely convincing handcraft with every bilingual line letter-perfect, but the gold arch frame dissolves unresolved into the florals and the bottom third crowds toward density a luxury letterpress suite would prune.",
+  "tags": [
+   "ornate",
+   "romantic",
+   "elegant",
+   "delicate"
+  ]
+ },
+ "ombre-silk--invite": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The liquid plum-to-ivory silk gradient carrying letter-perfect gold Naskh calligraphy is genuinely luxurious, but the silk texture dissolves into plain flat paper across the right half — leaving the composition left-weighted with a generic Times-like English serif that sits a notch below the calligraphy.",
+  "tags": [
+   "elegant",
+   "luminous",
+   "romantic",
+   "delicate"
+  ]
+ },
+ "toile-lilas--invite": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Flawless bilingual typography inside a disciplined single-lilac toile world with a genuinely beautiful Naskh names line is the strongest asset, while the weakest flaw is the bottom vignettes ballooning out of toile repeat scale into hero illustrations that crowd the cartouche's lower edge.",
+  "tags": [
+   "romantic",
+   "ornate",
+   "elegant",
+   "delicate"
+  ]
+ },
+ "crystal-chandelier--invite": {
+  "verdict": "regenerated-pass",
+  "score": 8,
+  "critique": "The luminous crystal-and-bokeh frame with watercolor florals is cohesively luxurious and letter-perfect in both languages, but the couple's Naskh name is plain typesetting that lacks the calligraphic flourish the ornate frame deserves.",
+  "tags": [
+   "romantic",
+   "ornate",
+   "luminous",
+   "elegant"
+  ]
+ },
+ "pearl-shell--invite": {
+  "verdict": "regenerated-pass",
+  "score": 8,
+  "critique": "The iridescent gold-rimmed nacre frame with dimensional pearls is genuinely luxurious and every Arabic and English line is now letter-perfect, but the center text block renders typeset-crisp rather than hand-calligraphic, leaving the ivory panel slightly sterile against so ornate a border.",
+  "tags": [
+   "luminous",
+   "elegant",
+   "romantic",
+   "delicate"
+  ]
+ },
+ "calligraphy-grand--invite": {
+  "verdict": "regenerated-pass",
+  "score": 8,
+  "critique": "The monumental, correctly-spelled gold thuluth hero with lilacs resting on its strokes is genuinely luxurious, but the soft watercolor cloud borders go slightly muddy and unresolved against the crisp filigree.",
+  "tags": [
+   "elegant",
+   "luminous",
+   "airy",
+   "romantic"
+  ]
+ },
+ "olive-holyland--invite": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The luminous Holy Land grove vignette dissolving into the lower border gives the card rare depth and letter-perfect bilingual hierarchy, but the heavy floral frame crowds the text column and the crisp font-like Naskh sits pasted-on rather than integrated with the painterly surface.",
+  "tags": [
+   "romantic",
+   "ornate",
+   "elegant",
+   "luminous"
+  ]
+ },
+ "iconostasis-gold--invite": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The triple-arched gold iconostasis crown with letter-perfect bilingual Naskh hierarchy is genuinely luxurious, but the unrelentingly dense border ornament crowds the text panel and makes the smaller typeset body lines feel flat beside the calligraphic name.",
+  "tags": [
+   "ornate",
+   "elegant",
+   "luminous"
+  ]
+ },
+ "dancing-ribbons--invite": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Commanding, letter-perfect Thuluth name calligraphy with real satin-and-gold paint texture is the star, but the border stacks ribbons, scrollwork, and rose clusters on all four edges until the frame edges toward busy rather than breathing luxury.",
+  "tags": [
+   "romantic",
+   "ornate",
+   "elegant",
+   "luminous"
+  ]
+ },
+ "wisteria-cathedral--table-number": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The layered Coptic arch dripping with wisteria and gilded angel medallions is genuinely sumptuous and letter-perfect, but the twin medallions are obvious mirror-clones and the heavy border density crowds the breathing room around the numeral.",
+  "tags": [
+   "ornate",
+   "romantic",
+   "elegant",
+   "luminous"
+  ]
+ },
+ "wisteria-cathedral--bride-sign": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Letter-perfect bilingual type set inside a genuinely painterly Coptic arch with disciplined lilac-and-gold theming is the strongest asset, while the beveled, slightly digital English serif and crowding wisteria corners are the weakest flaw.",
+  "tags": [
+   "romantic",
+   "ornate",
+   "elegant",
+   "luminous"
+  ]
+ },
+ "wisteria-cathedral--menu": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The wisteria-draped Coptic arch with jeweled crown and letter-perfect bilingual header is genuinely luxurious and print-ready, but the near-perfect mirror symmetry and five identical rules leave the large ivory center panel feeling slightly static.",
+  "tags": [
+   "ornate",
+   "elegant",
+   "romantic",
+   "luminous"
+  ]
+ },
+ "wisteria-cathedral--welcome-sign": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The luminous wisteria-draped Coptic arch framing letter-perfect bilingual text is genuinely send-worthy, but the clean typeset-flat Arabic lettering sits slightly detached from the painterly stonework and the tiny date-separator dot can misread as an Arabic zero.",
+  "tags": [
+   "romantic",
+   "ornate",
+   "luminous",
+   "elegant"
+  ]
+ },
+ "wisteria-cathedral--thank-you": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Letter-perfect bilingual type inside a genuinely painterly wisteria-draped Coptic arch is the strongest asset, but three stacked gold crowns plus two cross medallions tip the frame into ornamental redundancy.",
+  "tags": [
+   "romantic",
+   "ornate",
+   "elegant",
+   "luminous"
+  ]
+ },
+ "wisteria-cathedral--seating-chart": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Strongest asset is the regal coherence — crown-topped arched panels echoing the cathedral arch under a letter-perfect bilingual header with genuine painterly wisteria texture; weakest flaw is the right edge, where panels 4 and 8 sit pinched behind the column's overgrowth, breaking grid symmetry and shrinking their name space.",
+  "tags": [
+   "ornate",
+   "romantic",
+   "elegant",
+   "luminous"
+  ]
+ },
+ "wisteria-cathedral--moodboard": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The wisteria-draped Coptic arcade and gold-leaf angel icon in the top third are genuinely send-worthy, but the hero Arabic specimen collapses the word space into يوستيناومحب and the mauve chip runs too saturated versus #A493B4.",
+  "tags": [
+   "romantic",
+   "ornate",
+   "elegant",
+   "luminous"
+  ]
+ },
+ "wisteria-cathedral--monogram": {
+  "verdict": "pass",
+  "score": 7.5,
+  "critique": "Letter-perfect embossed-gold Naskh and English script with real relief texture is genuinely luxurious, but the emblem drowns in a crown, three crosses, arch, and columns — a cathedral tableau rather than a distilled interlocked monogram, with muddy wisteria clumps at the lower corners.",
+  "tags": [
+   "ornate",
+   "elegant",
+   "romantic",
+   "crowded"
+  ]
+ },
+ "wisteria-cathedral--save-the-date": {
+  "verdict": "regenerated-pass",
+  "score": 8,
+  "critique": "Letter-perfect bilingual typography inside a genuinely painterly Coptic arch with disciplined lilac-gold palette is the piece's strongest asset, while the storybook gold crown sits slightly sticker-flat against the wash and the dense lower ornament band crowds the Cairo line.",
+  "tags": [
+   "romantic",
+   "ornate",
+   "elegant",
+   "luminous"
+  ]
+ },
+ "pressed-herbarium--table-number": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The lush, botanically convincing pressed wisteria and lilac specimens with letter-perfect طاولة/5/Table hierarchy make this genuinely send-worthy, but the generic Times-style serif on \"Table\" betrays the theme's promised handwritten botanist-label lettering.",
+  "tags": [
+   "romantic",
+   "delicate",
+   "elegant"
+  ]
+ },
+ "pressed-herbarium--seating-chart": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Herbarium-credible pressed wisteria and lilac borders with letter-perfect bilingual header are genuinely send-worthy, but the ten uniform bracket-frame panels stack into a slightly mechanical grid that reads stiffer than the lush organic border around them.",
+  "tags": [
+   "romantic",
+   "delicate",
+   "elegant",
+   "airy"
+  ]
+ },
+ "pressed-herbarium--thank-you": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Museum-quality translucent pressed lilac and wisteria with letter-perfect trilingual gold text on convincingly grained ivory is the strongest asset; the weakest flaw is that the promised handwritten botanist labels never appear, so the herbarium concept softens into a generic pressed-floral border.",
+  "tags": [
+   "romantic",
+   "delicate",
+   "elegant"
+  ]
+ },
+ "pressed-herbarium--save-the-date": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The pressed lilac-and-wisteria specimen border is exquisitely painterly and letter-perfect in both scripts, but the two empty gold cartouches read as unfinished label placeholders that a true herbarium page would have filled.",
+  "tags": [
+   "romantic",
+   "delicate",
+   "elegant",
+   "airy"
+  ]
+ },
+ "pressed-herbarium--moodboard": {
+  "verdict": "pass",
+  "score": 8.5,
+  "critique": "The taped lilac and wisteria specimens with their loose-petal study sell authentic scientific-romance herbarium perfectly, but the plain bookish naskh on both cards falls short of the promised handwritten gold labels.",
+  "tags": [
+   "romantic",
+   "delicate",
+   "elegant",
+   "airy"
+  ]
+ },
+ "pressed-herbarium--menu": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Letter-perfect Arabic header and exquisite pressed lilac-wisteria borders make this genuinely send-worthy, but the five course rules crowd the upper half and leave a hollow dead band above the footer.",
+  "tags": [
+   "romantic",
+   "delicate",
+   "elegant",
+   "airy"
+  ]
+ },
+ "pressed-herbarium--welcome-sign": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Sumptuous, texture-rich pressed lilac-and-wisteria border with letter-perfect bilingual text and clean hierarchy; weakest note is the generic kashida-stretched naskh headline and slightly crowded upper corners that stiffen an otherwise lush herbarium page.",
+  "tags": [
+   "romantic",
+   "delicate",
+   "elegant",
+   "ornate"
+  ]
+ },
+ "pressed-herbarium--bride-sign": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Letter-perfect gilded العروسة جاية over genuinely convincing pressed lilac-and-wisteria specimens is the strongest asset, but the airless perimeter and three empty placeholder-reading labels (plus a thin, lopsided heart flourish) keep it just short of flawless.",
+  "tags": [
+   "romantic",
+   "ornate",
+   "delicate",
+   "elegant"
+  ]
+ },
+ "pressed-herbarium--monogram": {
+  "verdict": "pass",
+  "score": 7.5,
+  "critique": "Museum-grade pressed lilac and wisteria specimens frame letter-perfect gold Naskh and copperplate, but the names sit as two stacked title lines with generic scroll dividers instead of the interlocked emblem the brief demanded.",
+  "tags": [
+   "romantic",
+   "delicate",
+   "elegant"
+  ]
+ },
+ "art-deco-gatsby--table-number": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Letter-perfect gold-foil typography (طاولة / 5 / Table) inside a disciplined stepped deco cartouche is the star, but the perimeter piles shells, diamonds, fans, and sunrays into edge-crowding ornament that competes with the hierarchy.",
+  "tags": [
+   "ornate",
+   "elegant",
+   "luminous"
+  ]
+ },
+ "art-deco-gatsby--thank-you": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Immaculate mirror-symmetric gold Deco architecture with letter-perfect Arabic calligraphy is the showpiece, but the generic Times-like English serif and the densely packed side panels read slightly off-period and heavy against the Gatsby brief.",
+  "tags": [
+   "ornate",
+   "elegant",
+   "luminous"
+  ]
+ },
+ "art-deco-gatsby--moodboard": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The letter-perfect gilded Arabic calligraphy over the lilac silk title plate delivers genuinely send-worthy Gatsby glamour, but the awkward word gap in \"Deco Gold\" and the bottom row's near-duplicate fan sketches push the dense grid toward crowded.",
+  "tags": [
+   "ornate",
+   "elegant",
+   "luminous"
+  ]
+ },
+ "art-deco-gatsby--monogram": {
+  "verdict": "pass",
+  "score": 7.5,
+  "critique": "Letter-perfect gold Naskh over an equally flawless English script, locked into a genuinely glamorous stepped-Deco emblem, is the star — but four mismatched corner fans and broken frame-line hooks at the side edges betray AI wobble that robs the border of true Deco precision.",
+  "tags": [
+   "elegant",
+   "ornate",
+   "luminous"
+  ]
+ },
+ "art-deco-gatsby--menu": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The jewel-box Deco border — layered lilac sunrays with genuinely burnished gold rules and letter-perfect bilingual typography — is send-worthy craft, but the perimeter's dense stepped patchwork crowds the corners and slightly overpowers the airy menu well it frames.",
+  "tags": [
+   "ornate",
+   "elegant",
+   "luminous",
+   "dramatic"
+  ]
+ },
+ "art-deco-gatsby--welcome-sign": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Letter-perfect bilingual typography seated in a confidently symmetrical gold-fan Deco frame is the sell; the bottom fan crowding the lower divider and the slightly muddy airbrushed mauve corner panels are the only tells.",
+  "tags": [
+   "elegant",
+   "ornate",
+   "luminous"
+  ]
+ },
+ "art-deco-gatsby--seating-chart": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Letter-perfect bilingual header crowning immaculately disciplined gold Deco geometry on lilac silk makes this genuinely send-worthy, but every numeral floats too high in its panel, leaving top-heavy dead ivory and slightly mismatched corner fans on the bottom row.",
+  "tags": [
+   "ornate",
+   "elegant",
+   "luminous"
+  ]
+ },
+ "art-deco-gatsby--save-the-date": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The gold-fan-crowned stepped cartouche with letter-perfect bilingual text and true silk-and-gold painterly depth is genuinely send-worthy Gatsby glamour, but the bookish Times-style English serif is period-wrong for 1920s deco and slightly deflates the theme.",
+  "tags": [
+   "elegant",
+   "ornate",
+   "luminous",
+   "romantic"
+  ]
+ },
+ "art-deco-gatsby--bride-sign": {
+  "verdict": "regenerated-pass",
+  "score": 8,
+  "critique": "Regenerated Arabic calligraphy is now letter-perfect (جاية's final ta marbuta corrected from the original's qaf) and the gold-leaf Deco frame is symmetric and send-worthy, but the condensed single-line English reads slightly undersized against the monumental Arabic, leaving the lower silk panel a touch empty.",
+  "tags": [
+   "elegant",
+   "ornate",
+   "luminous",
+   "romantic"
+  ]
+ },
+ "porcelain-chinoiserie--table-number": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The lush, symmetrically painted chinoiserie border with its scalloped gold frame is genuinely porcelain-worthy, but the flat solid-lilac numeral and type read slightly digital and pasted-on against all that painterly texture.",
+  "tags": [
+   "romantic",
+   "ornate",
+   "elegant",
+   "delicate"
+  ]
+ },
+ "porcelain-chinoiserie--bride-sign": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The gold-rimmed scalloped porcelain cartouche wrapped in lush painterly lilac-and-periwinkle florals is the strongest framing in the suite, but both text lines sit as flat digital type — the mauve Arabic lacks calligraphic life against so ornate a border.",
+  "tags": [
+   "romantic",
+   "elegant",
+   "ornate",
+   "delicate"
+  ]
+ },
+ "porcelain-chinoiserie--save-the-date": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The hand-painted periwinkle-and-lilac porcelain border with its gold quatrefoil rim is genuinely convincing china painting in perfect palette, but the flat generic serif/naskh text block sits inert on the glaze and never matches the painterly craft framing it.",
+  "tags": [
+   "elegant",
+   "ornate",
+   "delicate",
+   "romantic"
+  ]
+ },
+ "porcelain-chinoiserie--seating-chart": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Letter-perfect bilingual header inside a lush hand-painted porcelain border is the star; the cramped 3-3-4 grid narrows the bottom-row panels and breaks the rhythm set by the rows above.",
+  "tags": [
+   "romantic",
+   "ornate",
+   "elegant",
+   "delicate"
+  ]
+ },
+ "porcelain-chinoiserie--menu": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Flawless bilingual typography inside a lush, genuinely painterly peony border is the strongest asset, but the ogee-arch frame reads Mughal manuscript more than porcelain china painting and the five identical course rules feel mechanically repetitive.",
+  "tags": [
+   "elegant",
+   "ornate",
+   "delicate",
+   "airy"
+  ]
+ },
+ "porcelain-chinoiserie--thank-you": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The lavish, letter-perfect chinoiserie border with gold-lined scalloped medallion is genuinely send-worthy, but the medallion's interior is over-empty with plainly typeset English lines that feel clinical against the painterly frame.",
+  "tags": [
+   "elegant",
+   "delicate",
+   "ornate",
+   "romantic"
+  ]
+ },
+ "porcelain-chinoiserie--moodboard": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The porcelain material studies and letter-perfect bilingual cartouche make this an unusually convincing, cohesive theme board, but the flat lilac-bordered type specimen panel reads stiffer and more digital than the painterly tiles surrounding it.",
+  "tags": [
+   "elegant",
+   "delicate",
+   "romantic",
+   "luminous"
+  ]
+ },
+ "porcelain-chinoiserie--welcome-sign": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Letter-perfect bilingual type inside a beautifully balanced gold ogee frame with genuinely painterly lilac-porcelain florals is the star, but the crisp emboss-shadowed lettering reads typeset-onto-glaze rather than painted-into-it, slightly detaching text from surface.",
+  "tags": [
+   "elegant",
+   "romantic",
+   "delicate",
+   "luminous"
+  ]
+ },
+ "porcelain-chinoiserie--monogram": {
+  "verdict": "regenerated-pass",
+  "score": 8,
+  "critique": "The regenerated wreath cartouche with letter-perfect gold Naskh over a beautifully swashed English script is genuinely send-worthy, but the near-absent word space between يوستينا and ومحب makes the Arabic read as one continuous word at a glance.",
+  "tags": [
+   "romantic",
+   "elegant",
+   "delicate",
+   "luminous"
+  ]
+ },
+ "stained-glass--table-number": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Letter-perfect طاولة / 5 / Table set in genuinely luminous textured glass with wisteria-and-lily framing that nails the anchor palette; the strict mirror symmetry and the slightly clumsy curled tail of the 5 leave the centerpiece a touch stiffer than the organic glasswork surrounding it.",
+  "tags": [
+   "luminous",
+   "ornate",
+   "elegant",
+   "romantic"
+  ]
+ },
+ "stained-glass--menu": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The luminous wisteria-and-lily stained-glass arch with letter-perfect gilded bilingual text is genuinely send-worthy, but the broad ivory interior feels a touch blank against the rich border and the five rules are spaced slightly unevenly.",
+  "tags": [
+   "luminous",
+   "ornate",
+   "elegant",
+   "romantic"
+  ]
+ },
+ "stained-glass--bride-sign": {
+  "verdict": "pass",
+  "score": 8.5,
+  "critique": "Letter-perfect bilingual text rendered as genuine gold-leaded jewel glass — the Arabic calligraphy as glasswork is the showpiece — but the large warm-ivory center field with its aimless crack-style lead lines reads slightly slack against the lush wisteria-and-lily border.",
+  "tags": [
+   "luminous",
+   "ornate",
+   "elegant",
+   "romantic"
+  ]
+ },
+ "stained-glass--welcome-sign": {
+  "verdict": "pass",
+  "score": 8.5,
+  "critique": "The luminous gold-leaded arch with cross, cascading wisteria, and jewel-glass palette is genuinely spectacular and letter-perfect in both scripts; the flat, generic typesetting and slack empty parchment below the date line are the only things keeping it from a 9.",
+  "tags": [
+   "luminous",
+   "ornate",
+   "elegant",
+   "romantic"
+  ]
+ },
+ "stained-glass--thank-you": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The heart-apex gothic tracery with letter-perfect trilingual text is a suite-worthy centerpiece, but the copy huddles in the upper two-thirds of the cream panel leaving a dead ivory field below the names, and the glass leans pastel-matte instead of jewel-luminous.",
+  "tags": [
+   "romantic",
+   "ornate",
+   "elegant",
+   "delicate"
+  ]
+ },
+ "stained-glass--monogram": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Letter-perfect gold Naskh and a genuinely luminous jewel-glass palette make this send-worthy, but the Y/&/M overlap zone congests so the M's left diagonal vanishes behind the ampersand and its right stem crowds the frame.",
+  "tags": [
+   "luminous",
+   "ornate",
+   "romantic",
+   "elegant"
+  ]
+ },
+ "stained-glass--invite": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Letter-perfect bilingual typography framed by genuinely painterly wisteria-and-tracery glasswork is the suite's cleanest execution, but the stained-glass conceit stops at the border — the flat ivory center panel reads as an ordinary invite card, never letting the jewel-light theme reach the text it exists to illuminate.",
+  "tags": [
+   "elegant",
+   "luminous",
+   "ornate",
+   "romantic"
+  ]
+ },
+ "stained-glass--seating-chart": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The luminous leaded-glass frame with letter-perfect ترتيب الجلوس header and blank, hallucination-free number panels is genuinely send-worthy, but the mirror-stamped 2x5 grid repeats so mechanically that the middle band drifts toward wallpaper rather than one composed window.",
+  "tags": [
+   "luminous",
+   "ornate",
+   "elegant",
+   "romantic"
+  ]
+ },
+ "stained-glass--save-the-date": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The cascading wisteria borders in leaded gold are genuinely jewel-luminous with flawless letter-perfect bilingual hierarchy, but the oversized ivory center panel reads as flat parchment rather than light-through-glass, muting the stained-glass premise exactly where the eye lands.",
+  "tags": [
+   "romantic",
+   "ornate",
+   "luminous",
+   "elegant"
+  ]
+ },
+ "stained-glass--moodboard": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Flawless bilingual lettering set inside genuinely beautiful wisteria-and-lily cathedral windows is the board's strongest asset, but the pastel mother-of-pearl fills mute the jewel-light glow that a stained-glass theme lives or dies on.",
+  "tags": [
+   "elegant",
+   "ornate",
+   "delicate",
+   "romantic"
+  ]
+ },
+ "manuscript-illumination--table-number": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The sumptuous Coptic interlace border with gold-leaf numeral 5 and letter-perfect طاولة is genuinely send-worthy, but the generic serif \"Table\" reads slightly typeset against the hand-illuminated ornament.",
+  "tags": [
+   "ornate",
+   "elegant",
+   "luminous",
+   "romantic"
+  ]
+ },
+ "manuscript-illumination--thank-you": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The richly painted Coptic interlace border with its arched gold frame and cross medallions is museum-grade and palette-perfect, but the clean modern serif and naskh text sit on the illumination like dropped-in type rather than hand-lettered script, leaving the center one register more sterile than the frame.",
+  "tags": [
+   "ornate",
+   "elegant",
+   "luminous",
+   "romantic"
+  ]
+ },
+ "manuscript-illumination--monogram": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Letter-perfect gold Naskh and English script inside a genuinely painterly, palette-faithful Coptic illuminated frame is the standout asset, but the piece reads as a dense full-page frontispiece rather than the prompt's single interlocked monogram emblem, with the heavy border slightly upstaging the names.",
+  "tags": [
+   "ornate",
+   "elegant",
+   "luminous",
+   "romantic"
+  ]
+ },
+ "manuscript-illumination--seating-chart": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The Arabic calligraphy is genuinely gorgeous — letter-perfect ترتيب الجلوس with real reed-pen stroke modulation crowning a cohesive Coptic border — but the off-center \"10\" numeral and the mismatched panel widths between row one and rows two/three betray a grid that wasn't fully disciplined.",
+  "tags": [
+   "ornate",
+   "elegant",
+   "delicate"
+  ]
+ },
+ "manuscript-illumination--bride-sign": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Letter-perfect bilingual calligraphy inside a genuinely painterly Coptic gold-leaf border is send-worthy, but the stray hyphen rendered before the heart flourish reads as a typographic artifact that slightly unbalances the English line.",
+  "tags": [
+   "ornate",
+   "elegant",
+   "luminous",
+   "romantic"
+  ]
+ },
+ "manuscript-illumination--moodboard": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The burnished gold interlace, rosette mandala, and cracked-leaf texture studies are museum-convincing with letter-perfect Arabic, but the board runs wall-to-wall ornament with no quiet module for the eye — and a stray damma sneaks onto the shadda of مذهّبة.",
+  "tags": [
+   "ornate",
+   "elegant",
+   "luminous"
+  ]
+ },
+ "manuscript-illumination--save-the-date": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The jewel-toned Coptic interlace border with letter-perfect bilingual text is museum-grade, but the center English lines feel slightly font-set with loose leading (and القاهرة sits left of Cairo), reading a touch more typeset than illuminated.",
+  "tags": [
+   "ornate",
+   "elegant",
+   "luminous",
+   "romantic"
+  ]
+ },
+ "manuscript-illumination--menu": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The museum-grade Coptic interlace border with letter-perfect bilingual text is the strongest asset; the five machine-identical rules and LTR-ordered header line feel slightly stiff against the hand-illuminated frame.",
+  "tags": [
+   "ornate",
+   "elegant",
+   "luminous",
+   "romantic"
+  ]
+ },
+ "manuscript-illumination--welcome-sign": {
+  "verdict": "regenerated-pass",
+  "score": 7.5,
+  "critique": "Now letter-perfect (فرح and أغسطس both corrected), its strongest asset is the genuinely painterly gold-and-periwinkle Coptic interlace frame on toothy parchment, while its weakest flaw is the flat Times-like English serif and slack gap above the date line that make the center read typeset rather than illuminated.",
+  "tags": [
+   "ornate",
+   "elegant",
+   "luminous",
+   "stiff"
+  ]
+ },
+ "moonlit-garden--table-number": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The luminous crescent-and-orchid night frame around the scalloped gold-edged panel is genuinely enchanting with letter-perfect طاولة / 5 / Table, but the gold divider rules colliding with the numeral's flanks and the flourish crowding \"Table\" pinch the center column's breathing room.",
+  "tags": [
+   "romantic",
+   "luminous",
+   "elegant",
+   "ornate"
+  ]
+ },
+ "moonlit-garden--thank-you": {
+  "verdict": "pass",
+  "score": 7.5,
+  "critique": "The luminous crescent-and-orchid atmosphere with letter-perfect gilded Arabic is genuinely enchanting, but the names line drifts off-center and collides with the right orchid, leaving the bottom third crowded and print-unready without retouch.",
+  "tags": [
+   "luminous",
+   "romantic",
+   "elegant",
+   "crowded"
+  ]
+ },
+ "moonlit-garden--save-the-date": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Letter-perfect bilingual type floating in a genuinely luminous orchid-and-crescent night garden is the asset; the frosted-glitter texture inside the crescent moon reads faintly craft-store against the otherwise refined painterly sky.",
+  "tags": [
+   "romantic",
+   "luminous",
+   "elegant",
+   "delicate"
+  ]
+ },
+ "moonlit-garden--seating-chart": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The luminous filigreed crescent and letter-perfect bilingual header lockup against the twilight-lilac sky are genuinely enchanting, but the ten identical tombstone panels locked in a rigid two-row grid trade garden magic for template stiffness and squeeze the moonlit-lake vignette into a sliver.",
+  "tags": [
+   "romantic",
+   "luminous",
+   "elegant",
+   "stiff"
+  ]
+ },
+ "moonlit-garden--bride-sign": {
+  "verdict": "pass",
+  "score": 8.5,
+  "critique": "The gilt-flecked crescent and letter-perfect textured Arabic-English calligraphy glowing against the twilight lilac nail the moonlit-garden magic, but the dense orchid corners plus a doubled center flourish (heart divider and a second big swash) crowd the sky's breathing room.",
+  "tags": [
+   "romantic",
+   "luminous",
+   "ornate",
+   "elegant"
+  ]
+ },
+ "moonlit-garden--menu": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Letter-perfect bilingual gold lettering fused into a genuinely luminous painterly night-garden is the card's triumph, but the five course rules huddle in the top half and abandon a washed-out dead zone of empty mist above the gazebo, leaving the layout top-heavy.",
+  "tags": [
+   "romantic",
+   "luminous",
+   "elegant"
+  ]
+ },
+ "moonlit-garden--monogram": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Letter-perfect gold Naskh and English script inside a luminous orchid-wrapped crescent ring is genuinely send-worthy, but the redundant second crescent moon top-left and the text stack drifting off the ring's optical center keep the emblem from feeling truly interlocked.",
+  "tags": [
+   "romantic",
+   "luminous",
+   "elegant",
+   "ornate"
+  ]
+ },
+ "moonlit-garden--moodboard": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The letter-perfect bilingual type specimen — gold calligraphy glowing on the ink-wash twilight panel — is genuinely send-worthy, but the grid is packed so tight, with the top-right orchid study bleeding unframed into the sky scene, that the board loses the negative space a moonlit theme is supposed to breathe with.",
+  "tags": [
+   "luminous",
+   "romantic",
+   "elegant",
+   "ornate"
+  ]
+ },
+ "moonlit-garden--welcome-sign": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The crescent-to-lake moonlight axis with letter-perfect bilingual typography gives the sign a genuine narrative spine, but the bottom third crowds five heavy orchids around the lake vignette and pins the date line too tight against the treeline.",
+  "tags": [
+   "romantic",
+   "luminous",
+   "elegant",
+   "ornate"
+  ]
+ }
+}
