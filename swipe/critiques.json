@@ -975,5 +975,242 @@
    "elegant",
    "ornate"
   ]
+ },
+ "lotus-nile--table-number": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The winged sun-disk crest and papyrus-column frame in a dead-on lilac-and-gold palette are suite-defining, but the Didone serif 5 and thin plain طاولة lettering sit stylistically apart from the Egyptian deco ornament, feeling placed rather than integrated.",
+  "tags": [
+   "ornate",
+   "elegant",
+   "luminous",
+   "romantic"
+  ]
+ },
+ "lotus-nile--seating-chart": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The coherent Egyptian Art Nouveau frame with letter-perfect bilingual header is the strongest asset, but the four-panel middle row crowds panels 4 and 7 behind the side florals and breaks the layout's rhythm.",
+  "tags": [
+   "elegant",
+   "ornate",
+   "delicate",
+   "luminous"
+  ]
+ },
+ "lotus-nile--menu": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Letter-perfect bilingual typography inside a genuinely painterly, symmetric lotus-and-gold border is the card's strength, but the stacked crest, winged disk, and hieroglyph panels make the top edge noticeably heavier and busier than the airy menu body.",
+  "tags": [
+   "elegant",
+   "ornate",
+   "airy",
+   "delicate"
+  ]
+ },
+ "lotus-nile--thank-you": {
+  "verdict": "pass",
+  "score": 8.5,
+  "critique": "Letter-perfect naskh calligraphy inside a genuinely pharaonic sun-disk-and-winged-lotus composition is the strongest asset, but the oversized bottom medallion crowds the names line and leaves the card slightly bottom-heavy.",
+  "tags": [
+   "elegant",
+   "ornate",
+   "luminous"
+  ]
+ },
+ "lotus-nile--moodboard": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Letter-perfect bilingual typography inside a luminous, genuinely cohesive lilac-and-gold Egyptian revival system is the board's strongest asset; its weakest flaw is the bottom motif band, where the literal goddess and falcon figures tip toward souvenir-shop Egyptiana and crowd the otherwise refined restraint.",
+  "tags": [
+   "elegant",
+   "ornate",
+   "luminous",
+   "romantic"
+  ]
+ },
+ "lotus-nile--bride-sign": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The confident, letter-perfect Arabic calligraphy crowning a disciplined lilac-and-gold lotus frame is genuinely processional, but the triple-bloom pile-up in the bottom third crowds the English baseline and the strict mirror symmetry reads a touch stiff.",
+  "tags": [
+   "elegant",
+   "ornate",
+   "romantic"
+  ]
+ },
+ "lotus-nile--welcome-sign": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The monumental Arabic name calligraphy framed by the gold papyrus arch is the suite's strongest typographic moment, but the pyramids-palms-sunburst vignette at the base crowds one motif too many and tips slightly toward souvenir-poster Egypt.",
+  "tags": [
+   "elegant",
+   "ornate",
+   "luminous",
+   "romantic"
+  ]
+ },
+ "lotus-nile--save-the-date": {
+  "verdict": "pass",
+  "score": 8.5,
+  "critique": "Letter-perfect bilingual typography inside a genuinely elegant Egyptian-revival frame with flawless palette discipline is the strongest asset, while the bottom third's stacked lotuses, palm fronds, and scarab crowd the Cairo line and unbalance an otherwise airy composition.",
+  "tags": [
+   "elegant",
+   "ornate",
+   "luminous",
+   "romantic"
+  ]
+ },
+ "lotus-nile--invite": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Letter-perfect bilingual text set in a genuinely luxurious lilac-and-gold Egyptian revival frame is the strongest asset, but the triple-stacked ornament bands crowd the lower third and the mirrored Hathor figures read slightly stiff and literal.",
+  "tags": [
+   "ornate",
+   "elegant",
+   "luminous"
+  ]
+ },
+ "lotus-nile--monogram": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Letter-perfect dimensional gold Naskh (يوستينا ومحب verified dot-by-dot) paired with a matching Spencerian script is the strongest asset, but the checkered ring, hieroglyph strips, and corner papyrus crowd the frame into a decorative plate, and the names stack rather than interlock as the prompt's single emblem.",
+  "tags": [
+   "ornate",
+   "elegant",
+   "luminous",
+   "romantic"
+  ]
+ },
+ "baroque-mirror--table-number": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The chandelier-reflection inside the mirror glass is an inspired, letter-perfect centerpiece for the numeral, but the floral massing at the lower corners crowds the frame and the 5's swash tail loses edge contrast against the hazy reflection.",
+  "tags": [
+   "ornate",
+   "romantic",
+   "luminous",
+   "elegant"
+  ]
+ },
+ "baroque-mirror--seating-chart": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Letter-perfect gilt Arabic/English header floating on luminous mirror glass is genuinely palatial, but the outer panel columns crowd the side frame and rows 9-10 switch to a wider panel shape than rows 1-8.",
+  "tags": [
+   "ornate",
+   "elegant",
+   "luminous",
+   "romantic"
+  ]
+ },
+ "baroque-mirror--bride-sign": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Letter-perfect beveled-gold العروسة جاية floating on luminous mirror glass is the strongest asset, while the stray crescent flourish left of جاية plus the wall-to-wall floral-and-filigree density push the composition to the edge of crowded.",
+  "tags": [
+   "ornate",
+   "romantic",
+   "luminous",
+   "elegant"
+  ]
+ },
+ "baroque-mirror--save-the-date": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The lavishly coherent gilt rocaille frame with letter-perfect bilingual typography is the strongest asset, but the mirror concept underdelivers — the glass reads as flat pearly paper with faint sheen streaks instead of true reflection, softening the theme's central conceit.",
+  "tags": [
+   "romantic",
+   "ornate",
+   "elegant",
+   "luminous"
+  ]
+ },
+ "baroque-mirror--moodboard": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The chandelier-lit gilt mirror centerpiece with flawless palette discipline and letter-perfect bilingual type is genuinely send-worthy, but the flat modern color chips collide abruptly with the frame's scrollwork and the wall-to-wall ornament leaves the board almost no breathing room.",
+  "tags": [
+   "ornate",
+   "romantic",
+   "luminous",
+   "crowded"
+  ]
+ },
+ "baroque-mirror--invite": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The gilt Versailles mirror with its ghosted chandelier reflection and letter-perfect four-line Arabic is genuinely send-worthy opulence; the weakness is the bottom third, where corner bouquets crowd the frame and the Reception block sits tight against the oval's lower lip, tipping rich into dense.",
+  "tags": [
+   "ornate",
+   "romantic",
+   "elegant",
+   "luminous"
+  ]
+ },
+ "baroque-mirror--welcome-sign": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "The Versailles gilt frame is magnificently rendered with letter-perfect names and date and a disciplined lilac-gold palette, but the tanween on أهلاً collapses to a single fatha and the cool grey mirror void drifts off the suite's warm-ivory anchor.",
+  "tags": [
+   "ornate",
+   "romantic",
+   "elegant",
+   "luminous"
+  ]
+ },
+ "watercolor-jardin--table-number": {
+  "verdict": "pass",
+  "score": 8,
+  "critique": "Letter-perfect gold طاولة/5/Table stack on an exactly on-palette lilac-sage-gold garden is the strongest asset; the weakest flaw is a floral border dense enough to crowd the airy breathing white space the Jardin brief called for.",
+  "tags": [
+   "romantic",
+   "elegant",
+   "delicate",
+   "luminous"
+  ]
+ },
+ "E1-welcome-english--invite": {
+  "verdict": "pass"
+ },
+ "E4-bride-english--invite": {
+  "verdict": "pass"
+ },
+ "A1-english--invite": {
+  "verdict": "pass"
+ },
+ "B1-english--invite": {
+  "verdict": "pass"
+ },
+ "C1-english--invite": {
+  "verdict": "pass"
+ },
+ "B2-arabic--invite": {
+  "verdict": "pass"
+ },
+ "E3-welcome-bilingual--invite": {
+  "verdict": "pass"
+ },
+ "A3-bilingual--invite": {
+  "verdict": "pass"
+ },
+ "E2-welcome-arabic--invite": {
+  "verdict": "pass"
+ },
+ "C2-arabic--invite": {
+  "verdict": "pass"
+ },
+ "C3-bilingual--invite": {
+  "verdict": "pass"
+ },
+ "E5-bride-arabic--invite": {
+  "verdict": "pass"
+ },
+ "A2-arabic--invite": {
+  "verdict": "pass"
+ },
+ "B3-bilingual--invite": {
+  "verdict": "regenerated-pass"
  }
 }
