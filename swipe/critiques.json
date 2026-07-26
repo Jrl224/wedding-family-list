@@ -88,14 +88,14 @@
   ]
  },
  "moonlit-garden--invite": {
-  "verdict": "pass",
-  "score": 8,
-  "critique": "Letter-perfect bilingual Naskh-over-serif typography floating in a genuinely painterly moonlit arch with luminous orchid corners is send-worthy luxury; the flaw is the gold arch frame dissolving into the botanicals below the midpoint, robbing the composition of bottom closure.",
+  "verdict": "regenerated-pass",
+  "score": 7,
+  "critique": "The gold-flake Arabic names glowing under the glitter crescent are genuinely luminous and every required line is now letter-perfect (the original dropped the ن in كنيسة), but the body Arabic falls into a stiff modern bold face padded with kashidas instead of the classical Naskh the prompt specifies.",
   "tags": [
    "romantic",
    "luminous",
    "elegant",
-   "delicate"
+   "stiff"
   ]
  },
  "lace-veil--invite": {
