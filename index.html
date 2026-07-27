@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>قائمة العزومة — Guest List</title>
-<meta property="og:title" content="قائمة عزومة فرح يوستينا ومحب 🤍">
+<meta property="og:title" content="قائمة عزومة فرح محب ويوستينا 🤍">
 <meta property="og:description" content="سجّلوا عائلتكم في دقيقة — Add your family for the wedding in a minute">
 <meta property="og:type" content="website">
 <meta name="robots" content="noindex, nofollow">
@@ -224,7 +224,7 @@
 
 <div class="scr" id="sidePick" hidden>
   <p class="kicker" id="k1"></p>
-  <h1>يوستينا ومحب · Youstina & Moheb</h1>
+  <h1>محب ويوستينا · Moheb & Youstina</h1>
   <p class="sub" id="sideQ"></p>
   <div class="doors">
     <button class="b" onclick="setSide('bride')"><span class="heart">🤍</span><span class="big" id="doorB"></span>يوستينا · Youstina<br><small id="doorBs"></small></button>
@@ -235,7 +235,7 @@
 <div class="scr" id="app" hidden style="position:relative">
   <button class="back" id="backBtn" onclick="backStep()" hidden></button>
   <p class="kicker" id="k2"></p>
-  <h1 style="font-size:24px">يوستينا ومحب</h1>
+  <h1 style="font-size:24px">محب ويوستينا</h1>
   <p class="mine-side"><span id="onSideWord"></span> <b id="mySideLabel"></b> · <a onclick="changeSide()" id="changeLink"></a></p>
   <div class="dots"><i id="d1"></i><i id="d2"></i><i id="d3"></i></div>
 
@@ -447,8 +447,8 @@ const INVITES = {
     paths: ["invites/reception-invitation.jpg", "invites/reception-invitation.png"],
     fileBase: "Moheb & Youstina — Reception Invitation",
     message: {
-      ar: "بكل فرح نتشرف بدعوتكم لحفل زفاف محب ويوستينا 🤍",
-      en: "We would love for you to join the wedding reception of Moheb & Youstina 🤍",
+      ar: "بكل فرح نتشرف بدعوتكم لحفل زفاف محب ويوستينا 🤍\n📍 https://maps.google.com/?q=Al+Masa+Hotel+Nasr+City+Cairo",
+      en: "We would love for you to join the wedding reception of Moheb & Youstina 🤍\n📍 https://maps.google.com/?q=Al+Masa+Hotel+Nasr+City+Cairo",
     },
   },
   church: {
@@ -456,8 +456,8 @@ const INVITES = {
     paths: ["invites/church-invitation.jpg", "invites/church-invitation.png"],
     fileBase: "Moheb & Youstina — Church Invitation",
     message: {
-      ar: "نتشرف بحضوركم صلاة إكليل محب ويوستينا. حضوركم وصلواتكم أجمل هدية 🤍",
-      en: "Please join us for the crowning prayers of Moheb & Youstina. Your presence and prayers are the greatest gift 🤍",
+      ar: "نتشرف بحضوركم صلاة إكليل محب ويوستينا. حضوركم وصلواتكم أجمل هدية 🤍\n📍 https://maps.google.com/?q=St+Mary+Church+El+Rehab+Cairo",
+      en: "Please join us for the crowning prayers of Moheb & Youstina. Your presence and prayers are the greatest gift 🤍\n📍 https://maps.google.com/?q=St+Mary+Church+El+Rehab+Cairo",
     },
   },
   henna: {
@@ -466,8 +466,8 @@ const INVITES = {
     fileBase: "Moheb & Youstina — Henna Invitation",
     locked: true,
     message: {
-      ar: "مستنينكم تشاركونا فرحة حنة محب ويوستينا يوم الجمعة 14 أغسطس، من 8 مساءً إلى 12 منتصف الليل 🌿",
-      en: "Join us for Moheb & Youstina’s henna party on Friday, August 14, from 8 PM to midnight 🌿",
+      ar: "مستنينكم تشاركونا فرحة حنة محب ويوستينا يوم الجمعة 14 أغسطس، من 8 مساءً إلى 12 منتصف الليل 🌿\n📍 https://share.google/B4l7ZA9aE53sUIGx0",
+      en: "Join us for Moheb & Youstina’s henna party on Friday, August 14, from 8 PM to midnight 🌿\n📍 https://share.google/B4l7ZA9aE53sUIGx0",
     },
   },
 };
@@ -1393,7 +1393,7 @@ function showPhotoFallback(photos){ fbPhotos = photos; $("photoFbBg").hidden = f
 $("photoShareBtn").addEventListener("click", async () => {
   $("photoFbBg").hidden = true;
   if (navigator.canShare && navigator.canShare({ files: fbPhotos })) {
-    try { await navigator.share({ files: fbPhotos, text: "صور قائمة عزومة فرح يوستينا ومحب 🤍" }); } catch(e) {}
+    try { await navigator.share({ files: fbPhotos, text: "صور قائمة عزومة فرح محب ويوستينا 🤍" }); } catch(e) {}
   }
 });
 async function photosToFamilies(dataUrls){
@@ -1453,7 +1453,7 @@ function exportExcel(){
   const csv = "﻿" + [head, ...rows_].map(row => row.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\r\n");
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
-  a.download = "Youstina & Moheb — Guest List.csv";
+  a.download = "Moheb & Youstina — Guest List.csv";
   a.click();
   toast(t("xls"));
 }
@@ -1466,7 +1466,7 @@ function sendSnapshot(){
   const total = src.reduce((s, r) => s + r.count, 0);
   const church = src.filter(r => r.church_only);
   const churchP = church.reduce((s, r) => s + r.count, 0);
-  const msg = `قائمة عزومة فرح يوستينا ومحب 🤍\n${src.length} عيلة · ${total} فرد\n⛪ الكنيسة فقط: ${church.length} عيلة · ${churchP} فرد\n\n🤍 طرف العروسة (${bp.reduce((s,r)=>s+r.count,0)} فرد):\n${fmt(bp) || "—"}\n\n🤍 طرف العريس (${gp.reduce((s,r)=>s+r.count,0)} فرد):\n${fmt(gp) || "—"}`;
+  const msg = `قائمة عزومة فرح محب ويوستينا 🤍\n${src.length} عيلة · ${total} فرد\n⛪ الكنيسة فقط: ${church.length} عيلة · ${churchP} فرد\n\n🤍 طرف العروسة (${bp.reduce((s,r)=>s+r.count,0)} فرد):\n${fmt(bp) || "—"}\n\n🤍 طرف العريس (${gp.reduce((s,r)=>s+r.count,0)} فرد):\n${fmt(gp) || "—"}`;
   location.href = "https://wa.me/?text=" + encodeURIComponent(msg);
 }
 
