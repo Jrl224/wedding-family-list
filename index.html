@@ -343,7 +343,7 @@
     </div>
   </div>
 
-  <p class="ver">١٩ · 19</p>
+  <p class="ver">١٩٫٢ · 19.2</p>
 </div>
 
 <div class="modal-bg" id="previewBg" hidden>
@@ -410,7 +410,7 @@
     <p class="invite-limit" id="inviteLimit"></p>
     <div class="invite-steps">
       <button class="invite-share" type="button" id="inviteShareBtn" onclick="shareInviteImage()" disabled></button>
-      <a class="invite-wa disabled" id="inviteWaBtn" target="_blank" rel="noopener"></a>
+      <a class="invite-wa disabled" id="inviteWaBtn" target="_blank" rel="noopener" aria-disabled="true" tabindex="-1"></a>
     </div>
     <div class="m-actions">
       <button class="m-cancel" type="button" onclick="closeInvite()" id="inviteClose"></button>
@@ -1065,8 +1065,17 @@ function renderInviteModal(){
   status.className = "invite-status" + (locked || inviteAssetState === "missing" ? " err" : "");
   status.textContent = locked && inviteAssetState === "ready" ? t("inviteHennaLock") : inviteAssetState === "ready" ? t("inviteReady") : inviteAssetState === "missing" ? t("inviteMissing") : t("inviteLoading");
   const waUrl = inviteAssetState === "ready" && !locked ? buildWhatsAppUrl(inviteRow.phone, INVITES[inviteKind].message[L]) : "";
-  $("inviteWaBtn").href = waUrl || "";
-  $("inviteWaBtn").className = "invite-wa" + (waUrl ? "" : " disabled");
+  const waButton = $("inviteWaBtn");
+  waButton.className = "invite-wa" + (waUrl ? "" : " disabled");
+  if (waUrl) {
+    waButton.href = waUrl;
+    waButton.removeAttribute("aria-disabled");
+    waButton.tabIndex = 0;
+  } else {
+    waButton.removeAttribute("href");
+    waButton.setAttribute("aria-disabled", "true");
+    waButton.tabIndex = -1;
+  }
   $("inviteShareBtn").disabled = inviteAssetState !== "ready" || locked;
 }
 async function selectInvite(kind){
