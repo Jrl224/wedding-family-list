@@ -201,6 +201,7 @@
   .invite-types button.on{border-color:var(--gold);background:rgba(201,162,39,.13);color:var(--gold-b)}
   .invite-preview{display:block;width:100%;max-height:42vh;object-fit:contain;border-radius:13px;border:1px solid var(--line);background:#08111e;margin:0 auto 10px}
   .invite-status{min-height:20px;color:var(--dim);font-size:12.5px;line-height:1.6;margin:2px 0 10px}
+  .invite-status.locked{color:#e8c98a}
   .invite-status.err{color:#e08a8a}
   .invite-limit{padding:10px 12px;border:1px solid rgba(201,162,39,.25);border-radius:10px;background:rgba(201,162,39,.07);color:var(--dim);font-size:12px;line-height:1.65;text-align:start}
   .invite-steps{display:grid;gap:9px;margin-top:12px}
@@ -208,7 +209,7 @@
   .invite-share{background:var(--card2);color:var(--ivory);border:1px solid var(--line)!important}
   .invite-share:disabled{opacity:.45;cursor:not-allowed}
   .invite-wa{background:#25d366;color:#06190d}
-  .invite-wa.disabled{opacity:.4;pointer-events:none}
+  .invite-wa.disabled{background:var(--card2);color:var(--dim);border:1px solid var(--line)!important;cursor:not-allowed;pointer-events:none}
   .pin-in{width:210px;padding:16px;font-family:'Cormorant Garamond',serif;font-size:32px;text-align:center;letter-spacing:.4em;border-radius:14px;border:1px solid var(--line);background:rgba(9,18,32,.8);color:var(--gold-b);display:block;margin:12px auto}
   .toast{position:fixed;top:60px;left:50%;transform:translateX(-50%);background:#1f5c36;color:#fff;padding:11px 20px;border-radius:12px;font-size:14.5px;display:none;z-index:30;max-width:92vw;text-align:center;box-shadow:0 8px 26px rgba(0,0,0,.4)}
   .toast.err{background:#7a2c2c}
@@ -343,7 +344,7 @@
     </div>
   </div>
 
-  <p class="ver">١٩٫٢ · 19.2</p>
+  <p class="ver">١٩٫٣ · 19.3</p>
 </div>
 
 <div class="modal-bg" id="previewBg" hidden>
@@ -446,6 +447,9 @@ const INVITES = {
     label: "inviteReception",
     paths: ["invites/reception-invitation.jpg", "invites/reception-invitation.png"],
     fileBase: "Moheb & Youstina — Reception Invitation",
+    locked: true,
+    lockStatus: "inviteArtworkReviewLock",
+    lockRow: "artworkReviewLockedRow",
     message: {
       ar: "بكل فرح نتشرف بدعوتكم لحفل زفاف محب ويوستينا 🤍\n📍 https://maps.google.com/?q=Al+Masa+Hotel+Nasr+City+Cairo",
       en: "We would love for you to join the wedding reception of Moheb & Youstina 🤍\n📍 https://maps.google.com/?q=Al+Masa+Hotel+Nasr+City+Cairo",
@@ -455,6 +459,9 @@ const INVITES = {
     label: "inviteChurch",
     paths: ["invites/church-invitation.jpg", "invites/church-invitation.png"],
     fileBase: "Moheb & Youstina — Church Invitation",
+    locked: true,
+    lockStatus: "inviteArtworkReviewLock",
+    lockRow: "artworkReviewLockedRow",
     message: {
       ar: "نتشرف بحضوركم صلاة إكليل محب ويوستينا. حضوركم وصلواتكم أجمل هدية 🤍\n📍 https://maps.google.com/?q=St+Mary+Church+El+Rehab+Cairo",
       en: "Please join us for the crowning prayers of Moheb & Youstina. Your presence and prayers are the greatest gift 🤍\n📍 https://maps.google.com/?q=St+Mary+Church+El+Rehab+Cairo",
@@ -465,6 +472,8 @@ const INVITES = {
     paths: ["invites/henna-invitation.jpg", "invites/henna-invitation.png"],
     fileBase: "Moheb & Youstina — Henna Invitation",
     locked: true,
+    lockStatus: "inviteHennaLock",
+    lockRow: "hennaLockedRow",
     message: {
       ar: "مستنينكم تشاركونا فرحة حنة محب ويوستينا يوم الجمعة 14 أغسطس، من 8 مساءً إلى 12 منتصف الليل 🌿\n📍 https://share.google/B4l7ZA9aE53sUIGx0",
       en: "Join us for Moheb & Youstina’s henna party on Friday, August 14, from 8 PM to midnight 🌿\n📍 https://share.google/B4l7ZA9aE53sUIGx0",
@@ -524,6 +533,7 @@ const STR = {
     inviteShare:"١ · شاركوا أو احفظوا صورة الدعوة", inviteOpenWa:n=>`٢ · افتحوا شات ${n} على واتساب`,
     inviteLimit:"واتساب لا يسمح لموقع عادي إنه يحدد الشخص ويرفق الصورة معًا في ضغطة واحدة. شاركوا/احفظوا الصورة أولًا، وبعدها افتحوا الشات المحدد وأرفقوها.",
     inviteShared:"اتفتحت قائمة المشاركة ✓", inviteDownloaded:"اتحفظت صورة الدعوة ✓", inviteShareFail:"المشاركة ما اشتغلتش — اتحفظت الصورة بدلًا منها.",
+    artworkReviewLockedRow:"🔒 التصميم الجديد قيد المراجعة", inviteArtworkReviewLock:"🔒 التصميم الجديد قيد المراجعة",
     hennaLockedRow:"🔒 دعوة الحنة — مسودة", inviteHennaLock:"🔒 مسودة — مكان الحنة لسه محتاج تأكيد واحد. الإرسال مقفول لحد ما نتأكد إنه دار الدفاع الجوي مش عنوان صقلية.",
   },
   en: {
@@ -576,6 +586,7 @@ const STR = {
     inviteShare:"1 · Share or save the invitation image", inviteOpenWa:n=>`2 · Open ${n}'s exact WhatsApp chat`,
     inviteLimit:"A normal website cannot both preselect a WhatsApp recipient and attach an image in one click. Share/save the image first, then open the exact chat and attach it.",
     inviteShared:"Share menu opened ✓", inviteDownloaded:"Invitation image saved ✓", inviteShareFail:"Sharing was unavailable, so the image was saved instead.",
+    artworkReviewLockedRow:"🔒 New artwork in review", inviteArtworkReviewLock:"🔒 New artwork in review",
     hennaLockedRow:"🔒 Henna invite — DRAFT", inviteHennaLock:"🔒 DRAFT — the henna venue needs one factual confirmation. Sending stays locked until Dar Air Defense is confirmed over the older 9 Sakaliya pin.",
   }
 };
@@ -1014,6 +1025,9 @@ function inviteChoices(row){
   if (row.event2) choices.push("henna");
   return choices;
 }
+function defaultInviteKind(row){
+  return filter === "ev2" && row.event2 ? "henna" : row.church_only ? "church" : "reception";
+}
 let inviteRow = null, inviteKind = "reception", invitePrepared = null, inviteAssetState = "idle", inviteLoadSeq = 0;
 const inviteFileCache = new Map();
 async function loadInviteFile(kind){
@@ -1057,13 +1071,16 @@ function renderInviteModal(){
     types.appendChild(button);
   });
   $("inviteShareBtn").textContent = t("inviteShare");
-  $("inviteLimit").textContent = t("inviteLimit");
   $("inviteClose").textContent = t("cancel");
   $("inviteWaBtn").textContent = t("inviteOpenWa")(inviteRow.name);
   const status = $("inviteStatus");
-  const locked = !!INVITES[inviteKind].locked;
-  status.className = "invite-status" + (locked || inviteAssetState === "missing" ? " err" : "");
-  status.textContent = locked && inviteAssetState === "ready" ? t("inviteHennaLock") : inviteAssetState === "ready" ? t("inviteReady") : inviteAssetState === "missing" ? t("inviteMissing") : t("inviteLoading");
+  const cfg = INVITES[inviteKind];
+  const locked = !!cfg.locked;
+  status.className = "invite-status" + (locked ? " locked" : inviteAssetState === "missing" ? " err" : "");
+  status.textContent = locked ? t(cfg.lockStatus) : inviteAssetState === "ready" ? t("inviteReady") : inviteAssetState === "missing" ? t("inviteMissing") : t("inviteLoading");
+  const limit = $("inviteLimit");
+  limit.textContent = t("inviteLimit");
+  limit.hidden = locked;
   const waUrl = inviteAssetState === "ready" && !locked ? buildWhatsAppUrl(inviteRow.phone, INVITES[inviteKind].message[L]) : "";
   const waButton = $("inviteWaBtn");
   waButton.className = "invite-wa" + (waUrl ? "" : " disabled");
@@ -1102,7 +1119,7 @@ async function selectInvite(kind){
 function openInvite(row){
   if (!whatsappNumber(row.phone)) return;
   inviteRow = row;
-  inviteKind = filter === "ev2" && row.event2 ? "henna" : row.church_only ? "church" : "reception";
+  inviteKind = defaultInviteKind(row);
   $("inviteBg").hidden = false;
   selectInvite(inviteKind);
 }
@@ -1190,9 +1207,10 @@ function famRow(r, canDelete){
     row.classList.add("sendable");
     const send = document.createElement("button");
     send.type = "button";
-    const hennaDraft = filter === "ev2" && r.event2;
-    send.className = "send-invite" + (hennaDraft ? " locked" : "");
-    send.textContent = hennaDraft ? t("hennaLockedRow") : t("sendInvite");
+    const defaultKind = defaultInviteKind(r);
+    const inviteConfig = INVITES[defaultKind];
+    send.className = "send-invite" + (inviteConfig.locked ? " locked" : "");
+    send.textContent = inviteConfig.locked ? t(inviteConfig.lockRow) : t("sendInvite");
     send.onclick = () => openInvite(r);
     row.append(send);
   }
