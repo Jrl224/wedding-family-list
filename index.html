@@ -115,7 +115,6 @@
     background:rgba(37,211,102,.11);color:#8be6ad;font-family:inherit;font-size:13px;font-weight:700;line-height:1.4;cursor:pointer;
   }
   .fam .send-invite:active{transform:scale(.985)}
-  .fam .send-invite.locked{border-color:rgba(232,181,92,.42);background:rgba(232,181,92,.1);color:#e8c98a}
   .empty{text-align:center;color:var(--dim);font-size:13.5px;padding:14px 0;font-family:'Amiri',serif}
   details.adv{margin-top:32px;border:1px solid var(--line);border-radius:14px;background:rgba(18,32,58,.5);text-align:start}
   details.adv summary{padding:13px 16px;color:var(--dim);font-size:13.5px;cursor:pointer;text-align:center;list-style:none}
@@ -199,17 +198,45 @@
   .invite-types::-webkit-scrollbar{display:none}
   .invite-types button{flex:0 0 auto;min-height:40px;padding:8px 13px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--dim);font-family:inherit;font-size:12.5px;font-weight:700;line-height:1.4;cursor:pointer}
   .invite-types button.on{border-color:var(--gold);background:rgba(201,162,39,.13);color:var(--gold-b)}
+  .invite-step{color:var(--gold-b);font-size:12.5px;font-weight:700;margin:12px 0 7px;text-align:start}
+  .invite-langs{display:flex;gap:7px;flex-wrap:wrap;padding-bottom:2px}
+  .invite-langs button{flex:1 1 auto;min-height:40px;padding:8px 11px;border:1px solid var(--line);border-radius:11px;background:var(--card);color:var(--dim);font-family:inherit;font-size:12.5px;font-weight:700;line-height:1.4;cursor:pointer}
+  .invite-langs button.on{border-color:var(--gold);background:rgba(201,162,39,.13);color:var(--gold-b)}
+  .invite-msg{
+    margin:10px 0 0;padding:12px 13px;border:1px solid var(--line);border-radius:12px;background:rgba(9,18,32,.75);
+    color:var(--ivory);font-family:inherit;font-size:12.5px;line-height:1.75;white-space:pre-wrap;overflow-wrap:anywhere;
+    max-height:31vh;overflow:auto;text-align:start;
+  }
+  .invite-channels{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+  .invite-channels button,.invite-channels a{
+    display:flex;align-items:center;justify-content:center;min-height:48px;padding:11px 8px;border:1px solid var(--line);
+    border-radius:12px;background:var(--card2);color:var(--ivory);font-family:inherit;font-size:13.5px;font-weight:800;
+    line-height:1.3;text-align:center;text-decoration:none;cursor:pointer;
+  }
+  .invite-channels .ch-wa{background:#25d366;color:#06190d;border-color:#25d366}
+  .invite-channels .ch-im{background:#2f7cf6;color:#f2f7ff;border-color:#2f7cf6}
+  .invite-channels .ch-fb{background:#8a5cf0;color:#fbf7ff;border-color:#8a5cf0}
+  .invite-channels .disabled{background:var(--card2)!important;color:var(--dim)!important;border-color:var(--line)!important;opacity:.5;cursor:not-allowed;pointer-events:none}
+  .invite-hint{margin:9px 0 0;color:var(--dim);font-size:12px;line-height:1.65;text-align:start}
+  .invite-sent{margin-top:13px}
+  .invite-sent button{width:100%;min-height:48px;padding:13px;border-radius:12px;border:1px solid var(--line);background:var(--card2);color:var(--ivory);font-family:inherit;font-size:14.5px;font-weight:800;cursor:pointer}
+  .invite-sent button.ask{border-color:var(--green);background:rgba(37,211,102,.14);color:#8be6ad;animation:sentAsk 1.5s ease-in-out infinite}
+  @keyframes sentAsk{50%{opacity:.62}}
+  .invite-sent .sent-done{display:flex;align-items:center;gap:10px;padding:11px 13px;border:1px solid rgba(37,211,102,.42);border-radius:12px;background:rgba(37,211,102,.1);text-align:start}
+  .invite-sent .sent-done b{flex:1;color:#8be6ad;font-size:13px;font-weight:700;line-height:1.5}
+  .invite-sent .sent-done button{width:auto;min-height:36px;padding:7px 14px;font-size:12.5px;color:var(--dim)}
+  .invite-art{margin-top:14px;border:1px solid var(--line);border-radius:12px;background:rgba(18,32,58,.45)}
+  .invite-art summary{padding:12px 14px;color:var(--dim);font-size:12.5px;cursor:pointer;list-style:none;text-align:start}
+  .invite-art summary::-webkit-details-marker{display:none}
+  .invite-art-in{padding:2px 12px 14px}
+  .fam .sent-badge{flex-basis:100%;color:#8be6ad;font-size:11.5px;font-weight:700;margin-top:-3px}
   .invite-preview{display:block;width:100%;max-height:42vh;object-fit:contain;border-radius:13px;border:1px solid var(--line);background:#08111e;margin:0 auto 10px}
   .invite-status{min-height:20px;color:var(--dim);font-size:12.5px;line-height:1.6;margin:2px 0 10px}
   .invite-status.locked{color:#e8c98a}
   .invite-status.err{color:#e08a8a}
   .invite-limit{padding:10px 12px;border:1px solid rgba(201,162,39,.25);border-radius:10px;background:rgba(201,162,39,.07);color:var(--dim);font-size:12px;line-height:1.65;text-align:start}
-  .invite-steps{display:grid;gap:9px;margin-top:12px}
-  .invite-steps button,.invite-steps a{display:block;width:100%;padding:14px;border:0;border-radius:12px;text-align:center;text-decoration:none;font-family:inherit;font-size:15px;font-weight:800;line-height:1.4;cursor:pointer}
-  .invite-share{background:var(--card2);color:var(--ivory);border:1px solid var(--line)!important}
+  .invite-share{display:block;width:100%;padding:13px;margin-top:2px;border:1px solid var(--line);border-radius:12px;background:var(--card2);color:var(--ivory);text-align:center;font-family:inherit;font-size:14.5px;font-weight:800;line-height:1.4;cursor:pointer}
   .invite-share:disabled{opacity:.45;cursor:not-allowed}
-  .invite-wa{background:#25d366;color:#06190d}
-  .invite-wa.disabled{background:var(--card2);color:var(--dim);border:1px solid var(--line)!important;cursor:not-allowed;pointer-events:none}
   .pin-in{width:210px;padding:16px;font-family:'Cormorant Garamond',serif;font-size:32px;text-align:center;letter-spacing:.4em;border-radius:14px;border:1px solid var(--line);background:rgba(9,18,32,.8);color:var(--gold-b);display:block;margin:12px auto}
   .toast{position:fixed;top:60px;left:50%;transform:translateX(-50%);background:#1f5c36;color:#fff;padding:11px 20px;border-radius:12px;font-size:14.5px;display:none;z-index:30;max-width:92vw;text-align:center;box-shadow:0 8px 26px rgba(0,0,0,.4)}
   .toast.err{background:#7a2c2c}
@@ -333,6 +360,8 @@
       <button id="fG" onclick="setFilter('groom')"></button>
       <button id="fE2" onclick="setFilter('ev2')">🌿</button>
       <button id="fCo" onclick="setFilter('church')">⛪</button>
+      <button id="fSent" onclick="setFilter('sent')"></button>
+      <button id="fUnsent" onclick="setFilter('unsent')"></button>
     </div>
     <input class="search" id="search" oninput="renderAll()">
     <div id="fullList" style="text-align:start"></div>
@@ -344,7 +373,7 @@
     </div>
   </div>
 
-  <p class="ver">١٩٫٣ · 19.3</p>
+  <p class="ver">٢٠٫٠ · 20.0</p>
 </div>
 
 <div class="modal-bg" id="previewBg" hidden>
@@ -405,14 +434,24 @@
   <div class="modal">
     <h3 id="inviteTitle"></h3>
     <div class="invite-recipient"><b id="inviteRecipient"></b><span id="invitePhone"></span></div>
+    <p class="invite-step" id="inviteStepType"></p>
     <div class="invite-types" id="inviteTypes"></div>
-    <img class="invite-preview" id="invitePreview" alt="" hidden>
-    <p class="invite-status" id="inviteStatus"></p>
-    <p class="invite-limit" id="inviteLimit"></p>
-    <div class="invite-steps">
-      <button class="invite-share" type="button" id="inviteShareBtn" onclick="shareInviteImage()" disabled></button>
-      <a class="invite-wa disabled" id="inviteWaBtn" target="_blank" rel="noopener" aria-disabled="true" tabindex="-1"></a>
-    </div>
+    <p class="invite-step" id="inviteStepLang"></p>
+    <div class="invite-langs" id="inviteLangs"></div>
+    <pre class="invite-msg" id="inviteMsg"></pre>
+    <p class="invite-step" id="inviteStepChan"></p>
+    <div class="invite-channels" id="inviteChannels"></div>
+    <p class="invite-hint" id="inviteHint" hidden></p>
+    <div class="invite-sent" id="inviteSent"></div>
+    <details class="invite-art">
+      <summary id="inviteArtTitle"></summary>
+      <div class="invite-art-in">
+        <img class="invite-preview" id="invitePreview" alt="" hidden>
+        <p class="invite-status" id="inviteStatus"></p>
+        <p class="invite-limit" id="inviteLimit"></p>
+        <button class="invite-share" type="button" id="inviteShareBtn" onclick="shareInviteImage()" disabled></button>
+      </div>
+    </details>
     <div class="m-actions">
       <button class="m-cancel" type="button" onclick="closeInvite()" id="inviteClose"></button>
     </div>
@@ -442,43 +481,93 @@ const KEY = "sb_publishable_TSmh8zzk8gvPL5uIrcNbwA_HK45ASUe";
 const ANON_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind5ZG9kdmJrcWhwb3llZmN3cG5mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMxOTYxNjcsImV4cCI6MjA4ODc3MjE2N30.x65toIsFqhKnSDK8n6dXEYg64dLz8idG6r-T9KxijaE";
 const PINS = { "1994": "master", "1360": "groom", "3882": "bride" };
 const H = { "apikey": KEY, "Authorization": "Bearer " + KEY, "Content-Type": "application/json" };
+/* The one invitation link that goes out with every message. */
+const INVITE_LINK = "https://www.wooowinvites.com/invite/22f37518";
+const INVITE_CTA = { en: "Details & RSVP", ar: "التفاصيل وتأكيد الحضور" };
+const INVITE_RULE = "— — —";
+
+/* `artLocked` gates the finalized ARTWORK IMAGE only. The link message is
+   independent of the artwork and stays sendable. */
 const INVITES = {
   reception: {
     label: "inviteReception",
     paths: ["invites/reception-invitation.jpg", "invites/reception-invitation.png"],
     fileBase: "Moheb & Youstina — Reception Invitation",
-    locked: true,
-    lockStatus: "inviteArtworkReviewLock",
-    lockRow: "artworkReviewLockedRow",
-    message: {
-      ar: "بكل فرح نتشرف بدعوتكم لحفل زفاف محب ويوستينا 🤍\n📍 https://maps.google.com/?q=Al+Masa+Hotel+Nasr+City+Cairo",
-      en: "We would love for you to join the wedding reception of Moheb & Youstina 🤍\n📍 https://maps.google.com/?q=Al+Masa+Hotel+Nasr+City+Cairo",
+    artLocked: true,
+    artLockStatus: "inviteArtworkReviewLock",
+    copy: {
+      en: [
+        "You’re invited to the wedding of Moheb & Youstina 🤍",
+        "Saturday, 22 August 2026",
+        "Reception · 7:00 PM",
+        "Al Masa Hotel — Nasr City",
+      ],
+      ar: [
+        "يسرنا دعوتكم لحضور زفاف محب ويوستينا 🤍",
+        "السبت ٢٢ أغسطس ٢٠٢٦",
+        "حفل الزفاف · ٧:٠٠ مساءً",
+        "فندق الماسة — مدينة نصر",
+      ],
     },
   },
   church: {
     label: "inviteChurch",
     paths: ["invites/church-invitation.jpg", "invites/church-invitation.png"],
     fileBase: "Moheb & Youstina — Church Invitation",
-    locked: true,
-    lockStatus: "inviteArtworkReviewLock",
-    lockRow: "artworkReviewLockedRow",
-    message: {
-      ar: "نتشرف بحضوركم صلاة إكليل محب ويوستينا. حضوركم وصلواتكم أجمل هدية 🤍\n📍 https://maps.google.com/?q=St+Mary+Church+El+Rehab+Cairo",
-      en: "Please join us for the crowning prayers of Moheb & Youstina. Your presence and prayers are the greatest gift 🤍\n📍 https://maps.google.com/?q=St+Mary+Church+El+Rehab+Cairo",
+    artLocked: true,
+    artLockStatus: "inviteArtworkReviewLock",
+    copy: {
+      en: [
+        "You’re invited to the Holy Matrimony of Moheb & Youstina 🤍",
+        "Saturday, 22 August 2026",
+        "Crowning prayers · 5:00 PM",
+        "St. Mary Church — El Rehab",
+      ],
+      ar: [
+        "نتشرف بدعوتكم لحضور إكليل محب ويوستينا 🤍",
+        "السبت ٢٢ أغسطس ٢٠٢٦",
+        "صلاة الإكليل · ٥:٠٠ مساءً",
+        "كنيسة السيدة العذراء — الرحاب",
+      ],
     },
   },
   henna: {
     label: "inviteHenna",
     paths: ["invites/henna-invitation.jpg", "invites/henna-invitation.png"],
     fileBase: "Moheb & Youstina — Henna Invitation",
-    locked: true,
-    lockStatus: "inviteHennaLock",
-    lockRow: "hennaLockedRow",
-    message: {
-      ar: "مستنينكم تشاركونا فرحة حنة محب ويوستينا يوم الجمعة 14 أغسطس، من 8 مساءً إلى 12 منتصف الليل 🌿\n📍 https://share.google/B4l7ZA9aE53sUIGx0",
-      en: "Join us for Moheb & Youstina’s henna party on Friday, August 14, from 8 PM to midnight 🌿\n📍 https://share.google/B4l7ZA9aE53sUIGx0",
+    artLocked: true,
+    artLockStatus: "inviteArtworkReviewLock",
+    copy: {
+      en: [
+        "Join us for Moheb & Youstina’s henna night 🌿",
+        "Friday, 14 August 2026",
+        "8:00 PM – 12:00 AM",
+        "Dar Air Defense — Nasr City",
+      ],
+      ar: [
+        "مستنينكم في حنة محب ويوستينا 🌿",
+        "الجمعة ١٤ أغسطس ٢٠٢٦",
+        "٨:٠٠ مساءً – ١٢:٠٠ منتصف الليل",
+        "دار الدفاع الجوي — مدينة نصر",
+      ],
     },
   },
+};
+
+/* Three message languages the sender picks per recipient. */
+const INVITE_LANGS = ["both", "en", "ar"];
+
+/* Delivery channels. Messenger has no public deep link that can both preselect a
+   phone-number recipient and prefill text, so it copies the message first and
+   opens Messenger for a manual paste. */
+const CHANNELS = {
+  whatsapp: { label: "chWhatsapp", cls: "ch-wa", needsPhone: true, newTab: true,
+    url: (num, msg) => `https://wa.me/${num}?text=${encodeURIComponent(msg)}` },
+  imessage: { label: "chImessage", cls: "ch-im", needsPhone: true, newTab: false,
+    url: (num, msg) => `sms:+${num}?&body=${encodeURIComponent(msg)}` },
+  messenger: { label: "chMessenger", cls: "ch-fb", needsPhone: false, newTab: true, copyFirst: true,
+    url: () => "https://www.messenger.com/" },
+  copy: { label: "chCopy", cls: "ch-copy", needsPhone: false, copyOnly: true },
 };
 
 /* ═══ i18n ═══ */
@@ -528,13 +617,23 @@ const STR = {
     churchQ:"⛪ الكنيسة فقط (بدون الحفلة)", capChurch:n=>`⛪ ${n}`,
     sendInvite:"📨 إرسال الدعوة", inviteTitle:"إرسال الدعوة", inviteTo:n=>`الدعوة إلى ${n}`,
     inviteReception:"القاعة / الحفل", inviteChurch:"الكنيسة", inviteHenna:"الحنة",
+    stepType:"١ · الدعوة دي بتاعة إيه؟", stepLang:"٢ · الرسالة تطلع بأي لغة؟", stepChan:"٣ · هتبعتوها منين؟",
+    langBoth:"إنجليزي + عربي", langEn:"English", langAr:"عربي بس",
+    chWhatsapp:"واتساب", chImessage:"iMessage", chMessenger:"ماسنجر", chCopy:"نسخ الرسالة",
+    msgCopied:"الرسالة اتنسخت ✓", copyFail:"النسخ ما اشتغلش — اختاروا النص وانسخوه يدوي.",
+    messengerHint:"ماسنجر مش بيسمح بتحديد الشخص وكتابة الرسالة أوتوماتيك — نسخنا الرسالة، افتحوا الشات والصقوها.",
+    chanOpened:n=>`اتفتح ${n} — ابعتوا وبعدين علّموا إنها اتبعتت`,
+    markSent:"✓ علّموا إنها اتبعتت", markSentAsk:"اتبعتت؟ علّموا هنا ✓",
+    sentOn:(d,c)=>`✓ اتبعتت ${d} · ${c}`, unmark:"تراجع",
+    sentSaved:"اتعلّمت إنها اتبعتت ✓", sentCleared:"شيلنا علامة الإرسال",
+    rowSent:n=>`✓ اتبعتت (${n})`, fSent:"✓ اتبعتت", fUnsent:"◻︎ لسه",
+    artTitle:"📎 إرفاق صورة الدعوة (اختياري)",
     inviteLoading:"بنجهز صورة الدعوة النهائية…", inviteReady:"الصورة جاهزة للإرسال ✓",
-    inviteMissing:"صورة الدعوة النهائية دي لسه مش مضافة — الإرسال متوقف عشان ما تتبعتش صورة غلط.",
-    inviteShare:"١ · شاركوا أو احفظوا صورة الدعوة", inviteOpenWa:n=>`٢ · افتحوا شات ${n} على واتساب`,
+    inviteMissing:"صورة الدعوة النهائية دي لسه مش مضافة — الرسالة والرابط شغالين عادي من غيرها.",
+    inviteShare:"شاركوا أو احفظوا صورة الدعوة",
     inviteLimit:"واتساب لا يسمح لموقع عادي إنه يحدد الشخص ويرفق الصورة معًا في ضغطة واحدة. شاركوا/احفظوا الصورة أولًا، وبعدها افتحوا الشات المحدد وأرفقوها.",
     inviteShared:"اتفتحت قائمة المشاركة ✓", inviteDownloaded:"اتحفظت صورة الدعوة ✓", inviteShareFail:"المشاركة ما اشتغلتش — اتحفظت الصورة بدلًا منها.",
-    artworkReviewLockedRow:"🔒 التصميم الجديد قيد المراجعة", inviteArtworkReviewLock:"🔒 التصميم الجديد قيد المراجعة",
-    hennaLockedRow:"🔒 دعوة الحنة — مسودة", inviteHennaLock:"🔒 مسودة — مكان الحنة لسه محتاج تأكيد واحد. الإرسال مقفول لحد ما نتأكد إنه دار الدفاع الجوي مش عنوان صقلية.",
+    inviteArtworkReviewLock:"🔒 التصميم النهائي لسه تحت المراجعة — الرسالة والرابط بيتبعتوا عادي، الصورة بس هي المقفولة.",
   },
   en: {
     kicker:"Guest List", sideQ:"Which side are you from? One minute to add your families.",
@@ -581,13 +680,23 @@ const STR = {
     churchQ:"⛪ Church only (no reception)", capChurch:n=>`⛪ ${n}`,
     sendInvite:"📨 Send invite", inviteTitle:"Send invitation", inviteTo:n=>`Invitation for ${n}`,
     inviteReception:"Wedding hall", inviteChurch:"Church", inviteHenna:"Henna",
+    stepType:"1 · Which invitation is this?", stepLang:"2 · Which language should the message be in?", stepChan:"3 · Where do you want to send it?",
+    langBoth:"English + العربية", langEn:"English only", langAr:"العربية فقط",
+    chWhatsapp:"WhatsApp", chImessage:"iMessage", chMessenger:"Messenger", chCopy:"Copy message",
+    msgCopied:"Message copied ✓", copyFail:"Copy was blocked — select the text and copy it manually.",
+    messengerHint:"Messenger cannot preselect a person and prefill text from a website. The message is copied — open the chat and paste it.",
+    chanOpened:n=>`${n} opened — send it, then mark it as sent`,
+    markSent:"✓ Mark as sent", markSentAsk:"Did it go out? Mark as sent ✓",
+    sentOn:(d,c)=>`✓ Sent ${d} · ${c}`, unmark:"Undo",
+    sentSaved:"Marked as sent ✓", sentCleared:"Sent mark removed",
+    rowSent:n=>`✓ Sent (${n})`, fSent:"✓ Sent", fUnsent:"◻︎ Not sent",
+    artTitle:"📎 Attach the invitation image (optional)",
     inviteLoading:"Preparing the finalized invitation image…", inviteReady:"Final image is ready ✓",
-    inviteMissing:"This finalized invitation image has not been added yet. Sending is paused so the wrong image cannot go out.",
-    inviteShare:"1 · Share or save the invitation image", inviteOpenWa:n=>`2 · Open ${n}'s exact WhatsApp chat`,
+    inviteMissing:"This finalized invitation image has not been added yet. The message and link still send fine without it.",
+    inviteShare:"Share or save the invitation image",
     inviteLimit:"A normal website cannot both preselect a WhatsApp recipient and attach an image in one click. Share/save the image first, then open the exact chat and attach it.",
     inviteShared:"Share menu opened ✓", inviteDownloaded:"Invitation image saved ✓", inviteShareFail:"Sharing was unavailable, so the image was saved instead.",
-    artworkReviewLockedRow:"🔒 New artwork in review", inviteArtworkReviewLock:"🔒 New artwork in review",
-    hennaLockedRow:"🔒 Henna invite — DRAFT", inviteHennaLock:"🔒 DRAFT — the henna venue needs one factual confirmation. Sending stays locked until Dar Air Defense is confirmed over the older 9 Sakaliya pin.",
+    inviteArtworkReviewLock:"🔒 Final artwork is still in review — the message and link send normally, only the image attachment is held back.",
   }
 };
 let L = localStorage.getItem("wedLang") || "ar";
@@ -1016,10 +1125,6 @@ function whatsappNumber(raw){
   const digits = normDigits(String(normalized || "")).replace(/\D/g, "");
   return digits.length >= 8 && digits.length <= 15 && !digits.startsWith("0") ? digits : "";
 }
-function buildWhatsAppUrl(raw, message){
-  const number = whatsappNumber(raw);
-  return number ? `https://wa.me/${number}?text=${encodeURIComponent(message || "")}` : "";
-}
 function inviteChoices(row){
   const choices = row.church_only ? ["church"] : ["reception", "church"];
   if (row.event2) choices.push("henna");
@@ -1028,7 +1133,100 @@ function inviteChoices(row){
 function defaultInviteKind(row){
   return filter === "ev2" && row.event2 ? "henna" : row.church_only ? "church" : "reception";
 }
+
+/* ── message text ── */
+function inviteMessage(kind, lang){
+  const copy = INVITES[kind].copy;
+  const body = lang === "en" ? copy.en.join("\n")
+    : lang === "ar" ? copy.ar.join("\n")
+    : copy.en.join("\n") + "\n\n" + INVITE_RULE + "\n\n" + copy.ar.join("\n");
+  const cta = lang === "en" ? INVITE_CTA.en
+    : lang === "ar" ? INVITE_CTA.ar
+    : INVITE_CTA.en + " · " + INVITE_CTA.ar;
+  return `${body}\n\n${cta}\n${INVITE_LINK}`;
+}
+
+/* ── sent tracking (persisted on the row as jsonb) ── */
+function sentLog(row){
+  const log = row && row.invite_sent;
+  return log && typeof log === "object" && !Array.isArray(log) ? log : {};
+}
+function sentKinds(row){
+  return inviteChoices(row).filter(k => sentLog(row)[k]);
+}
+function sentDate(entry){
+  if (!entry || !entry.at) return "";
+  const d = new Date(entry.at);
+  return isNaN(d) ? "" : d.toLocaleDateString(L === "ar" ? "ar-EG" : "en-GB", { day: "numeric", month: "short" });
+}
+async function setSent(row, kind, entry){
+  const log = { ...sentLog(row) };
+  if (entry) log[kind] = entry; else delete log[kind];
+  row.invite_sent = log;
+  renderAll(); renderMine();
+  if (inviteRow && inviteRow.id === row.id) renderInviteModal();
+  try {
+    const r = await fetch(`${SUPA}?id=eq.${row.id}`, { method: "PATCH", headers: H, body: JSON.stringify({ invite_sent: log }) });
+    if (!r.ok) throw new Error("patch_failed");
+    toast(entry ? t("sentSaved") : t("sentCleared"));
+  } catch(e) { toast(t("netErr"), true); }
+}
+function markInviteSent(){
+  if (!inviteRow) return;
+  setSent(inviteRow, inviteKind, { at: new Date().toISOString(), via: inviteChannelUsed || "manual", lang: inviteLang });
+  inviteChannelUsed = null;
+}
+function unmarkInviteSent(){
+  if (!inviteRow) return;
+  setSent(inviteRow, inviteKind, null);
+}
+
+/* ── channels ── */
+async function copyText(text){
+  try {
+    if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(text); return true; }
+  } catch(e) {}
+  try {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.cssText = "position:fixed;top:0;left:0;opacity:0";
+    document.body.appendChild(ta);
+    ta.select(); ta.setSelectionRange(0, ta.value.length);
+    const ok = document.execCommand("copy");
+    ta.remove();
+    return ok;
+  } catch(e) { return false; }
+}
+async function sendVia(channelKey){
+  if (!inviteRow) return;
+  const channel = CHANNELS[channelKey];
+  const number = whatsappNumber(inviteRow.phone);
+  if (!channel || (channel.needsPhone && !number)) return;
+  const message = inviteMessage(inviteKind, inviteLang);
+  if (channel.copyOnly || channel.copyFirst) {
+    const copied = await copyText(message);
+    if (!copied) { toast(t("copyFail"), true); if (channel.copyOnly) return; }
+    else if (channel.copyOnly) { toast(t("msgCopied")); inviteChannelUsed = channelKey; renderInviteModal(); return; }
+  }
+  inviteChannelUsed = channelKey;
+  if (channel.copyFirst) { $("inviteHint").textContent = t("messengerHint"); $("inviteHint").hidden = false; }
+  renderInviteModal();
+  const url = channel.url(number, message);
+  if (channel.newTab) window.open(url, "_blank", "noopener");
+  else window.location.href = url;
+  toast(t("chanOpened")(t(channel.label)));
+}
+
 let inviteRow = null, inviteKind = "reception", invitePrepared = null, inviteAssetState = "idle", inviteLoadSeq = 0;
+let inviteLang = localStorage.getItem("wedInviteLang") || "both";
+let inviteChannelUsed = null;
+function selectInviteLang(lang){
+  if (!INVITE_LANGS.includes(lang)) return;
+  inviteLang = lang;
+  localStorage.setItem("wedInviteLang", lang);
+  renderInviteModal();
+}
 const inviteFileCache = new Map();
 async function loadInviteFile(kind){
   if (inviteFileCache.has(kind)) return inviteFileCache.get(kind);
@@ -1057,49 +1255,101 @@ async function loadInviteFile(kind){
 }
 function renderInviteModal(){
   if (!inviteRow) return;
+  const cfg = INVITES[inviteKind];
+  const number = whatsappNumber(inviteRow.phone);
   $("inviteRecipient").textContent = t("inviteTo")(inviteRow.name);
   $("invitePhone").textContent = normalizePhone(inviteRow.phone, "") || inviteRow.phone;
-  $("invitePreview").alt = t(INVITES[inviteKind].label);
+  $("invitePreview").alt = t(cfg.label);
+  $("inviteStepType").textContent = t("stepType");
+  $("inviteStepLang").textContent = t("stepLang");
+  $("inviteStepChan").textContent = t("stepChan");
+  $("inviteArtTitle").textContent = t("artTitle");
+  $("inviteClose").textContent = t("cancel");
+
   const types = $("inviteTypes");
   types.innerHTML = "";
   inviteChoices(inviteRow).forEach(kind => {
     const button = document.createElement("button");
     button.type = "button";
-    button.textContent = (INVITES[kind].locked ? "🔒 " : "") + t(INVITES[kind].label);
+    button.textContent = t(INVITES[kind].label) + (sentLog(inviteRow)[kind] ? " ✓" : "");
     button.className = kind === inviteKind ? "on" : "";
     button.onclick = () => selectInvite(kind);
     types.appendChild(button);
   });
-  $("inviteShareBtn").textContent = t("inviteShare");
-  $("inviteClose").textContent = t("cancel");
-  $("inviteWaBtn").textContent = t("inviteOpenWa")(inviteRow.name);
+
+  const langs = $("inviteLangs");
+  langs.innerHTML = "";
+  INVITE_LANGS.forEach(lang => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = t(lang === "both" ? "langBoth" : lang === "en" ? "langEn" : "langAr");
+    button.className = lang === inviteLang ? "on" : "";
+    button.onclick = () => selectInviteLang(lang);
+    langs.appendChild(button);
+  });
+
+  const message = inviteMessage(inviteKind, inviteLang);
+  const msgBox = $("inviteMsg");
+  msgBox.textContent = message;
+  msgBox.dir = inviteLang === "ar" ? "rtl" : "ltr";
+
+  const channels = $("inviteChannels");
+  channels.innerHTML = "";
+  Object.keys(CHANNELS).forEach(key => {
+    const channel = CHANNELS[key];
+    const blocked = channel.needsPhone && !number;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = channel.cls + (blocked ? " disabled" : "");
+    button.textContent = t(channel.label);
+    button.disabled = blocked;
+    button.onclick = () => sendVia(key);
+    channels.appendChild(button);
+  });
+
+  const entry = sentLog(inviteRow)[inviteKind];
+  const sentBar = $("inviteSent");
+  sentBar.innerHTML = "";
+  if (entry) {
+    const done = document.createElement("div");
+    done.className = "sent-done";
+    const label = document.createElement("b");
+    const via = CHANNELS[entry.via] ? t(CHANNELS[entry.via].label) : (entry.via || "");
+    label.textContent = t("sentOn")(sentDate(entry), via);
+    const undo = document.createElement("button");
+    undo.type = "button";
+    undo.textContent = t("unmark");
+    undo.onclick = unmarkInviteSent;
+    done.append(label, undo);
+    sentBar.appendChild(done);
+  } else {
+    const mark = document.createElement("button");
+    mark.type = "button";
+    mark.className = inviteChannelUsed ? "ask" : "";
+    mark.textContent = inviteChannelUsed ? t("markSentAsk") : t("markSent");
+    mark.onclick = markInviteSent;
+    sentBar.appendChild(mark);
+  }
+
+  const artLocked = !!cfg.artLocked;
   const status = $("inviteStatus");
-  const cfg = INVITES[inviteKind];
-  const locked = !!cfg.locked;
-  status.className = "invite-status" + (locked ? " locked" : inviteAssetState === "missing" ? " err" : "");
-  status.textContent = locked ? t(cfg.lockStatus) : inviteAssetState === "ready" ? t("inviteReady") : inviteAssetState === "missing" ? t("inviteMissing") : t("inviteLoading");
+  status.className = "invite-status" + (artLocked ? " locked" : inviteAssetState === "missing" ? " err" : "");
+  status.textContent = artLocked ? t(cfg.artLockStatus)
+    : inviteAssetState === "ready" ? t("inviteReady")
+    : inviteAssetState === "missing" ? t("inviteMissing") : t("inviteLoading");
   const limit = $("inviteLimit");
   limit.textContent = t("inviteLimit");
-  limit.hidden = locked;
-  const waUrl = inviteAssetState === "ready" && !locked ? buildWhatsAppUrl(inviteRow.phone, INVITES[inviteKind].message[L]) : "";
-  const waButton = $("inviteWaBtn");
-  waButton.className = "invite-wa" + (waUrl ? "" : " disabled");
-  if (waUrl) {
-    waButton.href = waUrl;
-    waButton.removeAttribute("aria-disabled");
-    waButton.tabIndex = 0;
-  } else {
-    waButton.removeAttribute("href");
-    waButton.setAttribute("aria-disabled", "true");
-    waButton.tabIndex = -1;
-  }
-  $("inviteShareBtn").disabled = inviteAssetState !== "ready" || locked;
+  limit.hidden = artLocked;
+  $("inviteShareBtn").textContent = t("inviteShare");
+  $("inviteShareBtn").disabled = inviteAssetState !== "ready" || artLocked;
 }
 async function selectInvite(kind){
   if (!inviteRow || !inviteChoices(inviteRow).includes(kind)) return;
   inviteKind = kind;
   invitePrepared = null;
   inviteAssetState = "loading";
+  inviteChannelUsed = null;
+  $("inviteHint").hidden = true;
   $("invitePreview").hidden = true;
   renderInviteModal();
   const seq = ++inviteLoadSeq;
@@ -1128,7 +1378,9 @@ function closeInvite(){
   inviteRow = null;
   invitePrepared = null;
   inviteAssetState = "idle";
+  inviteChannelUsed = null;
   $("inviteBg").hidden = true;
+  $("inviteHint").hidden = true;
   $("invitePreview").removeAttribute("src");
 }
 function downloadPreparedInvite(){
@@ -1144,7 +1396,7 @@ function downloadPreparedInvite(){
   return true;
 }
 async function shareInviteImage(){
-  if (!invitePrepared || inviteAssetState !== "ready" || INVITES[inviteKind].locked) return;
+  if (!invitePrepared || inviteAssetState !== "ready" || INVITES[inviteKind].artLocked) return;
   const file = invitePrepared.file;
   try {
     if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -1207,12 +1459,17 @@ function famRow(r, canDelete){
     row.classList.add("sendable");
     const send = document.createElement("button");
     send.type = "button";
-    const defaultKind = defaultInviteKind(r);
-    const inviteConfig = INVITES[defaultKind];
-    send.className = "send-invite" + (inviteConfig.locked ? " locked" : "");
-    send.textContent = inviteConfig.locked ? t(inviteConfig.lockRow) : t("sendInvite");
+    send.className = "send-invite";
+    send.textContent = t("sendInvite");
     send.onclick = () => openInvite(r);
     row.append(send);
+    const done = sentKinds(r);
+    if (done.length) {
+      const badge = document.createElement("div");
+      badge.className = "sent-badge";
+      badge.textContent = t("rowSent")(done.map(k => t(INVITES[k].label)).join(" · "));
+      row.append(badge);
+    }
   }
   return row;
 }
@@ -1265,11 +1522,15 @@ function renderAll(){
   $("orgCapG").hidden = role === "bride";
   document.querySelector(".filters").hidden = false;
   $("fAll").hidden = $("fB").hidden = $("fG").hidden = role !== "master";
-  if (role !== "master" && filter !== "ev2" && filter !== "church") filter = role;
+  if (role !== "master" && !["ev2", "church", "sent", "unsent"].includes(filter)) filter = role;
   const e2f = vis.filter(x => x.event2);
   $("fE2").textContent = "🌿 " + e2f.length + " · " + e2f.reduce((s, x) => s + x.count, 0);
   const cof = vis.filter(x => x.church_only);
   $("fCo").textContent = "⛪ " + cof.length + " · " + cof.reduce((s, x) => s + x.count, 0);
+  const sendable = vis.filter(x => whatsappNumber(x.phone));
+  const sentF = sendable.filter(x => sentKinds(x).length);
+  $("fSent").textContent = t("fSent") + " " + sentF.length;
+  $("fUnsent").textContent = t("fUnsent") + " " + (sendable.length - sentF.length);
   const nameGroups = {}, phoneGroups = {};
   vis.forEach(r => {
     const nk = normName(r.name); if (nk) (nameGroups[nk] = nameGroups[nk] || []).push(r);
@@ -1286,7 +1547,15 @@ function renderAll(){
     : "";
   const el = $("fullList");
   const q = ($("search").value || "").trim().toLowerCase();
-  const show = vis.filter(r => (filter === "all" || (filter === "ev2" ? r.event2 : filter === "church" ? r.church_only : r.side === filter)) && (!q || r.name.toLowerCase().includes(q) || (r.phone || "").includes(q)));
+  const matchesFilter = r => {
+    if (filter === "all") return true;
+    if (filter === "ev2") return r.event2;
+    if (filter === "church") return r.church_only;
+    if (filter === "sent") return !!whatsappNumber(r.phone) && sentKinds(r).length > 0;
+    if (filter === "unsent") return !!whatsappNumber(r.phone) && sentKinds(r).length === 0;
+    return r.side === filter;
+  };
+  const show = vis.filter(r => matchesFilter(r) && (!q || r.name.toLowerCase().includes(q) || (r.phone || "").includes(q)));
   el.innerHTML = "";
   if (!show.length) { el.innerHTML = `<p class="empty">${t("listEmpty")}</p>`; return; }
   show.forEach(r => el.appendChild(famRow(r, true)));
@@ -1297,6 +1566,8 @@ function setFilter(f){
   $("fAll").className = f === "all" ? "on" : ""; $("fB").className = f === "bride" ? "on" : ""; $("fG").className = f === "groom" ? "on" : "";
   $("fE2").className = f === "ev2" ? "on" : "";
   $("fCo").className = f === "church" ? "on" : "";
+  $("fSent").className = f === "sent" ? "on" : "";
+  $("fUnsent").className = f === "unsent" ? "on" : "";
   renderAll();
 }
 
@@ -1473,10 +1744,16 @@ async function handleFiles(files){
 
 /* ── exports ── */
 function exportExcel(){
-  const head = ["Name (الاسم)", "Side (الطرف)", "People (الأفراد)", "WhatsApp", ev2Name(), "Church Only (الكنيسة فقط)", "Added"];
+  const head = ["Name (الاسم)", "Side (الطرف)", "People (الأفراد)", "WhatsApp", ev2Name(), "Church Only (الكنيسة فقط)", "Invite Sent (اتبعتت)", "Sent On (تاريخ الإرسال)", "Added"];
   const xrole = orgRole() || "master";
   const xrows = xrole === "master" ? all : all.filter(r => r.side === xrole);
-  const rows_ = xrows.map(r => [r.name, r.side === "bride" ? "Bride عروسة" : "Groom عريس", r.count, r.phone || "", r.event2 ? "YES" : "", r.church_only ? "YES" : "", (r.created_at || "").slice(0, 10)]);
+  const rows_ = xrows.map(r => {
+    const log = sentLog(r);
+    const done = sentKinds(r);
+    const last = done.map(k => log[k].at).filter(Boolean).sort().pop() || "";
+    return [r.name, r.side === "bride" ? "Bride عروسة" : "Groom عريس", r.count, r.phone || "", r.event2 ? "YES" : "", r.church_only ? "YES" : "",
+      done.join(" + "), last.slice(0, 10), (r.created_at || "").slice(0, 10)];
+  });
   const csv = "﻿" + [head, ...rows_].map(row => row.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\r\n");
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
