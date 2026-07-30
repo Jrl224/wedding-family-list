@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regression coverage for v22.0 invitation delivery (church-universal model).
+"""Regression coverage for v22.1 invitation delivery (church-universal model).
 
 Everyone is always invited to church; the per-family choices are Reception and
 Henna. `church_only:true` means "church only, not invited to the reception"; the
@@ -16,9 +16,15 @@ pills that PATCH church_only / event2 and recompose the message live, above a
 static "church is universal" note; the ‹ / › family navigation with an N / M
 indicator; the ✕ close button; the missing-number badge + no-phone filter chip;
 the green sent-card class; the inline row delete removed (delete now lives inside
-Edit and writes church_only under the inverted "Reception?" label); and the
-single per-family sent record with rollback on a failed PATCH. Runs fully against
-a mocked Supabase, so no live guest row is ever touched.
+Edit and writes church_only under the inverted "Reception?" label); the
+single per-family sent record with rollback on a failed PATCH; bilingual
+guest names — displayName() shows name_en in the English UI and name in the
+Arabic UI, search matches either language, the Edit modal persists an optional
+name_en, and the Excel export gains a "Name (English)" column; and the v22.1
+label cleanup — no church-note text or ⛪ card chip, Reception/Henna are plain
+checkboxes in add/edit and the send modal, and the send modal has a pinned
+header (‹ N/M name › ✕) that stays visible while the body scrolls. Runs fully
+against a mocked Supabase, so no live guest row is ever touched.
 """
 
 import argparse
@@ -40,13 +46,14 @@ CHURCH_LINK = (
     "?cat=3eff4b55-85f1-4322-8ab6-f1bf8fd8c85c"
     "&g=rsvp-7110440c-c1ca-4577-abac-3cae79bce03c"
 )
-VERSION = "٢٢٫٠ · 22.0"
+VERSION = "٢٢٫١ · 22.1"
 TEMPLATE_VERSION = "21.0"
 ARABIC = re.compile(r"[؀-ۿ]")
 FAMILIES = [
     {
         "id": "henna-family",
-        "name": "Henna Test Family",
+        "name": "عيلة الحنة",
+        "name_en": "Henna Test Family",
         "phone": "+1 202-555-0123",
         "side": "bride",
         "count": 2,
@@ -57,7 +64,8 @@ FAMILIES = [
     },
     {
         "id": "church-family",
-        "name": "Church Test Family",
+        "name": "عيلة الكنيسة",
+        "name_en": "Church Test Family",
         "phone": "+20 100 123 4567",
         "side": "bride",
         "count": 2,
@@ -68,7 +76,8 @@ FAMILIES = [
     },
     {
         "id": "no-phone-family",
-        "name": "No Phone Family",
+        "name": "عيلة بدون رقم",
+        "name_en": "No Phone Family",
         "phone": "",
         "side": "bride",
         "count": 3,
@@ -220,20 +229,45 @@ def run_browser(browser_type, browser_name, base_url):
     assert page.locator("#fullList .fam .del").count() == 0
     assert page.locator("#fullList .fam .edit-btn").count() == 3
 
-    # ── Addendum: event chips on every card — ⛪ always, 🏛 iff invited to reception, 🌿 iff henna
+    # ── Addendum: event chips — 🏛 iff invited to reception, 🌿 iff henna; NO ⛪ church chip
+    # (church is universal and never shown on a card)
     def chips(row):
-        return {c: row.locator(f".card-chip.{c}").count() for c in ("church", "reception", "henna")}
-    assert chips(henna_row) == {"church": 1, "reception": 1, "henna": 1}       # reception + henna
-    assert chips(church_row) == {"church": 1, "reception": 0, "henna": 0}      # church only
-    assert chips(nophone_row) == {"church": 1, "reception": 1, "henna": 0}     # reception, no henna
+        return {c: row.locator(f".card-chip.{c}").count() for c in ("reception", "henna")}
+    assert chips(henna_row) == {"reception": 1, "henna": 1}       # reception + henna
+    assert chips(church_row) == {"reception": 0, "henna": 0}      # church only ⇒ no chips
+    assert chips(nophone_row) == {"reception": 1, "henna": 0}     # reception, no henna
+    assert page.locator("#fullList .card-chip.church").count() == 0
     # organizer chips carry text labels
-    assert "Church" in henna_row.locator(".card-chip.church").inner_text()
     assert "Reception" in henna_row.locator(".card-chip.reception").inner_text()
     assert "Henna" in henna_row.locator(".card-chip.henna").inner_text()
     # organizer row reception quick-toggle (🏛) is ON iff invited to the reception
     assert "🏛" in henna_row.locator(".cot").inner_text()
     assert on(henna_row.locator(".cot"))
     assert not on(church_row.locator(".cot"))
+
+    # ── Addendum #2: bilingual names — displayName follows the UI language toggle
+    assert page.evaluate("displayName(all.find(r => r.id === 'henna-family'))") == "Henna Test Family"
+    assert "Henna Test Family" in henna_row.inner_text()  # EN UI shows name_en
+    # flip the UI to Arabic → rows show the Arabic name
+    page.evaluate("toggleLang(); renderAll(); renderMine()")
+    assert page.evaluate("L") == "ar"
+    assert page.evaluate("displayName(all.find(r => r.id === 'henna-family'))") == "عيلة الحنة"
+    assert page.locator("#fullList .fam").filter(has_text="عيلة الحنة").count() == 1
+    # search by ENGLISH name while the UI is Arabic still finds the family
+    page.fill("#search", "Henna Test")
+    page.wait_for_function("document.querySelectorAll('#fullList .fam').length === 1")
+    assert "عيلة الحنة" in page.locator("#fullList .fam").first.inner_text()
+    page.fill("#search", "")
+    page.wait_for_function("document.querySelectorAll('#fullList .fam').length === 3")
+    # flip back to English
+    page.evaluate("toggleLang(); renderAll(); renderMine()")
+    assert page.evaluate("L") == "en"
+    # search by ARABIC name while the UI is English still finds the family
+    page.fill("#search", "عيلة الكنيسة")
+    page.wait_for_function("document.querySelectorAll('#fullList .fam').length === 1")
+    assert "Church Test Family" in page.locator("#fullList .fam").first.inner_text()
+    page.fill("#search", "")
+    page.wait_for_function("document.querySelectorAll('#fullList .fam').length === 3")
 
     # ── D6 + D7: send modal has a ✕ close, ‹ › nav, and an N / M indicator
     page.locator("#fullList .fam").first.locator(".send-invite").click()
@@ -261,48 +295,69 @@ def run_browser(browser_type, browser_name, base_url):
     henna_row.locator(".send-invite").click()
     page.wait_for_selector("#inviteChannels button")
     assert page.evaluate("inviteRow.id") == "henna-family"
+    # the recipient line uses displayName (English name in the EN UI)
+    assert "Henna Test Family" in page.locator("#inviteRecipient").inner_text()
     assert page.locator("#inviteChannels button").count() == 4
     # language chooser is still gone; one bilingual message, dir=auto
     assert page.locator("#invite" + "Langs").count() == 0
     assert page.locator("#inviteMsg").get_attribute("dir") == "auto"
 
-    # ── D5 + addendum: church is universal (static note); the Reception pill PATCHes
-    # church_only and swaps the link live (Reception OFF ⇒ church-only + ?cat= link)
-    assert page.locator("#inviteChurchNote").inner_text() == "⛪ Church — everyone is invited"
+    # ── Addendum: the church-note text is GONE (church never stated in UI)
+    assert page.locator("#inviteChurchNote").count() == 0
+
+    # ── Addendum: pinned header stays visible while the modal body scrolls
+    assert page.locator("#inviteHeader #invitePrev").count() == 1
+    assert page.locator("#inviteHeader #inviteNext").count() == 1
+    assert page.locator("#inviteHeader #invitePos").count() == 1
+    assert page.locator("#inviteHeader #inviteX").count() == 1
+    assert "Henna Test Family" in page.locator("#inviteHeader").inner_text()
+    assert "/" in page.locator("#inviteHeader #invitePos").inner_text()
+    page.evaluate("document.getElementById('inviteBody').scrollTop = 9999")
+    header_pinned = page.evaluate(
+        "() => {"
+        " const m = document.querySelector('#inviteBg .modal').getBoundingClientRect();"
+        " const h = document.getElementById('inviteHeader').getBoundingClientRect();"
+        " return h.height > 0 && h.top >= m.top - 1 && h.bottom <= m.bottom + 1;"
+        "}"
+    )
+    assert header_pinned
+
+    # ── D5 (addendum): Reception + Henna are checkbox rows; Reception unchecked ⇒
+    # church_only:true ⇒ church-only message + ?cat= link (same PATCH behaviour)
     henna_channel_msg = page.evaluate("inviteMessage(inviteRow)")
     assert henna_channel_msg.rstrip().endswith(INVITE_LINK)
-    reception_pill = page.locator("#inviteIncluded .inc-pill.reception")
-    henna_pill = page.locator("#inviteIncluded .inc-pill.henna")
-    # henna family is invited to the reception, so the Reception pill starts ON
-    assert on(reception_pill)
-    assert on(henna_pill)
+    reception_box = page.locator("#inviteIncluded .check-row.reception input")
+    henna_box = page.locator("#inviteIncluded .check-row.henna input")
+    # henna family is invited to the reception and to henna → both boxes checked
+    assert reception_box.is_checked()
+    assert henna_box.is_checked()
 
     n = len(family_mutations)
-    reception_pill.click()
+    reception_box.click()
     mut = wait_new_mutation(n)
     assert mut[0] == "PATCH" and json.loads(mut[2]) == {"church_only": True}, mut
     page.wait_for_function("inviteMessage(inviteRow).includes('?cat=')")
     assert "?cat=" in page.locator("#inviteMsg").inner_text()
-    assert not on(page.locator("#inviteIncluded .inc-pill.reception"))
+    assert not page.locator("#inviteIncluded .check-row.reception input").is_checked()
 
     n = len(family_mutations)
-    page.locator("#inviteIncluded .inc-pill.reception").click()
+    page.locator("#inviteIncluded .check-row.reception input").click()
     mut = wait_new_mutation(n)
     assert json.loads(mut[2]) == {"church_only": False}, mut
     page.wait_for_function("!inviteMessage(inviteRow).includes('?cat=')")
     assert "?cat=" not in page.locator("#inviteMsg").inner_text()
-    assert on(page.locator("#inviteIncluded .inc-pill.reception"))
+    assert page.locator("#inviteIncluded .check-row.reception input").is_checked()
 
-    # ── D5: henna pill PATCHes event2 and folds the henna block in/out live
+    # ── D5: Henna checkbox PATCHes event2 and folds the henna block in/out live
     n = len(family_mutations)
-    page.locator("#inviteIncluded .inc-pill.henna").click()
+    page.locator("#inviteIncluded .check-row.henna input").click()
     mut = wait_new_mutation(n)
     assert json.loads(mut[2]) == {"event2": False}, mut
     page.wait_for_function("!inviteMessage(inviteRow).includes('Henna Party')")
     assert "Henna Party" not in page.locator("#inviteMsg").inner_text()
 
     n = len(family_mutations)
-    page.locator("#inviteIncluded .inc-pill.henna").click()
+    page.locator("#inviteIncluded .check-row.henna input").click()
     mut = wait_new_mutation(n)
     assert json.loads(mut[2]) == {"event2": True}, mut
     page.wait_for_function("inviteMessage(inviteRow).includes('Henna Party')")
@@ -404,7 +459,7 @@ def run_browser(browser_type, browser_name, base_url):
     # ── church-only family: NOT invited to reception ⇒ Reception pill OFF, church-scoped link
     church_row.locator(".send-invite").click()
     page.wait_for_selector("#inviteChannels button")
-    assert not on(page.locator("#inviteIncluded .inc-pill.reception"))
+    assert not page.locator("#inviteIncluded .check-row.reception input").is_checked()
     church_msg = page.evaluate("inviteMessage(inviteRow)")
     assert church_msg.rstrip().endswith(CHURCH_LINK)
     assert "Reception" not in church_msg and "Henna" not in church_msg
@@ -421,18 +476,22 @@ def run_browser(browser_type, browser_name, base_url):
     assert INVITE_LINK in page.evaluate("window.__copied[window.__copied.length - 1]")
     page.locator("#inviteClose").click()
 
-    # ── Addendum: the edit flow writes church_only under the inverted "Reception?" label
+    # ── Addendum: the edit flow writes church_only under the inverted "Reception?"
+    # label AND persists the optional English name (name_en) in the same PATCH
     nophone_row.locator(".edit-btn").click()
     page.wait_for_function("!document.getElementById('editBg').hidden")
-    # a reception-invited family defaults to Reception = Yes highlighted
-    assert on(page.locator("#eChurchYes"))
-    assert not on(page.locator("#eChurchNo"))
+    # the English-name field is prefilled from name_en
+    assert page.locator("#eNameEn").input_value() == "No Phone Family"
+    # a reception-invited family defaults to the Reception checkbox checked
+    assert page.locator("#eRecChk").is_checked()
+    page.fill("#eNameEn", "No Phone Family EN")
     n = len(family_mutations)
-    page.locator("#eChurchNo").click()  # Reception No ⇒ church_only:true
+    page.locator("#eRecChk").uncheck()  # not invited to reception ⇒ church_only:true
     page.locator("#editSave").click()
     mut = wait_new_mutation(n)
     edit_body = json.loads(mut[2])
     assert edit_body.get("church_only") is True and "name" in edit_body, mut
+    assert edit_body.get("name_en") == "No Phone Family EN", mut
     page.wait_for_function("document.getElementById('editBg').hidden")
 
     # ── D3: delete now lives inside the Edit modal and DELETEs via the API
@@ -451,6 +510,14 @@ def run_browser(browser_type, browser_name, base_url):
     # the undo-toast delete path is intact (removeRow still offers an undo);
     # removeRow shows the toast only after the DELETE resolves, so wait for it
     page.wait_for_selector(".toast button")
+
+    # ── Addendum #2: Excel export carries a "Name (English)" column right after the name
+    with page.expect_download() as dl:
+        page.evaluate("exportExcel()")
+    export_text = Path(dl.value.path()).read_text(encoding="utf-8")
+    header_line = export_text.splitlines()[0]
+    assert '"Name (الاسم)","Name (English)"' in header_line, header_line
+    assert "Henna Test Family" in export_text  # a name_en value made it into the export
 
     # sends only ever leave as user-initiated deep links, never background fetches
     assert not outbound_requests
@@ -471,13 +538,15 @@ def run_browser(browser_type, browser_name, base_url):
     assert methods.count("PATCH") == 8, methods
     browser.close()
     print(
-        f"PASS {browser_name}: v22 church-universal — every card shows ⛪ + 🏛(reception) + "
-        "🌿(henna) chips; send-modal Reception/Henna pills PATCH church_only/event2 and "
-        "recompose live under a 'church is universal' note; Reception OFF ⇒ ?cat= church link; "
-        "edit flow writes church_only under the inverted Reception label; ‹ › family nav + N / M; "
-        "✕ close; iMessage sms: via hidden iframe (top page never unloads); WhatsApp/Messenger/"
-        "Copy wired; no-number badge + 📵 filter; green sent-cards; row delete lives in Edit; "
-        "sent tracking round-trips and rolls back"
+        f"PASS {browser_name}: v22.1 — cards show 🏛(reception)/🌿(henna) chips, no ⛪ chip; "
+        "send-modal Reception/Henna CHECKBOXES PATCH church_only/event2 and recompose live "
+        "(no church-note text); Reception unchecked ⇒ ?cat= church link; add/edit use plain "
+        "checkboxes; pinned send-modal header (‹ N/M name › ✕) stays visible while the body "
+        "scrolls; family nav + N / M; iMessage sms: via hidden iframe (top page never unloads); "
+        "WhatsApp/Messenger/Copy wired; no-number badge + 📵 filter; green sent-cards; row "
+        "delete lives in Edit; sent tracking round-trips and rolls back; bilingual names "
+        "(name_en) follow the UI toggle, search hits either language, Edit saves name_en, "
+        "export has the English column"
     )
 
 
