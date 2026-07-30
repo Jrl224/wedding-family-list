@@ -147,6 +147,7 @@ def run_browser(browser_type, browser_name, base_url):
                 rid = request.url.split("id=eq.")[1].split("&")[0]
                 deleted[rid] = pbody["deleted_at"]
             # v23.1: mirror live NOT NULL constraints — a null here rejected the whole payload in prod
+            # (waitlist is NOT NULL DEFAULT false, migrated for v24; confirmed likewise)
             notnull = {"name", "count", "side", "event2", "church_only", "confirmed", "waitlist"}
             for row_ in (pbody if isinstance(pbody, list) else [pbody]):
                 if isinstance(row_, dict) and any(row_.get(c) is None for c in notnull if c in row_):
@@ -703,6 +704,15 @@ def run_browser(browser_type, browser_name, base_url):
     delete_patches = [m for m in family_mutations if m[0] == "PATCH" and "deleted_at" in json.loads(m[2] or "{}")]
     assert len(delete_patches) == 2, delete_patches  # soft-delete + restore
     assert methods.count("PATCH") == 12, methods
+
+    # ── v23.1: the mock mirrors live column constraints EXACTLY (asserted last — these direct
+    # probes intentionally add to family_mutations, so they run after the counts above).
+    st_wait = page.evaluate("async () => (await fetch(SUPA + '?id=eq.henna-family', {method:'PATCH', headers:H, body: JSON.stringify({waitlist: null})})).status")
+    assert st_wait == 400, st_wait   # waitlist NOT NULL → rejected
+    st_conf = page.evaluate("async () => (await fetch(SUPA + '?id=eq.henna-family', {method:'PATCH', headers:H, body: JSON.stringify({confirmed: null})})).status")
+    assert st_conf == 400, st_conf   # confirmed NOT NULL → rejected
+    st_null = page.evaluate("async () => (await fetch(SUPA + '?id=eq.henna-family', {method:'PATCH', headers:H, body: JSON.stringify({seats:null, members:null, tags:null, group_name:null, name_en:null, parent_id:null})})).status")
+    assert st_null == 200, st_null   # nullable columns accept null both ways
     browser.close()
     print(
         f"PASS {browser_name}: v23.1 — HOTFIX: default-family Edit save round-trips (mock 400s "
