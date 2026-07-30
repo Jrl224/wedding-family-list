@@ -6,7 +6,17 @@ Single-file guest-list app (index.html) + Playwright suite (tests/). Supabase pr
 
 Work ONLY the topmost unshipped version. Do not start the next until the current one is reported, reviewed, committed, pushed, and live-verified. No mid-run scope additions: new asks get appended here by Nova and wait their turn.
 
-### ⏳ v22.1 — IN FLIGHT (finish + report)
+### 🔥 v23.1 — HOTFIX (ACTIVE — jumps everything; v24 WIP stashed)
+Root cause of live "nothing saves" (2026-07-30): saveEdit PATCHed `seats:null`; column was NOT NULL → PostgREST rejected the whole payload → every Edit save silently rolled back. DB fixed by Nova (seats now nullable, verified end-to-end in the live UI). App fixes: (1) member-input accumulation (6 inputs rendered for count-4; idempotent render required); (2) member semantics = contact IS person #1 → count−1 inputs, contact displayName shown as fixed line 1, send-modal/export dedupe, one-time normalization of over-length members arrays; (3) suite hardening — mocked Supabase enforces live column constraints (400 on null into NOT NULL) + full-default-family save round-trip test. Version ٢٣٫١ · 23.1.
+
+### v23.2 — Relationships + filter panel (spec: design fleet wf_75d34c19-df5, Nova pastes path on completion)
+Multi-level family relationships ("Semsem family inside the Shafik family" — tree/relationship model, NOT flat group_name) + the 11-chip strip replaced by a compact multi-check dropdown filter panel with live counts and active-summary trigger. Joseph's direct ask; jumps ahead of v24.
+
+### v24 — Tags + Waitlist (STASHED WIP — resume after v23.2)
+
+### ✅ SHIPPED: v22.1 (0a8373b), v23 (7537922) — see git log
+
+### ⏳ v22.1 — SHIPPED (reference)
 - Bilingual guest names: displayName() follows UI language (name_en fallback name); search matches both; optional English-name field in Edit; export "Name (English)" column.
 - Label fix: no "church for everyone" text anywhere; no ⛪ chip on cards; add/edit = bare checkboxes 🏛 Reception (default ✓; unchecked ⇒ church_only:true) / 🌿 Henna Party; send-modal pills as checkbox rows; label "Included"/"الدعوة شاملة".
 - Send modal phone fixes: sticky pinned header (‹ · N / M + name · › · ✕) visible at any scroll; arrows ≥44px gold; swipe with horizontal-intent detection (|dx|≥60 ∧ |dx|>|dy|·1.5); responsive at 390×844.
