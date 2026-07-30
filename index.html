@@ -76,10 +76,14 @@
   .ev2-row .chips{display:flex;border:1px solid var(--line);border-radius:12px;overflow:hidden}
   .ev2-row .chips button{padding:9px 20px;border:0;background:var(--card);color:var(--dim);font-size:14.5px;font-weight:700;cursor:pointer;font-family:inherit}
   .ev2-row .chips button.on{background:linear-gradient(120deg,#3f7d4e,#5aa66c);color:#fff}
-  .fam .ev2badge{font-size:13px;margin-inline-start:4px}
   .fam .ev2t{background:none;border:1px solid var(--line);border-radius:50%;width:32px;height:32px;font-size:15px;cursor:pointer;opacity:.35}
   .fam .ev2t.on{opacity:1;border-color:#5aa66c;background:rgba(90,166,108,.15)}
-  .fam .co-badge{font-size:11px;margin-inline-start:5px;padding:1px 6px;border-radius:6px;background:rgba(150,130,220,.18);border:1px solid rgba(150,130,220,.5);color:#c3b3f0;vertical-align:middle}
+  .fam .card-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+  .fam .card-chip{font-size:11px;padding:1px 7px;border-radius:6px;border:1px solid var(--line);background:var(--card2);color:var(--dim)}
+  .fam .card-chip.church{opacity:.6}
+  .fam .card-chip.reception{border-color:rgba(201,162,39,.5);background:rgba(201,162,39,.13);color:var(--gold-b)}
+  .fam .card-chip.henna{border-color:#5aa66c;background:rgba(90,166,108,.15);color:#8be6ad}
+  .fam .nophone-badge{font-size:11px;margin-inline-start:5px;padding:1px 6px;border-radius:6px;background:rgba(201,106,106,.18);border:1px solid rgba(201,106,106,.5);color:#e6a3a3;vertical-align:middle}
   .fam .cot{background:none;border:1px solid var(--line);border-radius:50%;width:32px;height:32px;font-size:15px;cursor:pointer;opacity:.35}
   .fam .cot.on{opacity:1;border-color:#9a82dc;background:rgba(150,130,220,.15)}
   .check{
@@ -102,6 +106,7 @@
   }
   .fam.sendable{flex-wrap:wrap}
   .fam.b{border-inline-start:4px solid var(--bride)} .fam.g{border-inline-start:4px solid var(--groom)}
+  .fam.sent{border-color:rgba(37,211,102,.55);background:rgba(37,211,102,.09)}
   .fam .info{flex:1;min-width:0}
   .fam b{font-size:15.5px;display:block;overflow-wrap:anywhere}
   .fam .meta{color:var(--dim);font-size:12.5px}
@@ -109,7 +114,7 @@
   .fam .cnt{display:flex;align-items:center;gap:5px}
   .fam .cnt button{width:32px;height:32px;border-radius:50%;border:1px solid var(--gold);background:none;color:var(--gold-b);font-size:17px;font-weight:700;cursor:pointer}
   .fam .cnt span{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--gold-b);min-width:20px;text-align:center}
-  .fam .del{background:none;border:0;color:#c96a6a;font-size:20px;padding:4px 6px;cursor:pointer}
+  .fam .edit-btn{background:none;border:0;color:var(--gold-b);font-size:20px;padding:4px 6px;cursor:pointer}
   .fam .send-invite{
     flex-basis:100%;min-height:44px;padding:9px 12px;border:1px solid rgba(37,211,102,.42);border-radius:10px;
     background:rgba(37,211,102,.11);color:#8be6ad;font-family:inherit;font-size:13px;font-weight:700;line-height:1.4;cursor:pointer;
@@ -191,10 +196,21 @@
   .m-actions button{flex:1;padding:15px;border:0;border-radius:12px;font-size:16px;font-weight:800;font-family:inherit;cursor:pointer}
   .m-ok{background:var(--green);color:#fff}
   .m-cancel{background:var(--card2);color:var(--ivory);border:1px solid var(--line)}
+  .m-delete{width:100%;margin-top:10px;padding:15px;border-radius:12px;font-size:16px;font-weight:800;font-family:inherit;cursor:pointer;background:rgba(201,106,106,.15);border:1px solid rgba(201,106,106,.5);color:#e08a8a}
   .invite-recipient{padding:11px 13px;margin:6px 0 12px;border:1px solid var(--line);border-radius:12px;background:var(--card);text-align:start}
   .invite-recipient b{display:block;color:var(--ivory);overflow-wrap:anywhere}
   .invite-recipient span{display:block;color:var(--dim);font-size:12.5px;direction:ltr;unicode-bidi:isolate}
-  .invite-auto{padding:11px 13px;border:1px solid rgba(201,162,39,.35);border-radius:12px;background:rgba(201,162,39,.08);color:var(--gold-b);font-size:13px;font-weight:700;line-height:1.55;text-align:start}
+  .invite-auto{display:flex;gap:8px}
+  .inc-pill{flex:1;min-height:42px;padding:9px 11px;border:1px solid var(--line);border-radius:11px;background:var(--card);color:var(--dim);font-family:inherit;font-size:12.5px;font-weight:700;line-height:1.35;cursor:pointer}
+  .inc-pill.henna.on{border-color:#5aa66c;background:rgba(90,166,108,.15);color:#8be6ad}
+  .inc-pill.reception.on{border-color:var(--gold);background:rgba(201,162,39,.15);color:var(--gold-b)}
+  .invite-church-note{color:var(--dim);font-size:12px;margin:0 0 7px;text-align:start;opacity:.85}
+  #inviteBg .modal{position:relative}
+  .invite-x{position:absolute;top:12px;inset-inline-end:12px;background:none;border:0;color:var(--dim);font-size:22px;line-height:1;cursor:pointer;padding:4px 8px}
+  .invite-nav{display:flex;align-items:center;justify-content:center;gap:14px;direction:ltr;margin:2px 0 8px}
+  .invite-nav button{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--gold-b);font-size:20px;cursor:pointer}
+  .invite-nav button:disabled{opacity:.3;cursor:default}
+  .invite-pos{color:var(--dim);font-size:13px;font-weight:700;min-width:54px;text-align:center}
   .invite-step{color:var(--gold-b);font-size:12.5px;font-weight:700;margin:12px 0 7px;text-align:start}
   .invite-langs{display:flex;gap:7px;flex-wrap:wrap;padding-bottom:2px}
   .invite-langs button{flex:1 1 auto;min-height:40px;padding:8px 11px;border:1px solid var(--line);border-radius:11px;background:var(--card);color:var(--dim);font-family:inherit;font-size:12.5px;font-weight:700;line-height:1.4;cursor:pointer}
@@ -222,7 +238,7 @@
   .invite-sent .sent-done{display:flex;align-items:center;gap:10px;padding:11px 13px;border:1px solid rgba(37,211,102,.42);border-radius:12px;background:rgba(37,211,102,.1);text-align:start}
   .invite-sent .sent-done b{flex:1;color:#8be6ad;font-size:13px;font-weight:700;line-height:1.5}
   .invite-sent .sent-done button{width:auto;min-height:36px;padding:7px 14px;font-size:12.5px;color:var(--dim)}
-  .fam .sent-badge{flex-basis:100%;color:#8be6ad;font-size:11.5px;font-weight:700;margin-top:-3px}
+  .fam .sent-badge{flex-basis:100%;color:#8be6ad;font-size:13px;font-weight:800;margin-top:-3px}
   .pin-in{width:210px;padding:16px;font-family:'Cormorant Garamond',serif;font-size:32px;text-align:center;letter-spacing:.4em;border-radius:14px;border:1px solid var(--line);background:rgba(9,18,32,.8);color:var(--gold-b);display:block;margin:12px auto}
   .toast{position:fixed;top:60px;left:50%;transform:translateX(-50%);background:#1f5c36;color:#fff;padding:11px 20px;border-radius:12px;font-size:14.5px;display:none;z-index:30;max-width:92vw;text-align:center;box-shadow:0 8px 26px rgba(0,0,0,.4)}
   .toast.err{background:#7a2c2c}
@@ -284,7 +300,7 @@
     </div>
     <input class="wiz-in phone-big" id="wPhone" inputmode="tel" autocomplete="off">
     <div class="ev2-row"><span id="ev2Label"></span><div class="chips"><button type="button" id="ev2No" class="on" onclick="setEv2(false)"></button><button type="button" id="ev2Yes" onclick="setEv2(true)"></button></div></div>
-    <div class="ev2-row"><span id="churchLabel"></span><div class="chips"><button type="button" id="churchNo" class="on" onclick="setChurch(false)"></button><button type="button" id="churchYes" onclick="setChurch(true)"></button></div></div>
+    <div class="ev2-row"><span id="churchLabel"></span><div class="chips"><button type="button" id="churchNo" onclick="setChurch(true)"></button><button type="button" id="churchYes" class="on" onclick="setChurch(false)"></button></div></div>
     <button class="next" onclick="saveFamily()" id="saveBtn"></button>
     <button class="skip" onclick="saveFamily(true)" id="skipBtn"></button>
   </div>
@@ -348,6 +364,7 @@
       <button id="fCo" onclick="setFilter('church')">⛪</button>
       <button id="fSent" onclick="setFilter('sent')"></button>
       <button id="fUnsent" onclick="setFilter('unsent')"></button>
+      <button id="fNoPhone" onclick="setFilter('nophone')">📵</button>
     </div>
     <input class="search" id="search" oninput="renderAll()">
     <div id="fullList" style="text-align:start"></div>
@@ -359,7 +376,7 @@
     </div>
   </div>
 
-  <p class="ver">٢١٫٠ · 21.0</p>
+  <p class="ver">٢٢٫٠ · 22.0</p>
 </div>
 
 <div class="modal-bg" id="previewBg" hidden>
@@ -407,20 +424,24 @@
       <button type="button" onclick="eBump(-1)" style="width:52px;height:52px;font-size:26px">−</button>
     </div>
     <div class="ev2-row"><span id="eEv2Label"></span><div class="chips"><button type="button" id="eEv2No" class="on" onclick="setEEv2(false)"></button><button type="button" id="eEv2Yes" onclick="setEEv2(true)"></button></div></div>
-    <div class="ev2-row"><span id="eChurchLabel"></span><div class="chips"><button type="button" id="eChurchNo" class="on" onclick="setEChurch(false)"></button><button type="button" id="eChurchYes" onclick="setEChurch(true)"></button></div></div>
+    <div class="ev2-row"><span id="eChurchLabel"></span><div class="chips"><button type="button" id="eChurchNo" onclick="setEChurch(true)"></button><button type="button" id="eChurchYes" class="on" onclick="setEChurch(false)"></button></div></div>
     <input class="wiz-in phone-big" id="ePhone" inputmode="tel" style="font-size:17px" autocomplete="off">
     <div class="m-actions">
       <button class="m-ok" onclick="saveEdit()" id="editSave"></button>
       <button class="m-cancel" onclick="document.getElementById('editBg').hidden=true" id="editCancel"></button>
     </div>
+    <button class="m-delete" type="button" onclick="deleteFromEdit()" id="editDelete"></button>
   </div>
 </div>
 
 <div class="modal-bg" id="inviteBg" hidden>
   <div class="modal">
+    <button class="invite-x" type="button" onclick="closeInvite()" id="inviteX">✕</button>
     <h3 id="inviteTitle"></h3>
+    <div class="invite-nav" id="inviteNav"><button type="button" id="invitePrev" onclick="inviteGo(-1)">‹</button><span class="invite-pos" id="invitePos"></span><button type="button" id="inviteNext" onclick="inviteGo(1)">›</button></div>
     <div class="invite-recipient"><b id="inviteRecipient"></b><span id="invitePhone"></span></div>
     <p class="invite-step" id="inviteIncludedLabel"></p>
+    <p class="invite-church-note" id="inviteChurchNote"></p>
     <div class="invite-auto" id="inviteIncluded"></div>
     <pre class="invite-msg" id="inviteMsg"></pre>
     <p class="invite-step" id="inviteStepChan"></p>
@@ -554,10 +575,13 @@ const STR = {
     samePhone:"📱 نفس رقم الواتساب — غالبًا نفس العيلة حتى لو الاسم مختلف",
     photoGone:"اتشالت الصورة",
     ev2Q:n=>`🌿 هيتعزموا على ${n} كمان؟`, yes:"أيوة", no:"لأ", ev2Count:(f,p)=>`🌿 ${f} عيلة · ${p} فرد`,
-    churchQ:"⛪ الكنيسة فقط (بدون الحفلة)", capChurch:n=>`⛪ ${n}`,
+    churchQ:"🏛 معزومين على حفل الزفاف؟ (الكنيسة للكل)", capChurch:n=>`⛪ ${n}`,
     sendInvite:"📨 إرسال الدعوة", inviteTitle:"إرسال الدعوة", inviteTo:n=>`الدعوة إلى ${n}`,
-    includedLabel:"هتتضاف تلقائيًا حسب علامة العيلة",
-    includedFull:"الإكليل المقدس + حفل الزفاف", includedChurch:"الإكليل المقدس فقط", includedHenna:" + حفلة الحنة",
+    includedLabel:"الدعوة شاملة إيه؟ دوسوا للتغيير",
+    pillHenna:"🌿 حفلة الحنة", pillReception:"🏛 حفل الزفاف",
+    churchAll:"⛪ الكنيسة — الكل معزوم", fChurchOnly:"⛪ بس",
+    chipChurch:"الكنيسة", chipReception:"الحفل", chipHenna:"الحنة",
+    noPhoneBadge:"📵 من غير رقم", deleteFamily:"حذف العيلة", closeAria:"إغلاق",
     stepChan:"هتبعتوها منين؟",
     chWhatsapp:"واتساب", chImessage:"iMessage", chMessenger:"ماسنجر", chCopy:"نسخ الرسالة",
     msgCopied:"الرسالة اتنسخت ✓", copyFail:"النسخ ما اشتغلش — اختاروا النص وانسخوه يدوي.",
@@ -611,10 +635,13 @@ const STR = {
     samePhone:"📱 Same WhatsApp number — likely the same household even if the name differs",
     photoGone:"Photo removed",
     ev2Q:n=>`🌿 Also invited to the ${n}?`, yes:"Yes", no:"No", ev2Count:(f,p)=>`🌿 ${f} families · ${p} people`,
-    churchQ:"⛪ Church only (no reception)", capChurch:n=>`⛪ ${n}`,
+    churchQ:"🏛 Invited to the reception? (Church is for everyone)", capChurch:n=>`⛪ ${n}`,
     sendInvite:"📨 Send invite", inviteTitle:"Send invitation", inviteTo:n=>`Invitation for ${n}`,
-    includedLabel:"Included automatically from this family’s checkmarks",
-    includedFull:"Holy Matrimony + Reception", includedChurch:"Holy Matrimony only", includedHenna:" + Henna Party",
+    includedLabel:"Included — tap to change",
+    pillHenna:"🌿 Henna Party", pillReception:"🏛 Reception",
+    churchAll:"⛪ Church — everyone is invited", fChurchOnly:"⛪ only",
+    chipChurch:"Church", chipReception:"Reception", chipHenna:"Henna",
+    noPhoneBadge:"📵 No number", deleteFamily:"Delete family", closeAria:"Close",
     stepChan:"Where do you want to send it?",
     chWhatsapp:"WhatsApp", chImessage:"iMessage", chMessenger:"Messenger", chCopy:"Copy message",
     msgCopied:"Message copied ✓", copyFail:"Copy was blocked — select the text and copy it manually.",
@@ -653,7 +680,7 @@ function applyLang(){
   set("dupTitle","dupTitle"); set("dupSub","dupSub"); set("dupGo","dupGo"); set("dupCancel","dupCancel");
   set("fbTitle","fbTitle"); set("fbSub","fbSub"); set("photoShareBtn","fbShare"); set("fbBack","fbBack");
   set("pinTitle","pinTitle"); set("pinSub","pinSub"); set("pinOpen","pinOpen"); set("pinBack","pinBack"); set("pinErr","pinErr");
-  set("editTitle","editTitle"); set("editSave","editSave"); set("editCancel","cancel");
+  set("editTitle","editTitle"); set("editSave","editSave"); set("editCancel","cancel"); set("editDelete","deleteFamily");
   set("inviteTitle","inviteTitle"); set("inviteClose","cancel");
   set("switchPinBtn","switchPin");
   set("churchLabel","churchQ"); set("eChurchLabel","churchQ");
@@ -690,8 +717,8 @@ let wEv2 = false, eEv2 = false;
 function setEv2(v){ wEv2 = v; $("ev2Yes").className = v ? "on" : ""; $("ev2No").className = v ? "" : "on"; }
 function setEEv2(v){ eEv2 = v; $("eEv2Yes").className = v ? "on" : ""; $("eEv2No").className = v ? "" : "on"; }
 let wChurch = false, eChurch = false;
-function setChurch(v){ wChurch = v; $("churchYes").className = v ? "on" : ""; $("churchNo").className = v ? "" : "on"; }
-function setEChurch(v){ eChurch = v; $("eChurchYes").className = v ? "on" : ""; $("eChurchNo").className = v ? "" : "on"; }
+function setChurch(v){ wChurch = v; $("churchYes").className = v ? "" : "on"; $("churchNo").className = v ? "on" : ""; }
+function setEChurch(v){ eChurch = v; $("eChurchYes").className = v ? "" : "on"; $("eChurchNo").className = v ? "on" : ""; }
 async function refreshSideTotals(){
   try {
     const r = await fetch(SUPA + "?select=side,count,church_only", { headers: H });
@@ -926,10 +953,10 @@ function renderPreview(){
     const plus = document.createElement("button"); plus.textContent = "+";
     plus.onclick = () => { r.count = Math.min(30, r.count + 1); renderPreview(); };
     cnt.append(minus, num, plus);
-    const del = document.createElement("button");
-    del.className = "del"; del.textContent = "✕";
-    del.onclick = () => { pending.splice(i, 1); pending.length ? renderPreview() : closePreview(); };
-    row.append(info, cnt, del);
+    const previewRemove = document.createElement("button");
+    previewRemove.className = "edit-btn"; previewRemove.style.color = "#c96a6a"; previewRemove.textContent = "✕";
+    previewRemove.onclick = () => { pending.splice(i, 1); pending.length ? renderPreview() : closePreview(); };
+    row.append(info, cnt, previewRemove);
     el.appendChild(row);
   });
   $("previewOk").textContent = t("saveAll")(pending.length);
@@ -1156,21 +1183,56 @@ async function sendVia(channelKey){
   if (channel.hint) { $("inviteHint").textContent = t(channel.hint); $("inviteHint").hidden = false; }
   const url = channel.url(number, message);
   if (channel.newTab) window.open(url, "_blank", "noopener");
-  else window.location.href = url;
+  else {
+    // Launch the sms: deep link through a throwaway hidden iframe so the top page never
+    // unloads — navigating window.location to sms: made the invite modal disappear.
+    const frame = document.createElement("iframe");
+    frame.style.display = "none";
+    frame.src = url;
+    document.body.appendChild(frame);
+    setTimeout(() => frame.remove(), 2000);
+  }
   toast(t("chanOpened")(t(channel.label)));
 }
 
 let inviteRow = null;
 let inviteChannelUsed = null;
+let inviteNav = [];
+let inviteNavIdx = -1;
+async function toggleInclude(field){
+  if (!inviteRow) return;
+  inviteRow[field] = !inviteRow[field];
+  renderInviteModal();
+  renderAll(); renderMine();
+  try {
+    await fetch(`${SUPA}?id=eq.${inviteRow.id}`, { method: "PATCH", headers: H, body: JSON.stringify({ [field]: inviteRow[field] }) });
+  } catch(e) {}
+  if (field === "church_only") refreshSideTotals();
+}
 function renderInviteModal(){
   if (!inviteRow) return;
   const number = whatsappNumber(inviteRow.phone);
+  $("inviteX").setAttribute("aria-label", t("closeAria"));
+  $("invitePos").textContent = inviteNav.length ? `${inviteNavIdx + 1} / ${inviteNav.length}` : "";
+  $("invitePrev").disabled = inviteNavIdx <= 0;
+  $("inviteNext").disabled = inviteNavIdx < 0 || inviteNavIdx >= inviteNav.length - 1;
   $("inviteRecipient").textContent = t("inviteTo")(inviteRow.name);
   $("invitePhone").textContent = normalizePhone(inviteRow.phone, "") || inviteRow.phone || t("noPhone");
   $("inviteIncludedLabel").textContent = t("includedLabel");
-  $("inviteIncluded").textContent =
-    t(inviteRow.church_only ? "includedChurch" : "includedFull") +
-    (inviteRow.event2 ? t("includedHenna") : "");
+  $("inviteChurchNote").textContent = t("churchAll");
+  const inc = $("inviteIncluded");
+  inc.innerHTML = "";
+  const receptionPill = document.createElement("button");
+  receptionPill.type = "button";
+  receptionPill.className = "inc-pill reception" + (!inviteRow.church_only ? " on" : "");
+  receptionPill.textContent = t("pillReception");
+  receptionPill.onclick = () => toggleInclude("church_only");
+  const hennaPill = document.createElement("button");
+  hennaPill.type = "button";
+  hennaPill.className = "inc-pill henna" + (inviteRow.event2 ? " on" : "");
+  hennaPill.textContent = t("pillHenna");
+  hennaPill.onclick = () => toggleInclude("event2");
+  inc.append(receptionPill, hennaPill);
   $("inviteStepChan").textContent = t("stepChan");
   $("inviteClose").textContent = t("cancel");
 
@@ -1217,26 +1279,63 @@ function renderInviteModal(){
     sentBar.appendChild(mark);
   }
 }
-function openInvite(row){
+function openInvite(row, navIds){
+  inviteRow = row;
+  inviteChannelUsed = null;
+  inviteNav = Array.isArray(navIds) ? navIds.slice() : [row.id];
+  inviteNavIdx = inviteNav.indexOf(row.id);
+  $("inviteHint").hidden = true;
+  $("inviteBg").hidden = false;
+  renderInviteModal();
+}
+function inviteGo(delta){
+  if (inviteNavIdx < 0) return;
+  const nextIdx = inviteNavIdx + delta;
+  if (nextIdx < 0 || nextIdx >= inviteNav.length) return;
+  const row = all.find(r => r.id === inviteNav[nextIdx]) || mine.find(r => r.id === inviteNav[nextIdx]);
+  if (!row) return;
+  inviteNavIdx = nextIdx;
   inviteRow = row;
   inviteChannelUsed = null;
   $("inviteHint").hidden = true;
-  $("inviteBg").hidden = false;
   renderInviteModal();
 }
 function closeInvite(){
   inviteRow = null;
   inviteChannelUsed = null;
+  inviteNav = [];
+  inviteNavIdx = -1;
   $("inviteBg").hidden = true;
   $("inviteHint").hidden = true;
 }
-function famRow(r, canDelete){
+(function(){
+  const el = document.querySelector("#inviteBg .modal");
+  if (!el) return;
+  let startX = null;
+  el.addEventListener("touchstart", e => { startX = e.touches[0].clientX; }, { passive: true });
+  el.addEventListener("touchend", e => {
+    if (startX === null) return;
+    const dx = e.changedTouches[0].clientX - startX;
+    startX = null;
+    if (Math.abs(dx) < 60) return;
+    // swipe left = next (LTR); inverted in the Arabic RTL UI
+    const forward = (dx < 0) !== (L === "ar");
+    inviteGo(forward ? 1 : -1);
+  }, { passive: true });
+})();
+function famRow(r, canDelete, navIds){
   const row = document.createElement("div");
-  row.className = "fam " + (r.side === "bride" ? "b" : "g");
+  row.className = "fam " + (r.side === "bride" ? "b" : "g") + (isInviteSent(r) ? " sent" : "");
   const info = document.createElement("div");
   info.className = "info";
   const sideWord = r.side === "bride" ? t("sideWordB") : t("sideWordG");
-  info.innerHTML = `<b>${esc(r.name)}${r.event2 ? '<span class="ev2badge">🌿</span>' : ""}${r.church_only ? '<span class="co-badge">⛪</span>' : ""}</b><div class="meta">${sideWord}${r.phone ? ` · <span dir="ltr">${esc(r.phone)}</span>` : ""}</div>`;
+  const noNumber = !whatsappNumber(r.phone);
+  const orgCtx = isOrg() && !$("orgView").hidden;
+  const chip = (cls, emoji, key) => `<span class="card-chip ${cls}">${emoji}${orgCtx ? " " + t(key) : ""}</span>`;
+  const chips = chip("church", "⛪", "chipChurch")
+    + (!r.church_only ? chip("reception", "🏛", "chipReception") : "")
+    + (r.event2 ? chip("henna", "🌿", "chipHenna") : "");
+  info.innerHTML = `<b>${esc(r.name)}</b><div class="meta">${sideWord}${r.phone ? ` · <span dir="ltr">${esc(r.phone)}</span>` : ""}${noNumber ? ` <span class="nophone-badge">${t("noPhoneBadge")}</span>` : ""}</div><div class="card-chips">${chips}</div>`;
   const cnt = document.createElement("div");
   cnt.className = "cnt";
   const minus = document.createElement("button"); minus.textContent = "−";
@@ -1256,8 +1355,8 @@ function famRow(r, canDelete){
     };
     row.append(ev);
     const co = document.createElement("button");
-    co.className = "cot" + (r.church_only ? " on" : "");
-    co.textContent = "⛪";
+    co.className = "cot" + (!r.church_only ? " on" : "");
+    co.textContent = "🏛";
     co.onclick = async () => {
       r.church_only = !r.church_only; renderAll(); renderMine();
       try { await fetch(`${SUPA}?id=eq.${r.id}`, { method: "PATCH", headers: H, body: JSON.stringify({ church_only: r.church_only }) }); } catch(e) {}
@@ -1267,12 +1366,9 @@ function famRow(r, canDelete){
   }
   if (canDelete) {
     const ed = document.createElement("button");
-    ed.className = "del"; ed.style.color = "var(--gold-b)"; ed.textContent = "✏️";
+    ed.className = "edit-btn"; ed.textContent = "✏️";
     ed.onclick = () => openEdit(r);
-    const del = document.createElement("button");
-    del.className = "del"; del.textContent = "✕";
-    del.onclick = () => removeRow(r);
-    row.append(ed, del);
+    row.append(ed);
   }
   if (canDelete && isOrg() && !$("orgView").hidden) {
     row.classList.add("sendable");
@@ -1280,7 +1376,7 @@ function famRow(r, canDelete){
     send.type = "button";
     send.className = "send-invite";
     send.textContent = t("sendInvite");
-    send.onclick = () => openInvite(r);
+    send.onclick = () => openInvite(r, navIds);
     row.append(send);
     const entry = sentEntry(r);
     if (entry) {
@@ -1318,6 +1414,12 @@ async function saveEdit(){
   refreshMine(); if (isOrg()) refreshAll();
   editing = null;
 }
+function deleteFromEdit(){
+  const row = editing;
+  $("editBg").hidden = true;
+  editing = null;
+  if (row) removeRow(row);
+}
 function renderMine(){
   const btn = $("myFamsBtn");
   if (btn) { btn.style.display = mine.length ? "block" : "none"; btn.textContent = t("myFams")(mine.length); }
@@ -1325,7 +1427,8 @@ function renderMine(){
   if (!el) return;
   el.innerHTML = "";
   if (!mine.length) { el.innerHTML = `<p class="empty">${t("mineEmpty")}</p>`; return; }
-  mine.forEach(r => el.appendChild(famRow(r, true)));
+  const mineIds = mine.map(r => r.id);
+  mine.forEach(r => el.appendChild(famRow(r, true, mineIds)));
 }
 function renderAll(){
   if ($("orgView").hidden) return;
@@ -1341,14 +1444,15 @@ function renderAll(){
   $("orgCapG").hidden = role === "bride";
   document.querySelector(".filters").hidden = false;
   $("fAll").hidden = $("fB").hidden = $("fG").hidden = role !== "master";
-  if (role !== "master" && !["ev2", "church", "sent", "unsent"].includes(filter)) filter = role;
+  if (role !== "master" && !["ev2", "church", "sent", "unsent", "nophone"].includes(filter)) filter = role;
   const e2f = vis.filter(x => x.event2);
   $("fE2").textContent = "🌿 " + e2f.length + " · " + e2f.reduce((s, x) => s + x.count, 0);
   const cof = vis.filter(x => x.church_only);
-  $("fCo").textContent = "⛪ " + cof.length + " · " + cof.reduce((s, x) => s + x.count, 0);
+  $("fCo").textContent = t("fChurchOnly") + " " + cof.length + " · " + cof.reduce((s, x) => s + x.count, 0);
   const sentF = vis.filter(isInviteSent);
   $("fSent").textContent = t("fSent") + " " + sentF.length;
   $("fUnsent").textContent = t("fUnsent") + " " + (vis.length - sentF.length);
+  $("fNoPhone").textContent = "📵 " + vis.filter(x => !whatsappNumber(x.phone)).length;
   const nameGroups = {}, phoneGroups = {};
   vis.forEach(r => {
     const nk = normName(r.name); if (nk) (nameGroups[nk] = nameGroups[nk] || []).push(r);
@@ -1371,12 +1475,14 @@ function renderAll(){
     if (filter === "church") return r.church_only;
     if (filter === "sent") return isInviteSent(r);
     if (filter === "unsent") return !isInviteSent(r);
+    if (filter === "nophone") return !whatsappNumber(r.phone);
     return r.side === filter;
   };
   const show = vis.filter(r => matchesFilter(r) && (!q || r.name.toLowerCase().includes(q) || (r.phone || "").includes(q)));
   el.innerHTML = "";
   if (!show.length) { el.innerHTML = `<p class="empty">${t("listEmpty")}</p>`; return; }
-  show.forEach(r => el.appendChild(famRow(r, true)));
+  const showIds = show.map(r => r.id);
+  show.forEach(r => el.appendChild(famRow(r, true, showIds)));
   renderCaps();
 }
 function setFilter(f){
@@ -1386,6 +1492,7 @@ function setFilter(f){
   $("fCo").className = f === "church" ? "on" : "";
   $("fSent").className = f === "sent" ? "on" : "";
   $("fUnsent").className = f === "unsent" ? "on" : "";
+  $("fNoPhone").className = f === "nophone" ? "on" : "";
   renderAll();
 }
 
@@ -1483,10 +1590,10 @@ async function loadPhotos(){
       a.href = url; a.target = "_blank"; a.rel = "noopener";
       const side = o.name.startsWith("bride") ? t("fB") : o.name.startsWith("groom") ? t("fG") : "";
       a.innerHTML = `<img loading="lazy" src="${url}"><span class="tag">${side}</span>`;
-      const del = document.createElement("button");
-      del.className = "pdel"; del.textContent = "✕";
-      del.onclick = (e) => { e.preventDefault(); e.stopPropagation(); deletePhoto(o.name, url, a); };
-      a.appendChild(del);
+      const photoRemove = document.createElement("button");
+      photoRemove.className = "pdel"; photoRemove.textContent = "✕";
+      photoRemove.onclick = (e) => { e.preventDefault(); e.stopPropagation(); deletePhoto(o.name, url, a); };
+      a.appendChild(photoRemove);
       el.appendChild(a);
     });
   } catch(e) {}
