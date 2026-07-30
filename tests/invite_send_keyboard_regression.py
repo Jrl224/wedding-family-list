@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regression coverage for v22.1 invitation delivery (church-universal model).
+"""Regression coverage for v23.0 invitation delivery (church-universal model).
 
 Everyone is always invited to church; the per-family choices are Reception and
 Henna. `church_only:true` means "church only, not invited to the reception"; the
@@ -46,7 +46,7 @@ CHURCH_LINK = (
     "?cat=3eff4b55-85f1-4322-8ab6-f1bf8fd8c85c"
     "&g=rsvp-7110440c-c1ca-4577-abac-3cae79bce03c"
 )
-VERSION = "٢٢٫١ · 22.1"
+VERSION = "٢٣٫٠ · 23.0"
 TEMPLATE_VERSION = "21.0"
 ARABIC = re.compile(r"[؀-ۿ]")
 FAMILIES = [
@@ -60,6 +60,8 @@ FAMILIES = [
         "event2": True,
         "church_only": False,
         "confirmed": True,
+        "group_name": "Makram",
+        "members": ["Shenouda", "Malak"],
         "added_by": "fixture",
         "invite_sent": {},
     },
@@ -300,6 +302,18 @@ def run_browser(browser_type, browser_name, base_url):
     page.evaluate("all.find(r => r.id === 'henna-family').seats = null; renderAll()")
     assert "🌿 1" not in henna_row.locator(".card-chip.henna").inner_text()
 
+    # ── v23 item 1: group chip on the card + "By group" grouped view
+    assert henna_row.locator(".card-chip.group").count() == 1
+    assert "Makram" in henna_row.locator(".card-chip.group").inner_text()
+    assert church_row.locator(".card-chip.group").count() == 0
+    assert not page.locator("#sortGroup").is_hidden()  # a group exists → toggle available
+    page.evaluate("toggleGroupView()")
+    page.wait_for_function("document.querySelectorAll('#fullList .group-head').length >= 1")
+    heads = page.evaluate("() => [...document.querySelectorAll('#fullList .group-head')].map(h => h.textContent)")
+    assert any("Makram" in h for h in heads), heads
+    page.evaluate("toggleGroupView()")
+    page.wait_for_function("document.querySelectorAll('#fullList .group-head').length === 0")
+
     # ── v23: cards are READ-ONLY indicators — no +/− count buttons, no 🌿/🏛 quick-toggles;
     # only ✏️ Edit and 📨 Send invite are interactive. Count renders as plain text.
     assert henna_row.locator(".cnt button").count() == 0
@@ -378,6 +392,10 @@ def run_browser(browser_type, browser_name, base_url):
     assert page.evaluate("inviteRow.id") == "henna-family"
     # the recipient line uses displayName (English name in the EN UI)
     assert "Henna Test Family" in page.locator("#inviteRecipient").inner_text()
+    # ── v23 item 2: member names show under the family name in the send modal
+    assert not page.locator("#inviteMembers").is_hidden()
+    assert "Shenouda" in page.locator("#inviteMembers").inner_text()
+    assert "Malak" in page.locator("#inviteMembers").inner_text()
     assert page.locator("#inviteChannels button").count() == 4
     # language chooser is still gone; one bilingual message, dir=auto
     assert page.locator("#invite" + "Langs").count() == 0
@@ -569,6 +587,12 @@ def run_browser(browser_type, browser_name, base_url):
     assert not page.locator("#eConfirmedChk").is_checked()  # no-phone fixture is unconfirmed
     page.fill("#eNameEn", "No Phone Family EN")
     page.locator("#eConfirmedChk").check()  # v23: mark confirmed
+    # ── v23 items 1+2: group + member names save in the same Edit PATCH
+    page.evaluate("document.getElementById('eMore').open = true")
+    page.fill("#eGroup", "Cousins")
+    member_inputs = page.locator("#eMembers input")
+    assert member_inputs.count() == 3  # inputs match the family count (3)
+    member_inputs.nth(0).fill("Mina")
     n = len(family_mutations)
     page.locator("#eRecChk").uncheck()  # not invited to reception ⇒ church_only:true
     page.locator("#editSave").click()
@@ -577,6 +601,8 @@ def run_browser(browser_type, browser_name, base_url):
     assert edit_body.get("church_only") is True and "name" in edit_body, mut
     assert edit_body.get("name_en") == "No Phone Family EN", mut
     assert edit_body.get("confirmed") is True, mut
+    assert edit_body.get("group_name") == "Cousins", mut
+    assert edit_body.get("members") and edit_body["members"][0] == "Mina", mut
     page.wait_for_function("document.getElementById('editBg').hidden")
 
     # ── v23 item 8: the Edit henna stepper writes seats {henna:n} in the PATCH
@@ -629,7 +655,10 @@ def run_browser(browser_type, browser_name, base_url):
     header_line = export_text.splitlines()[0]
     assert '"Name (الاسم)","Name (English)"' in header_line, header_line
     assert "Confirmed" in header_line, header_line
+    assert "Group" in header_line and "Members" in header_line, header_line  # v23 columns
     assert "Henna Test Family" in export_text  # a name_en value made it into the export
+    assert "Makram" in export_text  # group_name exported
+    assert "Shenouda" in export_text  # members exported
     assert "YES (1)" in export_text  # henna override renders the seat count
     page.evaluate("all.find(r => r.id === 'henna-family').seats = null; renderAll()")
 
@@ -655,15 +684,13 @@ def run_browser(browser_type, browser_name, base_url):
     assert methods.count("PATCH") == 11, methods
     browser.close()
     print(
-        f"PASS {browser_name}: v22.1 — cards show 🏛(reception)/🌿(henna) chips, no ⛪ chip; "
-        "send-modal Reception/Henna CHECKBOXES PATCH church_only/event2 and recompose live "
-        "(no church-note text); Reception unchecked ⇒ ?cat= church link; add/edit use plain "
-        "checkboxes; pinned send-modal header (‹ N/M name › ✕) stays visible while the body "
-        "scrolls; family nav + N / M; iMessage sms: via hidden iframe (top page never unloads); "
-        "WhatsApp/Messenger/Copy wired; no-number badge + 📵 filter; green sent-cards; row "
-        "delete lives in Edit; sent tracking round-trips and rolls back; bilingual names "
-        "(name_en) follow the UI toggle, search hits either language, Edit saves name_en, "
-        "export has the English column"
+        f"PASS {browser_name}: v23.0 — read-only cards (count text, only Send+Edit); red 📵 + "
+        "amber ⚠️ + green sent precedence, 📵-first/A–Z/last-name sort; ✅ Confirmed; soft delete "
+        "via deleted_at (no API DELETE) + 🗑 dimmed Restore; multi-select AND filter row "
+        "(Bride/Groom/Sent/Not-sent/✅/🌿/🏛/⛪ only/📵/⚠️/🗑, exclusive pairs, counts); henna "
+        "headcount stepper → seats {henna:n}, card 🌿 n, export YES (n); family groups (chip, "
+        "By-group view, datalist) + member names (Edit inputs, send-modal, export); all on top "
+        "of v22.1 bilingual names + church-universal model"
     )
 
 
