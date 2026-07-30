@@ -85,6 +85,7 @@
   .more-lbl{color:var(--gold-b);font-size:12.5px;font-weight:700;margin:8px 0 6px;text-align:start}
   .member-inputs{display:flex;flex-direction:column;gap:6px}
   .member-inputs .member-in{font-size:15px}
+  .member-contact{color:var(--gold-b);font-weight:700;font-size:14px;padding:2px 0 5px;text-align:start;overflow-wrap:anywhere}
   .fam .card-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
   .fam .card-chip{font-size:11px;padding:1px 7px;border-radius:6px;border:1px solid var(--line);background:var(--card2);color:var(--dim)}
   .fam .card-chip.reception{border-color:rgba(201,162,39,.5);background:rgba(201,162,39,.13);color:var(--gold-b)}
@@ -405,7 +406,7 @@
     </div>
   </div>
 
-  <p class="ver">٢٣٫٠ · 23.0</p>
+  <p class="ver">٢٣٫١ · 23.1</p>
 </div>
 
 <div class="modal-bg" id="previewBg" hidden>
@@ -856,11 +857,18 @@ function refreshGroupList(){
   const names = [...new Set(all.filter(r => !r.deleted_at && r.group_name).map(r => r.group_name))].sort();
   el.innerHTML = names.map(n => `<option value="${esc(n)}"></option>`).join("");
 }
-function renderMemberInputs(containerId, count, values){
+function renderMemberInputs(containerId, count, values, contactName){
   const el = $(containerId); if (!el) return;
   const vals = Array.isArray(values) ? values : [];
+  const slots = Math.max(0, (Number(count) || 0) - 1);   // the contact is person #1
   el.innerHTML = "";
-  for (let i = 0; i < count; i++){
+  if (contactName) {
+    const c = document.createElement("div");
+    c.className = "member-contact";
+    c.textContent = contactName;
+    el.appendChild(c);
+  }
+  for (let i = 0; i < slots; i++){
     const inp = document.createElement("input");
     inp.className = "wiz-in member-in"; inp.type = "text"; inp.autocomplete = "off";
     inp.value = vals[i] || "";
@@ -868,10 +876,10 @@ function renderMemberInputs(containerId, count, values){
   }
 }
 function collectMembers(containerId){
-  const vals = [...$(containerId).querySelectorAll("input")].map(i => i.value.trim());
+  const vals = [...$(containerId).querySelectorAll("input.member-in")].map(i => i.value.trim());
   return vals.some(v => v) ? vals : null;
 }
-function bump(d){ n = Math.min(30, Math.max(1, n + d)); $("count").textContent = n; renderMemberInputs("wMembers", n, collectMembers("wMembers") || []); }
+function bump(d){ n = Math.min(30, Math.max(1, n + d)); $("count").textContent = n; renderMemberInputs("wMembers", n, collectMembers("wMembers") || [], $("wName").value.trim()); }
 
 /* ── routing ── */
 function setSide(s){ mySide = s; localStorage.setItem("wedSide", s); route(); }
@@ -892,7 +900,7 @@ function toStep(s){
   ["step1","step2","step3","stepDone","mineWrap"].forEach(id => $(id).hidden = true);
   if (s === 1) { $("step1").hidden = false; }
   if (s === 2) $("step2").hidden = false;
-  if (s === 3) { $("step3").hidden = false; renderMemberInputs("wMembers", n, collectMembers("wMembers") || []); setTimeout(()=> $("wPhone").focus(), 60); }
+  if (s === 3) { $("step3").hidden = false; renderMemberInputs("wMembers", n, collectMembers("wMembers") || [], $("wName").value.trim()); setTimeout(()=> $("wPhone").focus(), 60); }
   [1,2,3].forEach(i => $("d"+i).className = "");
   $("d"+Math.min(s,3)).className = "on";
   $("backBtn").hidden = (s === 1 || s > 3);
@@ -915,7 +923,7 @@ async function saveFamily(skipPhone){
   if (await insertRows([{ name, count: n, phone, event2: wEv2, church_only: wChurch, group_name, members }])) {
     setEv2(false); setChurch(false);
     $("doneName").textContent = name;
-    $("wName").value = ""; $("wPhone").value = ""; $("wGroup").value = ""; renderMemberInputs("wMembers", 2, []);
+    $("wName").value = ""; $("wPhone").value = ""; $("wGroup").value = ""; renderMemberInputs("wMembers", 2, [], "");
     $("wMore").open = false;
     n = 2; $("count").textContent = n;
     ["step1","step2","step3","mineWrap"].forEach(id => $(id).hidden = true);
@@ -1176,6 +1184,7 @@ function hennaSeats(row){ return row.seats && Number.isInteger(row.seats.henna) 
 function hennaOverridden(row){ return !!(row.event2 && row.seats && Number.isInteger(row.seats.henna) && row.seats.henna < row.count); }
 function localDigits(n){ return L === "ar" ? String(n).replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[d]) : String(n); }
 function displayName(row){ return (L === "en" ? (row.name_en || row.name) : row.name) || ""; }
+function memNorm(s){ return String(s == null ? "" : s).normalize("NFC").trim().toLowerCase(); }
 
 /* ── message text ── */
 function invitePairs(row){
@@ -1313,7 +1322,8 @@ function renderInviteModal(){
   $("invitePrev").disabled = inviteNavIdx <= 0;
   $("inviteNext").disabled = inviteNavIdx < 0 || inviteNavIdx >= inviteNav.length - 1;
   $("inviteRecipient").textContent = displayName(inviteRow);
-  const mem = Array.isArray(inviteRow.members) ? inviteRow.members.filter(v => v) : [];
+  const cN = memNorm(displayName(inviteRow));
+  const mem = (Array.isArray(inviteRow.members) ? inviteRow.members : []).filter(v => v && memNorm(v) !== cN);
   const memEl = $("inviteMembers");
   if (memEl) { memEl.textContent = mem.join("، "); memEl.hidden = !mem.length; }
   $("invitePhone").textContent = normalizePhone(inviteRow.phone, "") || inviteRow.phone || t("noPhone");
@@ -1485,7 +1495,7 @@ function famRow(r, canDelete, navIds){
 
 /* ── edit saved rows ── */
 let editing = null, eCount = 2;
-function eBump(d){ eCount = Math.min(30, Math.max(1, eCount + d)); $("eCount").textContent = eCount; if (eEv2 && eHenna > eCount) { eHenna = eCount; renderHennaSeats(); } renderMemberInputs("eMembers", eCount, collectMembers("eMembers") || []); }
+function eBump(d){ eCount = Math.min(30, Math.max(1, eCount + d)); $("eCount").textContent = eCount; if (eEv2 && eHenna > eCount) { eHenna = eCount; renderHennaSeats(); } renderMemberInputs("eMembers", eCount, collectMembers("eMembers") || [], displayName(editing)); }
 function openEdit(r){
   editing = r; eCount = r.count;
   eHenna = hennaSeats(r);
@@ -1493,7 +1503,7 @@ function openEdit(r){
   $("eName").value = r.name; $("eNameEn").value = r.name_en || ""; $("ePhone").value = r.phone || ""; $("eCount").textContent = eCount;
   $("eConfirmedChk").checked = !!r.confirmed;
   $("eGroup").value = r.group_name || "";
-  renderMemberInputs("eMembers", eCount, Array.isArray(r.members) ? r.members : []);
+  renderMemberInputs("eMembers", eCount, Array.isArray(r.members) ? r.members : [], displayName(r));
   $("eMore").open = !!(r.group_name || (Array.isArray(r.members) && r.members.some(v => v)));
   refreshGroupList();
   $("editBg").hidden = false;
@@ -1834,7 +1844,7 @@ function exportExcel(){
   const rows_ = xrows.map(r => {
     const entry = sentEntry(r);
     const sentAt = entry && entry.at ? entry.at : "";
-    return [r.name, r.name_en || "", r.side === "bride" ? "Bride عروسة" : "Groom عريس", r.count, r.phone || "", r.event2 ? (hennaOverridden(r) ? "YES (" + r.seats.henna + ")" : "YES") : "", r.church_only ? "YES" : "", r.confirmed ? "YES" : "", r.group_name || "", (Array.isArray(r.members) ? r.members.filter(v => v).join(", ") : ""),
+    return [r.name, r.name_en || "", r.side === "bride" ? "Bride عروسة" : "Groom عريس", r.count, r.phone || "", r.event2 ? (hennaOverridden(r) ? "YES (" + r.seats.henna + ")" : "YES") : "", r.church_only ? "YES" : "", r.confirmed ? "YES" : "", r.group_name || "", (Array.isArray(r.members) ? r.members.filter(v => v && memNorm(v) !== memNorm(r.name) && memNorm(v) !== memNorm(r.name_en)).join(", ") : ""),
       entry ? "YES" : "", sentAt.slice(0, 10), (r.created_at || "").slice(0, 10)];
   });
   const csv = "﻿" + [head, ...rows_].map(row => row.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\r\n");

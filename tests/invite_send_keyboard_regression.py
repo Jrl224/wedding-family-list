@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regression coverage for v23.0 invitation delivery (church-universal model).
+"""Regression coverage for v23.1 invitation delivery (church-universal model).
 
 Everyone is always invited to church; the per-family choices are Reception and
 Henna. `church_only:true` means "church only, not invited to the reception"; the
@@ -46,7 +46,7 @@ CHURCH_LINK = (
     "?cat=3eff4b55-85f1-4322-8ab6-f1bf8fd8c85c"
     "&g=rsvp-7110440c-c1ca-4577-abac-3cae79bce03c"
 )
-VERSION = "٢٣٫٠ · 23.0"
+VERSION = "٢٣٫١ · 23.1"
 TEMPLATE_VERSION = "21.0"
 ARABIC = re.compile(r"[؀-ۿ]")
 FAMILIES = [
@@ -142,11 +142,16 @@ def run_browser(browser_type, browser_name, base_url):
         request = route.request
         if "wedding_families" in request.url and request.method != "GET":
             family_mutations.append((request.method, request.url, request.post_data))
-            if request.method == "PATCH":
-                pbody = json.loads(request.post_data or "{}")
-                if "deleted_at" in pbody:
-                    rid = request.url.split("id=eq.")[1].split("&")[0]
-                    deleted[rid] = pbody["deleted_at"]
+            pbody = json.loads(request.post_data or "{}")
+            if request.method == "PATCH" and isinstance(pbody, dict) and "deleted_at" in pbody:
+                rid = request.url.split("id=eq.")[1].split("&")[0]
+                deleted[rid] = pbody["deleted_at"]
+            # v23.1: mirror live NOT NULL constraints — a null here rejected the whole payload in prod
+            notnull = {"name", "count", "side", "event2", "church_only", "confirmed", "waitlist"}
+            for row_ in (pbody if isinstance(pbody, list) else [pbody]):
+                if isinstance(row_, dict) and any(row_.get(c) is None for c in notnull if c in row_):
+                    route.fulfill(status=400, content_type="application/json", body='{"message":"null value violates not-null constraint"}')
+                    return
             if state["fail_patch"] and request.method == "PATCH":
                 state["fail_patch"] = False
                 route.fulfill(status=500, content_type="application/json", body="{}")
@@ -590,8 +595,9 @@ def run_browser(browser_type, browser_name, base_url):
     # ── v23 items 1+2: group + member names save in the same Edit PATCH
     page.evaluate("document.getElementById('eMore').open = true")
     page.fill("#eGroup", "Cousins")
-    member_inputs = page.locator("#eMembers input")
-    assert member_inputs.count() == 3  # inputs match the family count (3)
+    assert "No Phone Family" in page.locator("#eMembers .member-contact").inner_text()  # contact = person #1
+    member_inputs = page.locator("#eMembers input.member-in")
+    assert member_inputs.count() == 2  # count - 1 additional-member inputs (contact is #1)
     member_inputs.nth(0).fill("Mina")
     n = len(family_mutations)
     page.locator("#eRecChk").uncheck()  # not invited to reception ⇒ church_only:true
@@ -613,10 +619,25 @@ def run_browser(browser_type, browser_name, base_url):
     n = len(family_mutations)
     page.locator("#eHennaSeatsRow button").first.click()       # − : 2 → 1 (override)
     assert page.locator("#eHennaSeats").inner_text() == "1"
+    # v23.1: contact is person #1 → count-1 member inputs; the over-length fixture array trims
+    assert "Henna Test Family" in page.locator("#eMembers .member-contact").inner_text()
+    assert page.locator("#eMembers input.member-in").count() == 1  # count 2 ⇒ 1 additional slot
     page.locator("#editSave").click()
     mut = wait_new_mutation(n)
     assert json.loads(mut[2]).get("seats") == {"henna": 1}, mut
+    assert len(json.loads(mut[2]).get("members") or []) == 1, mut  # 2-member fixture trimmed to count-1
     page.wait_for_function("document.getElementById('editBg').hidden")
+
+    # ── v23.1 HOTFIX: a full default-family save round-trips (the seats:null NOT-NULL bug fix).
+    # The mock now 400s any null into a NOT NULL column; a plain save must be accepted (success toast).
+    church_row.locator(".edit-btn").click()
+    page.wait_for_function("!document.getElementById('editBg').hidden")
+    n = len(family_mutations)
+    page.locator("#editSave").click()
+    mut = wait_new_mutation(n)
+    rt = json.loads(mut[2])
+    assert not any(rt.get(c) is None for c in ("name", "count", "event2", "church_only", "confirmed")), rt
+    page.wait_for_selector(".toast:has-text('Updated')")  # success — payload accepted, not rejected
 
     # ── v23 item 6: Delete in Edit SOFT-deletes via PATCH deleted_at — no API DELETE
     nophone_row.locator(".edit-btn").click()
@@ -678,13 +699,15 @@ def run_browser(browser_type, browser_name, base_url):
     ]
     assert len(toggle_patches) == 4, toggle_patches
     edit_patches = [m for m in family_mutations if m[0] == "PATCH" and "name" in json.loads(m[2] or "{}")]
-    assert len(edit_patches) == 2, edit_patches  # no-phone reception/confirmed edit + henna seats edit
+    assert len(edit_patches) == 3, edit_patches  # no-phone edit + henna seats edit + church round-trip
     delete_patches = [m for m in family_mutations if m[0] == "PATCH" and "deleted_at" in json.loads(m[2] or "{}")]
     assert len(delete_patches) == 2, delete_patches  # soft-delete + restore
-    assert methods.count("PATCH") == 11, methods
+    assert methods.count("PATCH") == 12, methods
     browser.close()
     print(
-        f"PASS {browser_name}: v23.0 — read-only cards (count text, only Send+Edit); red 📵 + "
+        f"PASS {browser_name}: v23.1 — HOTFIX: default-family Edit save round-trips (mock 400s "
+        "null→NOT NULL, guarding the seats bug); members = contact is person #1 (count-1 inputs, "
+        "contact line, over-length arrays trimmed, send-modal/export dedupe). Plus v23: read-only cards (count text, only Send+Edit); red 📵 + "
         "amber ⚠️ + green sent precedence, 📵-first/A–Z/last-name sort; ✅ Confirmed; soft delete "
         "via deleted_at (no API DELETE) + 🗑 dimmed Restore; multi-select AND filter row "
         "(Bride/Groom/Sent/Not-sent/✅/🌿/🏛/⛪ only/📵/⚠️/🗑, exclusive pairs, counts); henna "
