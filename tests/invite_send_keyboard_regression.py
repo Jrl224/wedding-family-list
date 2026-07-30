@@ -59,6 +59,7 @@ FAMILIES = [
         "count": 2,
         "event2": True,
         "church_only": False,
+        "confirmed": True,
         "added_by": "fixture",
         "invite_sent": {},
     },
@@ -71,6 +72,7 @@ FAMILIES = [
         "count": 2,
         "event2": False,
         "church_only": True,
+        "confirmed": False,
         "added_by": "fixture",
         "invite_sent": {},
     },
@@ -83,6 +85,7 @@ FAMILIES = [
         "count": 3,
         "event2": False,
         "church_only": False,
+        "confirmed": False,
         "added_by": "fixture",
         "invite_sent": {},
     },
@@ -131,10 +134,17 @@ def run_browser(browser_type, browser_name, base_url):
         """
     )
 
+    deleted = {}
+
     def mock_supabase(route):
         request = route.request
         if "wedding_families" in request.url and request.method != "GET":
             family_mutations.append((request.method, request.url, request.post_data))
+            if request.method == "PATCH":
+                pbody = json.loads(request.post_data or "{}")
+                if "deleted_at" in pbody:
+                    rid = request.url.split("id=eq.")[1].split("&")[0]
+                    deleted[rid] = pbody["deleted_at"]
             if state["fail_patch"] and request.method == "PATCH":
                 state["fail_patch"] = False
                 route.fulfill(status=500, content_type="application/json", body="{}")
@@ -150,7 +160,7 @@ def run_browser(browser_type, browser_name, base_url):
                 }
             ]
         elif "wedding_families" in request.url and request.method == "GET":
-            body = FAMILIES
+            body = [dict(f, deleted_at=deleted.get(f["id"])) for f in FAMILIES]
         route.fulfill(status=200, content_type="application/json", body=json.dumps(body))
 
     page.route("**/*.supabase.co/**", mock_supabase)
@@ -236,6 +246,24 @@ def run_browser(browser_type, browser_name, base_url):
     # organizer chips carry text labels
     assert "Reception" in henna_row.locator(".card-chip.reception").inner_text()
     assert "Henna" in henna_row.locator(".card-chip.henna").inner_text()
+
+    # ── v23 item 5: ✅ Confirmed chip shows only on a confirmed family
+    assert henna_row.locator(".card-chip.confirmed").count() == 1
+    assert church_row.locator(".card-chip.confirmed").count() == 0
+
+    # ── v23 item 9: number-validity states (missing / wrong / ok) per country code
+    assert page.evaluate("numberState({phone: ''})") == "missing"
+    assert page.evaluate("numberState({phone: '+20 100 123 4567'})") == "ok"
+    assert page.evaluate("numberState({phone: '+1 202-555-0123'})") == "ok"
+    assert page.evaluate("numberState({phone: '+20 55 66'})") == "wrong"
+    assert page.evaluate("numberState({phone: '+20 200 123 4567'})") == "wrong"  # EG mobile must start with 1
+    # amber card + ⚠️ badge render for a wrong number (mutate church family, then restore)
+    page.evaluate("all.find(r => r.id === 'church-family').phone = '+20 200 123 4567'; renderAll()")
+    wrong_row = page.locator("#fullList .fam").filter(has_text="Church Test Family")
+    assert "wrong" in (wrong_row.get_attribute("class") or "")
+    assert wrong_row.locator(".wrong-badge").count() == 1
+    page.evaluate("all.find(r => r.id === 'church-family').phone = '+20 100 123 4567'; renderAll()")
+    assert "wrong" not in (page.locator("#fullList .fam").filter(has_text="Church Test Family").get_attribute("class") or "")
 
     # ── v23: cards are READ-ONLY indicators — no +/− count buttons, no 🌿/🏛 quick-toggles;
     # only ✏️ Edit and 📨 Send invite are interactive. Count renders as plain text.
@@ -502,7 +530,9 @@ def run_browser(browser_type, browser_name, base_url):
     assert page.locator("#eNameEn").input_value() == "No Phone Family"
     # a reception-invited family defaults to the Reception checkbox checked
     assert page.locator("#eRecChk").is_checked()
+    assert not page.locator("#eConfirmedChk").is_checked()  # no-phone fixture is unconfirmed
     page.fill("#eNameEn", "No Phone Family EN")
+    page.locator("#eConfirmedChk").check()  # v23: mark confirmed
     n = len(family_mutations)
     page.locator("#eRecChk").uncheck()  # not invited to reception ⇒ church_only:true
     page.locator("#editSave").click()
@@ -510,31 +540,37 @@ def run_browser(browser_type, browser_name, base_url):
     edit_body = json.loads(mut[2])
     assert edit_body.get("church_only") is True and "name" in edit_body, mut
     assert edit_body.get("name_en") == "No Phone Family EN", mut
+    assert edit_body.get("confirmed") is True, mut
     page.wait_for_function("document.getElementById('editBg').hidden")
 
-    # ── D3: delete now lives inside the Edit modal and DELETEs via the API
+    # ── v23 item 6: Delete in Edit SOFT-deletes via PATCH deleted_at — no API DELETE
     nophone_row.locator(".edit-btn").click()
     page.wait_for_function("!document.getElementById('editBg').hidden")
     assert page.locator("#editDelete").inner_text() == "Delete family"
-    n = len([m for m in family_mutations if m[0] == "DELETE"])
+    n = len(family_mutations)
     page.locator("#editDelete").click()
-    deadline = time.monotonic() + 10
-    while len([m for m in family_mutations if m[0] == "DELETE"]) <= n:
-        assert time.monotonic() < deadline, family_mutations
-        page.wait_for_timeout(30)
-    delete_mut = [m for m in family_mutations if m[0] == "DELETE"][-1]
-    assert "id=eq.no-phone-family" in delete_mut[1], delete_mut
+    mut = wait_new_mutation(n)
+    assert mut[0] == "PATCH" and json.loads(mut[2]).get("deleted_at"), mut
+    assert "id=eq.no-phone-family" in mut[1], mut
     assert page.evaluate("document.getElementById('editBg').hidden") is True
-    # the undo-toast delete path is intact (removeRow still offers an undo);
-    # removeRow shows the toast only after the DELETE resolves, so wait for it
+    # the row leaves the default list once the soft delete round-trips
+    page.wait_for_function("document.querySelectorAll('#fullList .fam').length === 2")
+    assert page.locator("#fullList .fam").filter(has_text="No Phone Family").count() == 0
+    # undo (toast) restores it via PATCH deleted_at:null
     page.wait_for_selector(".toast button")
+    n = len(family_mutations)
+    page.locator(".toast button").click()
+    mut = wait_new_mutation(n)
+    assert mut[0] == "PATCH" and json.loads(mut[2]) == {"deleted_at": None}, mut
+    page.wait_for_function("document.querySelectorAll('#fullList .fam').length === 3")
 
-    # ── Addendum #2: Excel export carries a "Name (English)" column right after the name
+    # ── Excel export: "Name (English)" + "Confirmed" columns
     with page.expect_download() as dl:
         page.evaluate("exportExcel()")
     export_text = Path(dl.value.path()).read_text(encoding="utf-8")
     header_line = export_text.splitlines()[0]
     assert '"Name (الاسم)","Name (English)"' in header_line, header_line
+    assert "Confirmed" in header_line, header_line
     assert "Henna Test Family" in export_text  # a name_en value made it into the export
 
     # sends only ever leave as user-initiated deep links, never background fetches
@@ -542,8 +578,9 @@ def run_browser(browser_type, browser_name, base_url):
     assert not image_requests
     assert not page_errors
     methods = [m[0] for m in family_mutations]
-    assert set(methods) <= {"PATCH", "DELETE"}, methods
-    assert methods.count("DELETE") == 1, methods
+    # v23: nothing is ever hard-deleted — the app must never issue an API DELETE
+    assert "DELETE" not in methods, methods
+    assert set(methods) == {"PATCH"}, methods
     assert len(sent_patches()) == 3, family_mutations
     toggle_patches = [
         m for m in family_mutations
@@ -553,7 +590,9 @@ def run_browser(browser_type, browser_name, base_url):
     assert len(toggle_patches) == 4, toggle_patches
     edit_patches = [m for m in family_mutations if m[0] == "PATCH" and "name" in json.loads(m[2] or "{}")]
     assert len(edit_patches) == 1, edit_patches
-    assert methods.count("PATCH") == 8, methods
+    delete_patches = [m for m in family_mutations if m[0] == "PATCH" and "deleted_at" in json.loads(m[2] or "{}")]
+    assert len(delete_patches) == 2, delete_patches  # soft-delete + restore
+    assert methods.count("PATCH") == 10, methods
     browser.close()
     print(
         f"PASS {browser_name}: v22.1 — cards show 🏛(reception)/🌿(henna) chips, no ⛪ chip; "

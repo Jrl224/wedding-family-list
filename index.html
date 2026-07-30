@@ -78,7 +78,9 @@
   .fam .card-chip{font-size:11px;padding:1px 7px;border-radius:6px;border:1px solid var(--line);background:var(--card2);color:var(--dim)}
   .fam .card-chip.reception{border-color:rgba(201,162,39,.5);background:rgba(201,162,39,.13);color:var(--gold-b)}
   .fam .card-chip.henna{border-color:#5aa66c;background:rgba(90,166,108,.15);color:#8be6ad}
+  .fam .card-chip.confirmed{border-color:rgba(37,211,102,.5);background:rgba(37,211,102,.13);color:#8be6ad}
   .fam .nophone-badge{font-size:11px;margin-inline-start:5px;padding:1px 6px;border-radius:6px;background:rgba(201,106,106,.18);border:1px solid rgba(201,106,106,.5);color:#e6a3a3;vertical-align:middle}
+  .fam .wrong-badge{font-size:11px;margin-inline-start:5px;padding:1px 6px;border-radius:6px;background:rgba(224,178,90,.18);border:1px solid rgba(224,178,90,.5);color:#e6c67a;vertical-align:middle}
   .check{
     width:92px;height:92px;border-radius:50%;margin:4px auto 16px;display:flex;align-items:center;justify-content:center;
     border:1.5px solid var(--gold);background:radial-gradient(circle at 35% 30%, #16273f, var(--deep));
@@ -100,6 +102,7 @@
   .fam.sendable{flex-wrap:wrap}
   .fam.b{border-inline-start:4px solid var(--bride)} .fam.g{border-inline-start:4px solid var(--groom)}
   .fam.nophone{border-color:rgba(224,138,138,.55);background:rgba(224,138,138,.08)}
+  .fam.wrong{border-color:rgba(224,178,90,.55);background:rgba(224,178,90,.09)}
   .fam.sent{border-color:rgba(37,211,102,.55);background:rgba(37,211,102,.09)}
   .fam .info{flex:1;min-width:0}
   .fam b{font-size:15.5px;display:block;overflow-wrap:anywhere}
@@ -426,6 +429,7 @@
     </div>
     <label class="check-row"><input type="checkbox" id="eRecChk" onchange="setEChurch(!this.checked)"><span id="eChurchLabel"></span></label>
     <label class="check-row"><input type="checkbox" id="eEv2Chk" onchange="setEEv2(this.checked)"><span id="eEv2Label"></span></label>
+    <label class="check-row"><input type="checkbox" id="eConfirmedChk"><span id="eConfirmedLabel"></span></label>
     <input class="wiz-in phone-big" id="ePhone" inputmode="tel" style="font-size:17px" autocomplete="off">
     <div class="m-actions">
       <button class="m-ok" onclick="saveEdit()" id="editSave"></button>
@@ -586,7 +590,7 @@ const STR = {
     includedLabel:"الدعوة شاملة",
     pillHenna:"🌿 حفلة الحنة", pillReception:"🏛 حفل الزفاف",
     fChurchOnly:"⛪ بس",
-    chipReception:"الحفل", chipHenna:"الحنة",
+    chipReception:"الحفل", chipHenna:"الحنة", confirmedLabel:"✅ أكدوا", chipConfirmed:"مؤكد", checkNumberBadge:"⚠️ راجعوا الرقم",
     noPhoneBadge:"📵 من غير رقم", deleteFamily:"حذف العيلة", closeAria:"إغلاق",
     stepChan:"هتبعتوها منين؟",
     chWhatsapp:"واتساب", chImessage:"iMessage", chMessenger:"ماسنجر", chCopy:"نسخ الرسالة",
@@ -646,7 +650,7 @@ const STR = {
     includedLabel:"Included",
     pillHenna:"🌿 Henna Party", pillReception:"🏛 Reception",
     fChurchOnly:"⛪ only",
-    chipReception:"Reception", chipHenna:"Henna",
+    chipReception:"Reception", chipHenna:"Henna", confirmedLabel:"✅ Confirmed", chipConfirmed:"Confirmed", checkNumberBadge:"⚠️ Check number",
     noPhoneBadge:"📵 No number", deleteFamily:"Delete family", closeAria:"Close",
     stepChan:"Where do you want to send it?",
     chWhatsapp:"WhatsApp", chImessage:"iMessage", chMessenger:"Messenger", chCopy:"Copy message",
@@ -687,6 +691,7 @@ function applyLang(){
   set("fbTitle","fbTitle"); set("fbSub","fbSub"); set("photoShareBtn","fbShare"); set("fbBack","fbBack");
   set("pinTitle","pinTitle"); set("pinSub","pinSub"); set("pinOpen","pinOpen"); set("pinBack","pinBack"); set("pinErr","pinErr");
   set("editTitle","editTitle"); set("editSave","editSave"); set("editCancel","cancel"); set("editDelete","deleteFamily");
+  set("eConfirmedLabel","confirmedLabel");
   set("inviteTitle","inviteTitle"); set("inviteClose","cancel");
   set("switchPinBtn","switchPin");
   set("churchLabel","pillReception"); set("eChurchLabel","pillReception");
@@ -725,12 +730,13 @@ function setChurch(v){ wChurch = v; $("recChk").checked = !v; }
 function setEChurch(v){ eChurch = v; $("eRecChk").checked = !v; }
 async function refreshSideTotals(){
   try {
-    const r = await fetch(SUPA + "?select=side,count,church_only", { headers: H });
+    const r = await fetch(SUPA + "?select=side,count,church_only,deleted_at", { headers: H });
     if (!r.ok) return;
     const rows = await r.json();
     sideTotals = { bride: 0, groom: 0 };
     churchTotals = { bride: 0, groom: 0 };
     rows.forEach(x => {
+      if (x.deleted_at) return;
       if (sideTotals[x.side] === undefined) return;
       if (x.church_only) churchTotals[x.side] += x.count;
       else sideTotals[x.side] += x.count;
@@ -1060,17 +1066,19 @@ async function refreshAll(){
   if (photoTick++ % 3 === 0) loadPhotos();
 }
 async function removeRow(row){
-  mine = mine.filter(r => r.id !== row.id); all = all.filter(r => r.id !== row.id);
+  const stamp = new Date().toISOString();
+  row.deleted_at = stamp;
   renderMine(); renderAll();
-  try { await fetch(`${SUPA}?id=eq.${row.id}`, { method: "DELETE", headers: H }); } catch(e) {}
-  refreshMine(); if (isOrg()) refreshAll();
-  toast(t("removed")(displayName(row)), false, { label: t("undo"), fn: async () => {
-    try {
-      await fetch(SUPA, { method: "POST", headers: H, body: JSON.stringify([{ name: row.name, count: row.count, phone: row.phone, side: row.side, added_by: row.added_by, event2: !!row.event2, church_only: !!row.church_only }]) });
-      refreshMine(); if (isOrg()) refreshAll();
-      toast(t("restored"));
-    } catch(e) { toast(t("netErr"), true); }
-  }});
+  try { await fetch(`${SUPA}?id=eq.${row.id}`, { method: "PATCH", headers: H, body: JSON.stringify({ deleted_at: stamp }) }); } catch(e) {}
+  refreshMine(); if (isOrg()) { refreshAll(); refreshSideTotals(); }
+  toast(t("removed")(displayName(row)), false, { label: t("undo"), fn: () => restoreRow(row) });
+}
+async function restoreRow(row){
+  row.deleted_at = null;
+  renderMine(); renderAll();
+  try { await fetch(`${SUPA}?id=eq.${row.id}`, { method: "PATCH", headers: H, body: JSON.stringify({ deleted_at: null }) }); } catch(e) {}
+  refreshMine(); if (isOrg()) { refreshAll(); refreshSideTotals(); }
+  toast(t("restored"));
 }
 
 /* ── invitation delivery ── */
@@ -1078,6 +1086,16 @@ function whatsappNumber(raw){
   const normalized = normalizePhone(raw, "");
   const digits = normDigits(String(normalized || "")).replace(/\D/g, "");
   return digits.length >= 8 && digits.length <= 15 && !digits.startsWith("0") ? digits : "";
+}
+function numberState(row){
+  const digits = normDigits(String(normalizePhone(row.phone, "") || "")).replace(/\D/g, "");
+  if (!digits) return "missing";
+  const raw = String(row.phone || "").replace(/[^\d+]/g, "");
+  let ok;
+  if (raw.startsWith("+20")) ok = digits.length === 12 && digits.slice(2).startsWith("1");
+  else if (raw.startsWith("+1")) ok = digits.length === 11 && digits.startsWith("1");
+  else ok = digits.length >= 8 && digits.length <= 15;
+  return ok ? "ok" : "wrong";
 }
 function displayName(row){ return (L === "en" ? (row.name_en || row.name) : row.name) || ""; }
 
@@ -1330,17 +1348,20 @@ function closeInvite(){
   }, { passive: true });
 })();
 function famRow(r, canDelete, navIds){
-  const noNumber = !whatsappNumber(r.phone);
+  const st = numberState(r);
   const row = document.createElement("div");
-  row.className = "fam " + (r.side === "bride" ? "b" : "g") + (isInviteSent(r) ? " sent" : (noNumber ? " nophone" : ""));
+  row.className = "fam " + (r.side === "bride" ? "b" : "g") + (isInviteSent(r) ? " sent" : (st === "missing" ? " nophone" : (st === "wrong" ? " wrong" : "")));
   const info = document.createElement("div");
   info.className = "info";
   const sideWord = r.side === "bride" ? t("sideWordB") : t("sideWordG");
   const orgCtx = isOrg() && !$("orgView").hidden;
   const chip = (cls, emoji, key) => `<span class="card-chip ${cls}">${emoji}${orgCtx ? " " + t(key) : ""}</span>`;
   const chips = (!r.church_only ? chip("reception", "🏛", "chipReception") : "")
-    + (r.event2 ? chip("henna", "🌿", "chipHenna") : "");
-  info.innerHTML = `<b>${esc(displayName(r))}</b><div class="meta">${sideWord}${r.phone ? ` · <span dir="ltr">${esc(r.phone)}</span>` : ""}${noNumber ? ` <span class="nophone-badge">${t("noPhoneBadge")}</span>` : ""}</div>${chips ? `<div class="card-chips">${chips}</div>` : ""}`;
+    + (r.event2 ? chip("henna", "🌿", "chipHenna") : "")
+    + (r.confirmed ? chip("confirmed", "✅", "chipConfirmed") : "");
+  const numBadge = st === "missing" ? ` <span class="nophone-badge">${t("noPhoneBadge")}</span>`
+    : (st === "wrong" ? ` <span class="wrong-badge">${t("checkNumberBadge")}</span>` : "");
+  info.innerHTML = `<b>${esc(displayName(r))}</b><div class="meta">${sideWord}${r.phone ? ` · <span dir="ltr">${esc(r.phone)}</span>` : ""}${numBadge}</div>${chips ? `<div class="card-chips">${chips}</div>` : ""}`;
   const cnt = document.createElement("div");
   cnt.className = "cnt";
   const num = document.createElement("span");
@@ -1379,6 +1400,7 @@ function openEdit(r){
   editing = r; eCount = r.count;
   setEEv2(!!r.event2); setEChurch(!!r.church_only);
   $("eName").value = r.name; $("eNameEn").value = r.name_en || ""; $("ePhone").value = r.phone || ""; $("eCount").textContent = eCount;
+  $("eConfirmedChk").checked = !!r.confirmed;
   $("editBg").hidden = false;
   setTimeout(()=> $("eName").focus(), 60);
 }
@@ -1388,11 +1410,12 @@ async function saveEdit(){
   if (!name) { $("eName").focus(); return; }
   const name_en = $("eNameEn").value.trim();
   const phone = $("ePhone").value.trim() ? normalizePhone($("ePhone").value.trim(), "") : "";
+  const confirmed = $("eConfirmedChk").checked;
   $("editBg").hidden = true;
-  editing.name = name; editing.name_en = name_en || null; editing.count = eCount; editing.phone = phone; editing.event2 = eEv2; editing.church_only = eChurch;
+  editing.name = name; editing.name_en = name_en || null; editing.count = eCount; editing.phone = phone; editing.event2 = eEv2; editing.church_only = eChurch; editing.confirmed = confirmed;
   renderMine(); renderAll();
   try {
-    await fetch(`${SUPA}?id=eq.${editing.id}`, { method: "PATCH", headers: H, body: JSON.stringify({ name, name_en: name_en || null, count: eCount, phone, event2: eEv2, church_only: eChurch }) });
+    await fetch(`${SUPA}?id=eq.${editing.id}`, { method: "PATCH", headers: H, body: JSON.stringify({ name, name_en: name_en || null, count: eCount, phone, event2: eEv2, church_only: eChurch, confirmed }) });
     toast(t("edited"));
   } catch(e) { toast(t("netErr"), true); }
   refreshMine(); if (isOrg()) refreshAll();
@@ -1405,14 +1428,15 @@ function deleteFromEdit(){
   if (row) removeRow(row);
 }
 function renderMine(){
+  const live = mine.filter(r => !r.deleted_at);
   const btn = $("myFamsBtn");
-  if (btn) { btn.style.display = mine.length ? "block" : "none"; btn.textContent = t("myFams")(mine.length); }
+  if (btn) { btn.style.display = live.length ? "block" : "none"; btn.textContent = t("myFams")(live.length); }
   const el = $("mineList");
   if (!el) return;
   el.innerHTML = "";
-  if (!mine.length) { el.innerHTML = `<p class="empty">${t("mineEmpty")}</p>`; return; }
-  const mineIds = mine.map(r => r.id);
-  mine.forEach(r => el.appendChild(famRow(r, true, mineIds)));
+  if (!live.length) { el.innerHTML = `<p class="empty">${t("mineEmpty")}</p>`; return; }
+  const mineIds = live.map(r => r.id);
+  live.forEach(r => el.appendChild(famRow(r, true, mineIds)));
 }
 function sortRows(rows){
   const dn = r => displayName(r).toLowerCase();
@@ -1427,9 +1451,10 @@ function sortRows(rows){
 function renderAll(){
   if ($("orgView").hidden) return;
   const role = orgRole() || "master";
-  const vis = role === "master" ? all : all.filter(r => r.side === role);
-  const bp = all.filter(r => r.side === "bride").reduce((s, r) => s + r.count, 0);
-  const gp = all.filter(r => r.side === "groom").reduce((s, r) => s + r.count, 0);
+  const live = all.filter(r => !r.deleted_at);
+  const vis = role === "master" ? live : live.filter(r => r.side === role);
+  const bp = live.filter(r => r.side === "bride").reduce((s, r) => s + r.count, 0);
+  const gp = live.filter(r => r.side === "groom").reduce((s, r) => s + r.count, 0);
   $("tB").textContent = bp; $("tG").textContent = gp; $("tA").textContent = bp + gp;
   document.querySelector(".tot.b").hidden = role === "groom";
   document.querySelector(".tot.g").hidden = role === "bride";
@@ -1580,7 +1605,7 @@ async function loadPhotos(){
       body: JSON.stringify({ prefix: "", limit: 60, sortBy: { column: "created_at", order: "desc" } }),
     });
     if (!r.ok) return;
-    let objs = (await r.json()).filter(o => o.name && o.name.endsWith(".jpg"));
+    let objs = (await r.json()).filter(o => o.name && o.name.endsWith(".jpg") && !o.name.startsWith("deleted/"));
     const prole = orgRole();
     if (prole && prole !== "master") objs = objs.filter(o => o.name.startsWith(prole));
     const el = $("photoGrid");
@@ -1602,17 +1627,18 @@ async function loadPhotos(){
   } catch(e) {}
 }
 async function deletePhoto(name, url, tile){
-  let blob = null;
-  try { blob = await (await fetch(url)).blob(); } catch(e) {}
+  const deletedName = `deleted/${name}`;
   tile.remove();
-  try { await fetch(`${STORAGE}/object/guest-photos/${name}`, { method: "DELETE", headers: { "apikey": KEY, "Authorization": "Bearer " + KEY } }); } catch(e) {}
-  toast(t("photoGone"), false, blob ? { label: t("undo"), fn: async () => {
+  try {
+    await fetch(`${STORAGE}/object/move`, { method: "POST", headers: { "apikey": KEY, "Authorization": "Bearer " + KEY, "Content-Type": "application/json" }, body: JSON.stringify({ bucketId: "guest-photos", sourceKey: name, destinationKey: deletedName }) });
+  } catch(e) {}
+  toast(t("photoGone"), false, { label: t("undo"), fn: async () => {
     try {
-      await fetch(`${STORAGE}/object/guest-photos/${name}`, { method: "POST", headers: { "apikey": KEY, "Authorization": "Bearer " + KEY, "Content-Type": "image/jpeg" }, body: blob });
+      await fetch(`${STORAGE}/object/move`, { method: "POST", headers: { "apikey": KEY, "Authorization": "Bearer " + KEY, "Content-Type": "application/json" }, body: JSON.stringify({ bucketId: "guest-photos", sourceKey: deletedName, destinationKey: name }) });
       loadPhotos();
       toast(t("restored"));
     } catch(e) { toast(t("netErr"), true); }
-  } } : undefined);
+  }});
 }
 let fbPhotos = [];
 function showPhotoFallback(photos){ fbPhotos = photos; $("photoFbBg").hidden = false; }
@@ -1672,13 +1698,13 @@ async function handleFiles(files){
 
 /* ── exports ── */
 function exportExcel(){
-  const head = ["Name (الاسم)", "Name (English)", "Side (الطرف)", "People (الأفراد)", "WhatsApp", ev2Name(), "Church Only (الكنيسة فقط)", "Invite Sent (اتبعتت)", "Sent On (تاريخ الإرسال)", "Added"];
+  const head = ["Name (الاسم)", "Name (English)", "Side (الطرف)", "People (الأفراد)", "WhatsApp", ev2Name(), "Church Only (الكنيسة فقط)", "Confirmed (مؤكد)", "Invite Sent (اتبعتت)", "Sent On (تاريخ الإرسال)", "Added"];
   const xrole = orgRole() || "master";
-  const xrows = xrole === "master" ? all : all.filter(r => r.side === xrole);
+  const xrows = (xrole === "master" ? all : all.filter(r => r.side === xrole)).filter(r => !r.deleted_at);
   const rows_ = xrows.map(r => {
     const entry = sentEntry(r);
     const sentAt = entry && entry.at ? entry.at : "";
-    return [r.name, r.name_en || "", r.side === "bride" ? "Bride عروسة" : "Groom عريس", r.count, r.phone || "", r.event2 ? "YES" : "", r.church_only ? "YES" : "",
+    return [r.name, r.name_en || "", r.side === "bride" ? "Bride عروسة" : "Groom عريس", r.count, r.phone || "", r.event2 ? "YES" : "", r.church_only ? "YES" : "", r.confirmed ? "YES" : "",
       entry ? "YES" : "", sentAt.slice(0, 10), (r.created_at || "").slice(0, 10)];
   });
   const csv = "﻿" + [head, ...rows_].map(row => row.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\r\n");
@@ -1690,7 +1716,7 @@ function exportExcel(){
 }
 function sendSnapshot(){
   const srole = orgRole() || "master";
-  const src = srole === "master" ? all : all.filter(r => r.side === srole);
+  const src = (srole === "master" ? all : all.filter(r => r.side === srole)).filter(r => !r.deleted_at);
   const part = side => src.filter(r => r.side === side);
   const fmt = list => list.map((r, i) => `${i+1}. ${displayName(r)} — ${r.count} أفراد${r.phone ? " — " + r.phone : ""}`).join("\n");
   const bp = part("bride"), gp = part("groom");
