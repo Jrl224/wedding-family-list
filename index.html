@@ -73,6 +73,10 @@
   .cc-toggle button.on{background:linear-gradient(120deg,var(--gold),var(--gold-b));color:#0b1524}
   .phone-big{direction:ltr;text-align:center;letter-spacing:.04em}
   .check-row{display:flex;align-items:center;gap:10px;margin:12px 0 2px;font-size:15px;color:var(--ivory);cursor:pointer;font-weight:700}
+  .check-row-seats{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .seat-step{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+  .seat-step button{width:30px;height:30px;border-radius:50%;border:1px solid var(--gold);background:none;color:var(--gold-b);font-size:16px;font-weight:700;cursor:pointer}
+  .seat-step span{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--gold-b);min-width:20px;text-align:center}
   .check-row input[type=checkbox]{width:22px;height:22px;accent-color:var(--gold);cursor:pointer;flex:0 0 auto}
   .fam .card-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
   .fam .card-chip{font-size:11px;padding:1px 7px;border-radius:6px;border:1px solid var(--line);background:var(--card2);color:var(--dim)}
@@ -103,6 +107,7 @@
   .fam.b{border-inline-start:4px solid var(--bride)} .fam.g{border-inline-start:4px solid var(--groom)}
   .fam.nophone{border-color:rgba(224,138,138,.55);background:rgba(224,138,138,.08)}
   .fam.wrong{border-color:rgba(224,178,90,.55);background:rgba(224,178,90,.09)}
+  .fam.deleted{opacity:.55}
   .fam.sent{border-color:rgba(37,211,102,.55);background:rgba(37,211,102,.09)}
   .fam .info{flex:1;min-width:0}
   .fam b{font-size:15.5px;display:block;overflow-wrap:anywhere}
@@ -111,6 +116,7 @@
   .fam .cnt{display:flex;align-items:center;gap:5px}
   .fam .cnt span{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--gold-b);min-width:20px;text-align:center}
   .fam .edit-btn{background:none;border:0;color:var(--gold-b);font-size:20px;padding:4px 6px;cursor:pointer}
+  .fam .restore-btn{background:rgba(37,211,102,.12);border:1px solid rgba(37,211,102,.4);color:#8be6ad;border-radius:10px;padding:7px 14px;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer}
   .fam .send-invite{
     flex-basis:100%;min-height:44px;padding:9px 12px;border:1px solid rgba(37,211,102,.42);border-radius:10px;
     background:rgba(37,211,102,.11);color:#8be6ad;font-family:inherit;font-size:13px;font-weight:700;line-height:1.4;cursor:pointer;
@@ -354,15 +360,18 @@
       <div class="cap-line"><b id="orgCapGName"></b><span><span id="orgCapGUsed">0</span> / <span id="orgCapGMax">200</span> · <span class="cap-left" id="orgCapGLeft"></span><span class="cap-church" id="orgCapGChurch"></span></span></div>
       <div class="cap-bar"><div class="cap-fill ok" id="orgCapGFill"></div></div>
     </div>
-    <div class="filters">
-      <button id="fAll" class="on" onclick="setFilter('all')"></button>
-      <button id="fB" onclick="setFilter('bride')"></button>
-      <button id="fG" onclick="setFilter('groom')"></button>
-      <button id="fE2" onclick="setFilter('ev2')">🌿</button>
-      <button id="fCo" onclick="setFilter('church')">⛪</button>
-      <button id="fSent" onclick="setFilter('sent')"></button>
-      <button id="fUnsent" onclick="setFilter('unsent')"></button>
-      <button id="fNoPhone" onclick="setFilter('nophone')">📵</button>
+    <div class="filters" id="filters">
+      <button id="fB" onclick="toggleFilter('bride')"></button>
+      <button id="fG" onclick="toggleFilter('groom')"></button>
+      <button id="fSent" onclick="toggleFilter('sent')"></button>
+      <button id="fUnsent" onclick="toggleFilter('unsent')"></button>
+      <button id="fConfirmed" onclick="toggleFilter('confirmed')"></button>
+      <button id="fE2" onclick="toggleFilter('ev2')">🌿</button>
+      <button id="fRec" onclick="toggleFilter('reception')"></button>
+      <button id="fCo" onclick="toggleFilter('church')">⛪</button>
+      <button id="fNoPhone" onclick="toggleFilter('nophone')">📵</button>
+      <button id="fWrong" onclick="toggleFilter('wrong')">⚠️</button>
+      <button id="fDeleted" onclick="toggleFilter('deleted')">🗑</button>
     </div>
     <div class="sortbar" id="sortBar">
       <button id="sortNoPhone" class="on" onclick="setSort('nophone')"></button>
@@ -428,7 +437,7 @@
       <button type="button" onclick="eBump(-1)" style="width:52px;height:52px;font-size:26px">−</button>
     </div>
     <label class="check-row"><input type="checkbox" id="eRecChk" onchange="setEChurch(!this.checked)"><span id="eChurchLabel"></span></label>
-    <label class="check-row"><input type="checkbox" id="eEv2Chk" onchange="setEEv2(this.checked)"><span id="eEv2Label"></span></label>
+    <div class="check-row-seats"><label class="check-row"><input type="checkbox" id="eEv2Chk" onchange="setEEv2(this.checked)"><span id="eEv2Label"></span></label><span class="seat-step" id="eHennaSeatsRow" hidden><button type="button" onclick="hennaBump(-1)">−</button><span id="eHennaSeats"></span><button type="button" onclick="hennaBump(1)">+</button></span></div>
     <label class="check-row"><input type="checkbox" id="eConfirmedChk"><span id="eConfirmedLabel"></span></label>
     <input class="wiz-in phone-big" id="ePhone" inputmode="tel" style="font-size:17px" autocomplete="off">
     <div class="m-actions">
@@ -562,7 +571,7 @@ const STR = {
     orgBar:"🔒 للمنظمين", orgPill:"🔒 المنظمين", orgPillOn:"📊 المنظمين",
     orgBack:"‹ رجوع لتسجيل العائلات", orgTitle:"القائمة الكاملة لايف",
     lB:"طرف العروسة · فرد", lG:"طرف العريس · فرد", lA:"الإجمالي · فرد",
-    fAll:"الكل", fB:"العروسة", fG:"العريس", sortNoPhone:"📵 الأول", sortAZ:"أ–ي", sortLast:"اسم العيلة", searchPh:"🔍 دوروا على اسم",
+    fB:"العروسة", fG:"العريس", sortNoPhone:"📵 الأول", sortAZ:"أ–ي", sortLast:"اسم العيلة", searchPh:"🔍 دوروا على اسم",
     listEmpty:"لسه مفيش حد هنا", photosTitle:"📷 الصور المرفوعة", photosEmpty:"مفيش صور لسه",
     prevTitle:"لقينا العائلات دي 👇", prevSub:"عدّلوا العدد بـ + و − أو شيلوا اللي مش مظبوط، وبعدين احفظوا.",
     saveAll:n=>`احفظوا ${n} عيلة ✓`, cancel:"إلغاء",
@@ -590,6 +599,7 @@ const STR = {
     includedLabel:"الدعوة شاملة",
     pillHenna:"🌿 حفلة الحنة", pillReception:"🏛 حفل الزفاف",
     fChurchOnly:"⛪ بس",
+    fReception:"🏛 حفل", fConfirmed:"✅ مؤكد", fDeleted:"🗑 المحذوفين", restore:"استرجاع",
     chipReception:"الحفل", chipHenna:"الحنة", confirmedLabel:"✅ أكدوا", chipConfirmed:"مؤكد", checkNumberBadge:"⚠️ راجعوا الرقم",
     noPhoneBadge:"📵 من غير رقم", deleteFamily:"حذف العيلة", closeAria:"إغلاق",
     stepChan:"هتبعتوها منين؟",
@@ -622,7 +632,7 @@ const STR = {
     orgBar:"🔒 Organizers", orgPill:"🔒 Organizers", orgPillOn:"📊 Organizers",
     orgBack:"‹ Back to adding families", orgTitle:"Full list — live",
     lB:"Bride side · people", lG:"Groom side · people", lA:"Total · people",
-    fAll:"All", fB:"Bride", fG:"Groom", sortNoPhone:"📵 first", sortAZ:"A–Z", sortLast:"Last name", searchPh:"🔍 Search a name",
+    fB:"Bride", fG:"Groom", sortNoPhone:"📵 first", sortAZ:"A–Z", sortLast:"Last name", searchPh:"🔍 Search a name",
     listEmpty:"Nobody here yet", photosTitle:"📷 Uploaded photos", photosEmpty:"No photos yet",
     prevTitle:"We found these families 👇", prevSub:"Adjust counts with + and −, remove anything wrong, then save.",
     saveAll:n=>`Save ${n} families ✓`, cancel:"Cancel",
@@ -650,6 +660,7 @@ const STR = {
     includedLabel:"Included",
     pillHenna:"🌿 Henna Party", pillReception:"🏛 Reception",
     fChurchOnly:"⛪ only",
+    fReception:"🏛 Reception", fConfirmed:"✅ Confirmed", fDeleted:"🗑 Deleted", restore:"Restore",
     chipReception:"Reception", chipHenna:"Henna", confirmedLabel:"✅ Confirmed", chipConfirmed:"Confirmed", checkNumberBadge:"⚠️ Check number",
     noPhoneBadge:"📵 No number", deleteFamily:"Delete family", closeAria:"Close",
     stepChan:"Where do you want to send it?",
@@ -684,7 +695,7 @@ function applyLang(){
   set("sortBtn","sort"); set("pickBtn","pick"); set("fileBtn","fileB");
   set("orgBarBtn","orgBar"); set("orgBack","orgBack"); set("orgTitle","orgTitle");
   set("lB","lB"); set("lG","lG"); set("lA","lA");
-  set("fAll","fAll"); set("fB","fB"); set("fG","fG"); set("sortNoPhone","sortNoPhone"); set("sortAZ","sortAZ"); set("sortLast","sortLast"); $("search").placeholder = t("searchPh");
+  set("sortNoPhone","sortNoPhone"); set("sortAZ","sortAZ"); set("sortLast","sortLast"); $("search").placeholder = t("searchPh");
   set("photosTitle","photosTitle");
   set("prevTitle","prevTitle"); set("prevSub","prevSub"); set("prevCancel","cancel");
   set("dupTitle","dupTitle"); set("dupSub","dupSub"); set("dupGo","dupGo"); set("dupCancel","dupCancel");
@@ -724,7 +735,23 @@ async function loadCaps(){
 }
 let wEv2 = false, eEv2 = false;
 function setEv2(v){ wEv2 = v; $("ev2Chk").checked = v; }
-function setEEv2(v){ eEv2 = v; $("eEv2Chk").checked = v; }
+let eHenna = 0;
+function setEEv2(v){
+  eEv2 = v;
+  $("eEv2Chk").checked = v;
+  const rowEl = $("eHennaSeatsRow");
+  if (rowEl) {
+    rowEl.hidden = !v;
+    if (v && (eHenna <= 0 || eHenna > eCount)) eHenna = eCount;
+    renderHennaSeats();
+  }
+}
+function renderHennaSeats(){ const el = $("eHennaSeats"); if (el) el.textContent = localDigits(eHenna); }
+function hennaBump(d){
+  eHenna = Math.max(0, Math.min(eCount, eHenna + d));
+  if (eHenna === 0) { setEEv2(false); return; }
+  renderHennaSeats();
+}
 let wChurch = false, eChurch = false;
 function setChurch(v){ wChurch = v; $("recChk").checked = !v; }
 function setEChurch(v){ eChurch = v; $("eRecChk").checked = !v; }
@@ -778,7 +805,7 @@ let device = localStorage.getItem("wedDevice");
 if (!device) { device = "d" + Math.random().toString(36).slice(2, 10); localStorage.setItem("wedDevice", device); }
 let mySide = localStorage.getItem("wedSide") || "";
 let cc = localStorage.getItem("wedCC") || "+20";
-let mine = [], all = [], filter = "all", sortMode = "nophone", n = 2, orgTimer = null, pending = [], step = 1, photoTick = 0;
+let mine = [], all = [], activeFilters = new Set(), sortMode = "nophone", n = 2, orgTimer = null, pending = [], step = 1, photoTick = 0;
 
 const $ = id => document.getElementById(id);
 const orgRole = () => { const r = localStorage.getItem("wedOrg"); return ["master","bride","groom"].includes(r) ? r : ""; };
@@ -1097,6 +1124,9 @@ function numberState(row){
   else ok = digits.length >= 8 && digits.length <= 15;
   return ok ? "ok" : "wrong";
 }
+function hennaSeats(row){ return row.seats && Number.isInteger(row.seats.henna) ? row.seats.henna : (row.count || 0); }
+function hennaOverridden(row){ return !!(row.event2 && row.seats && Number.isInteger(row.seats.henna) && row.seats.henna < row.count); }
+function localDigits(n){ return L === "ar" ? String(n).replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[d]) : String(n); }
 function displayName(row){ return (L === "en" ? (row.name_en || row.name) : row.name) || ""; }
 
 /* ── message text ── */
@@ -1357,7 +1387,7 @@ function famRow(r, canDelete, navIds){
   const orgCtx = isOrg() && !$("orgView").hidden;
   const chip = (cls, emoji, key) => `<span class="card-chip ${cls}">${emoji}${orgCtx ? " " + t(key) : ""}</span>`;
   const chips = (!r.church_only ? chip("reception", "🏛", "chipReception") : "")
-    + (r.event2 ? chip("henna", "🌿", "chipHenna") : "")
+    + (r.event2 ? chip("henna", "🌿" + (hennaOverridden(r) ? " " + localDigits(r.seats.henna) : ""), "chipHenna") : "")
     + (r.confirmed ? chip("confirmed", "✅", "chipConfirmed") : "");
   const numBadge = st === "missing" ? ` <span class="nophone-badge">${t("noPhoneBadge")}</span>`
     : (st === "wrong" ? ` <span class="wrong-badge">${t("checkNumberBadge")}</span>` : "");
@@ -1368,6 +1398,14 @@ function famRow(r, canDelete, navIds){
   num.textContent = r.count;
   cnt.append(num);
   row.append(info, cnt);
+  if (r.deleted_at) {
+    row.classList.add("deleted");
+    const rb = document.createElement("button");
+    rb.type = "button"; rb.className = "restore-btn"; rb.textContent = t("restore");
+    rb.onclick = () => restoreRow(r);
+    row.append(rb);
+    return row;
+  }
   if (canDelete) {
     const ed = document.createElement("button");
     ed.className = "edit-btn"; ed.textContent = "✏️";
@@ -1395,9 +1433,10 @@ function famRow(r, canDelete, navIds){
 
 /* ── edit saved rows ── */
 let editing = null, eCount = 2;
-function eBump(d){ eCount = Math.min(30, Math.max(1, eCount + d)); $("eCount").textContent = eCount; }
+function eBump(d){ eCount = Math.min(30, Math.max(1, eCount + d)); $("eCount").textContent = eCount; if (eEv2 && eHenna > eCount) { eHenna = eCount; renderHennaSeats(); } }
 function openEdit(r){
   editing = r; eCount = r.count;
+  eHenna = hennaSeats(r);
   setEEv2(!!r.event2); setEChurch(!!r.church_only);
   $("eName").value = r.name; $("eNameEn").value = r.name_en || ""; $("ePhone").value = r.phone || ""; $("eCount").textContent = eCount;
   $("eConfirmedChk").checked = !!r.confirmed;
@@ -1411,11 +1450,14 @@ async function saveEdit(){
   const name_en = $("eNameEn").value.trim();
   const phone = $("ePhone").value.trim() ? normalizePhone($("ePhone").value.trim(), "") : "";
   const confirmed = $("eConfirmedChk").checked;
+  const seats = editing.seats && typeof editing.seats === "object" && !Array.isArray(editing.seats) ? { ...editing.seats } : {};
+  if (eEv2 && eHenna > 0 && eHenna < eCount) seats.henna = eHenna; else delete seats.henna;
+  const seatsVal = Object.keys(seats).length ? seats : null;
   $("editBg").hidden = true;
-  editing.name = name; editing.name_en = name_en || null; editing.count = eCount; editing.phone = phone; editing.event2 = eEv2; editing.church_only = eChurch; editing.confirmed = confirmed;
+  editing.name = name; editing.name_en = name_en || null; editing.count = eCount; editing.phone = phone; editing.event2 = eEv2; editing.church_only = eChurch; editing.confirmed = confirmed; editing.seats = seatsVal;
   renderMine(); renderAll();
   try {
-    await fetch(`${SUPA}?id=eq.${editing.id}`, { method: "PATCH", headers: H, body: JSON.stringify({ name, name_en: name_en || null, count: eCount, phone, event2: eEv2, church_only: eChurch, confirmed }) });
+    await fetch(`${SUPA}?id=eq.${editing.id}`, { method: "PATCH", headers: H, body: JSON.stringify({ name, name_en: name_en || null, count: eCount, phone, event2: eEv2, church_only: eChurch, confirmed, seats: seatsVal }) });
     toast(t("edited"));
   } catch(e) { toast(t("netErr"), true); }
   refreshMine(); if (isOrg()) refreshAll();
@@ -1462,16 +1504,21 @@ function renderAll(){
   $("orgCapB").hidden = role === "groom";
   $("orgCapG").hidden = role === "bride";
   document.querySelector(".filters").hidden = false;
-  $("fAll").hidden = $("fB").hidden = $("fG").hidden = role !== "master";
-  if (role !== "master" && !["ev2", "church", "sent", "unsent", "nophone"].includes(filter)) filter = role;
-  const e2f = vis.filter(x => x.event2);
-  $("fE2").textContent = "🌿 " + e2f.length + " · " + e2f.reduce((s, x) => s + x.count, 0);
-  const cof = vis.filter(x => x.church_only);
-  $("fCo").textContent = t("fChurchOnly") + " " + cof.length + " · " + cof.reduce((s, x) => s + x.count, 0);
-  const sentF = vis.filter(isInviteSent);
-  $("fSent").textContent = t("fSent") + " " + sentF.length;
-  $("fUnsent").textContent = t("fUnsent") + " " + (vis.length - sentF.length);
-  $("fNoPhone").textContent = "📵 " + vis.filter(x => !whatsappNumber(x.phone)).length;
+  $("fB").hidden = $("fG").hidden = role !== "master";
+  const c = pred => vis.filter(pred).length;
+  $("fB").textContent = t("fB") + " " + c(FILTER_PREDS.bride);
+  $("fG").textContent = t("fG") + " " + c(FILTER_PREDS.groom);
+  $("fSent").textContent = t("fSent") + " " + c(FILTER_PREDS.sent);
+  $("fUnsent").textContent = t("fUnsent") + " " + c(FILTER_PREDS.unsent);
+  $("fConfirmed").textContent = t("fConfirmed") + " " + c(FILTER_PREDS.confirmed);
+  $("fE2").textContent = "🌿 " + c(FILTER_PREDS.ev2);
+  $("fRec").textContent = t("fReception") + " " + c(FILTER_PREDS.reception);
+  $("fCo").textContent = t("fChurchOnly") + " " + c(FILTER_PREDS.church);
+  $("fNoPhone").textContent = "📵 " + c(FILTER_PREDS.nophone);
+  $("fWrong").textContent = "⚠️ " + c(FILTER_PREDS.wrong);
+  const delRows = (role === "master" ? all : all.filter(r => r.side === role)).filter(r => r.deleted_at);
+  $("fDeleted").textContent = t("fDeleted") + " " + delRows.length;
+  [["fB", "bride"], ["fG", "groom"], ["fSent", "sent"], ["fUnsent", "unsent"], ["fConfirmed", "confirmed"], ["fE2", "ev2"], ["fRec", "reception"], ["fCo", "church"], ["fNoPhone", "nophone"], ["fWrong", "wrong"], ["fDeleted", "deleted"]].forEach(([id, k]) => { $(id).className = activeFilters.has(k) ? "on" : ""; });
   const nameGroups = {}, phoneGroups = {};
   vis.forEach(r => {
     const nk = normName(r.name); if (nk) (nameGroups[nk] = nameGroups[nk] || []).push(r);
@@ -1488,17 +1535,10 @@ function renderAll(){
     : "";
   const el = $("fullList");
   const q = ($("search").value || "").toLowerCase().replace(/\s+/g, " ").trim();
-  const matchesFilter = r => {
-    if (filter === "all") return true;
-    if (filter === "ev2") return r.event2;
-    if (filter === "church") return r.church_only;
-    if (filter === "sent") return isInviteSent(r);
-    if (filter === "unsent") return !isInviteSent(r);
-    if (filter === "nophone") return !whatsappNumber(r.phone);
-    return r.side === filter;
-  };
   const nm = s => (s || "").toLowerCase().replace(/\s+/g, " ").trim();
-  const show = vis.filter(r => matchesFilter(r) && (!q || nm(r.name).includes(q) || nm(r.name_en).includes(q) || (r.phone || "").includes(q)));
+  const base = activeFilters.has("deleted") ? delRows : vis;
+  const preds = [...activeFilters].filter(k => FILTER_PREDS[k]).map(k => FILTER_PREDS[k]);
+  const show = base.filter(r => preds.every(p => p(r)) && (!q || nm(r.name).includes(q) || nm(r.name_en).includes(q) || (r.phone || "").includes(q)));
   el.innerHTML = "";
   if (!show.length) { el.innerHTML = `<p class="empty">${t("listEmpty")}</p>`; return; }
   const ordered = sortRows(show);
@@ -1506,14 +1546,28 @@ function renderAll(){
   ordered.forEach(r => el.appendChild(famRow(r, true, showIds)));
   renderCaps();
 }
-function setFilter(f){
-  filter = f;
-  $("fAll").className = f === "all" ? "on" : ""; $("fB").className = f === "bride" ? "on" : ""; $("fG").className = f === "groom" ? "on" : "";
-  $("fE2").className = f === "ev2" ? "on" : "";
-  $("fCo").className = f === "church" ? "on" : "";
-  $("fSent").className = f === "sent" ? "on" : "";
-  $("fUnsent").className = f === "unsent" ? "on" : "";
-  $("fNoPhone").className = f === "nophone" ? "on" : "";
+const FILTER_PREDS = {
+  bride: r => r.side === "bride",
+  groom: r => r.side === "groom",
+  sent: r => isInviteSent(r),
+  unsent: r => !isInviteSent(r),
+  confirmed: r => !!r.confirmed,
+  ev2: r => !!r.event2,
+  reception: r => !r.church_only,
+  church: r => !!r.church_only,
+  nophone: r => numberState(r) === "missing",
+  wrong: r => numberState(r) === "wrong",
+};
+const FILTER_EXCLUSIVE = { sent: "unsent", unsent: "sent", bride: "groom", groom: "bride" };
+function toggleFilter(k){
+  if (k === "deleted") {
+    if (activeFilters.has("deleted")) activeFilters.delete("deleted");
+    else { activeFilters.clear(); activeFilters.add("deleted"); }
+  } else {
+    activeFilters.delete("deleted");
+    if (activeFilters.has(k)) activeFilters.delete(k);
+    else { if (FILTER_EXCLUSIVE[k]) activeFilters.delete(FILTER_EXCLUSIVE[k]); activeFilters.add(k); }
+  }
   renderAll();
 }
 function setSort(m){
@@ -1704,7 +1758,7 @@ function exportExcel(){
   const rows_ = xrows.map(r => {
     const entry = sentEntry(r);
     const sentAt = entry && entry.at ? entry.at : "";
-    return [r.name, r.name_en || "", r.side === "bride" ? "Bride عروسة" : "Groom عريس", r.count, r.phone || "", r.event2 ? "YES" : "", r.church_only ? "YES" : "", r.confirmed ? "YES" : "",
+    return [r.name, r.name_en || "", r.side === "bride" ? "Bride عروسة" : "Groom عريس", r.count, r.phone || "", r.event2 ? (hennaOverridden(r) ? "YES (" + r.seats.henna + ")" : "YES") : "", r.church_only ? "YES" : "", r.confirmed ? "YES" : "",
       entry ? "YES" : "", sentAt.slice(0, 10), (r.created_at || "").slice(0, 10)];
   });
   const csv = "﻿" + [head, ...rows_].map(row => row.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\r\n");

@@ -226,10 +226,29 @@ def run_browser(browser_type, browser_name, base_url):
     assert henna_row.locator(".nophone-badge").count() == 0
     assert nophone_row.locator(".nophone-badge").inner_text() == "📵 No number"
     assert page.locator("#fNoPhone").inner_text() == "📵 1"
-    page.evaluate("setFilter('nophone')")
+    page.evaluate("toggleFilter('nophone')")
     assert page.locator("#fullList .fam").count() == 1
     assert "No Phone Family" in page.locator("#fullList .fam").first.inner_text()
-    page.evaluate("setFilter('all')")
+    page.evaluate("toggleFilter('nophone')")  # multi-select: toggling off clears it
+    page.wait_for_function("document.querySelectorAll('#fullList .fam').length === 3")
+
+    # ── v23 item 7: multi-select AND filters + exclusive pairs + 🗑 exclusivity
+    page.evaluate("toggleFilter('ev2'); toggleFilter('unsent')")  # henna AND not-sent
+    assert page.evaluate("[...activeFilters].sort().join(',')") == "ev2,unsent"
+    assert page.locator("#fullList .fam").count() == 1
+    assert "Henna Test Family" in page.locator("#fullList .fam").first.inner_text()
+    page.evaluate("toggleFilter('sent')")  # Sent/Not-sent are mutually exclusive
+    assert page.evaluate("activeFilters.has('unsent')") is False
+    assert page.evaluate("activeFilters.has('sent')") is True
+    page.evaluate("toggleFilter('bride'); toggleFilter('groom')")  # Bride/Groom exclusive
+    assert page.evaluate("activeFilters.has('bride')") is False
+    assert page.evaluate("activeFilters.has('groom')") is True
+    page.evaluate("toggleFilter('deleted')")  # 🗑 clears everything else
+    assert page.evaluate("[...activeFilters]") == ["deleted"]
+    page.evaluate("toggleFilter('ev2')")  # any normal chip clears 🗑
+    assert page.evaluate("activeFilters.has('deleted')") is False
+    page.evaluate("activeFilters.clear(); renderAll()")
+    page.wait_for_function("document.querySelectorAll('#fullList .fam').length === 3")
 
     # ── D3: no inline delete button remains in any row (delete moved into Edit)
     assert page.locator("#fullList .fam .del").count() == 0
@@ -262,8 +281,24 @@ def run_browser(browser_type, browser_name, base_url):
     wrong_row = page.locator("#fullList .fam").filter(has_text="Church Test Family")
     assert "wrong" in (wrong_row.get_attribute("class") or "")
     assert wrong_row.locator(".wrong-badge").count() == 1
+    # ⚠️ filter chip counts and isolates wrong-number families
+    assert page.locator("#fWrong").inner_text() == "⚠️ 1"
+    page.evaluate("toggleFilter('wrong')")
+    assert page.locator("#fullList .fam").count() == 1
+    assert "Church Test Family" in page.locator("#fullList .fam").first.inner_text()
+    page.evaluate("toggleFilter('wrong')")
     page.evaluate("all.find(r => r.id === 'church-family').phone = '+20 100 123 4567'; renderAll()")
     assert "wrong" not in (page.locator("#fullList .fam").filter(has_text="Church Test Family").get_attribute("class") or "")
+
+    # ── v23 item 8: henna headcount helpers + card chip number when overridden
+    assert page.evaluate("hennaSeats({count: 5, seats: {henna: 3}})") == 3
+    assert page.evaluate("hennaSeats({count: 5})") == 5
+    assert page.evaluate("hennaOverridden({event2: true, count: 5, seats: {henna: 3}})") is True
+    assert page.evaluate("hennaOverridden({event2: true, count: 5, seats: {henna: 5}})") is False
+    page.evaluate("all.find(r => r.id === 'henna-family').seats = {henna: 1}; renderAll()")
+    assert "🌿 1" in henna_row.locator(".card-chip.henna").inner_text()
+    page.evaluate("all.find(r => r.id === 'henna-family').seats = null; renderAll()")
+    assert "🌿 1" not in henna_row.locator(".card-chip.henna").inner_text()
 
     # ── v23: cards are READ-ONLY indicators — no +/− count buttons, no 🌿/🏛 quick-toggles;
     # only ✏️ Edit and 📨 Send invite are interactive. Count renders as plain text.
@@ -476,10 +511,11 @@ def run_browser(browser_type, browser_name, base_url):
     assert page.locator("#fSent").inner_text() == "✓ Sent 1"
     assert page.locator("#fUnsent").inner_text() == "◻︎ Not sent 2"
 
-    page.evaluate("setFilter('sent')")
+    page.evaluate("toggleFilter('sent')")
     assert page.locator("#fullList .fam").count() == 1
     assert "Henna Test Family" in page.locator("#fullList .fam").first.inner_text()
-    page.evaluate("setFilter('all')")
+    page.evaluate("toggleFilter('sent')")
+    page.wait_for_function("document.querySelectorAll('#fullList .fam').length === 3")
 
     # ── undo clears the mark back out of the database
     henna_row.locator(".send-invite").click()
@@ -543,6 +579,19 @@ def run_browser(browser_type, browser_name, base_url):
     assert edit_body.get("confirmed") is True, mut
     page.wait_for_function("document.getElementById('editBg').hidden")
 
+    # ── v23 item 8: the Edit henna stepper writes seats {henna:n} in the PATCH
+    henna_row.locator(".edit-btn").click()
+    page.wait_for_function("!document.getElementById('editBg').hidden")
+    assert page.locator("#eEv2Chk").is_checked()               # henna family
+    assert not page.locator("#eHennaSeatsRow").is_hidden()     # stepper visible when henna on
+    n = len(family_mutations)
+    page.locator("#eHennaSeatsRow button").first.click()       # − : 2 → 1 (override)
+    assert page.locator("#eHennaSeats").inner_text() == "1"
+    page.locator("#editSave").click()
+    mut = wait_new_mutation(n)
+    assert json.loads(mut[2]).get("seats") == {"henna": 1}, mut
+    page.wait_for_function("document.getElementById('editBg').hidden")
+
     # ── v23 item 6: Delete in Edit SOFT-deletes via PATCH deleted_at — no API DELETE
     nophone_row.locator(".edit-btn").click()
     page.wait_for_function("!document.getElementById('editBg').hidden")
@@ -556,15 +605,24 @@ def run_browser(browser_type, browser_name, base_url):
     # the row leaves the default list once the soft delete round-trips
     page.wait_for_function("document.querySelectorAll('#fullList .fam').length === 2")
     assert page.locator("#fullList .fam").filter(has_text="No Phone Family").count() == 0
-    # undo (toast) restores it via PATCH deleted_at:null
-    page.wait_for_selector(".toast button")
+    # ── v23 item 6: 🗑 filter shows the deleted family dimmed with a Restore button (no Edit/Send)
+    page.evaluate("toggleFilter('deleted')")
+    page.wait_for_function("document.querySelectorAll('#fullList .fam').length === 1")
+    del_card = page.locator("#fullList .fam").first
+    assert "deleted" in (del_card.get_attribute("class") or "")
+    assert del_card.locator(".restore-btn").count() == 1
+    assert del_card.locator(".edit-btn").count() == 0
+    assert del_card.locator(".send-invite").count() == 0
+    # Restore → PATCH deleted_at:null → family returns intact
     n = len(family_mutations)
-    page.locator(".toast button").click()
+    del_card.locator(".restore-btn").click()
     mut = wait_new_mutation(n)
     assert mut[0] == "PATCH" and json.loads(mut[2]) == {"deleted_at": None}, mut
+    page.evaluate("toggleFilter('deleted')")  # leave the 🗑 view
     page.wait_for_function("document.querySelectorAll('#fullList .fam').length === 3")
 
-    # ── Excel export: "Name (English)" + "Confirmed" columns
+    # ── Excel export: "Name (English)" + "Confirmed" columns + henna override "YES (n)"
+    page.evaluate("all.find(r => r.id === 'henna-family').seats = {henna: 1}; renderAll()")
     with page.expect_download() as dl:
         page.evaluate("exportExcel()")
     export_text = Path(dl.value.path()).read_text(encoding="utf-8")
@@ -572,6 +630,8 @@ def run_browser(browser_type, browser_name, base_url):
     assert '"Name (الاسم)","Name (English)"' in header_line, header_line
     assert "Confirmed" in header_line, header_line
     assert "Henna Test Family" in export_text  # a name_en value made it into the export
+    assert "YES (1)" in export_text  # henna override renders the seat count
+    page.evaluate("all.find(r => r.id === 'henna-family').seats = null; renderAll()")
 
     # sends only ever leave as user-initiated deep links, never background fetches
     assert not outbound_requests
@@ -589,10 +649,10 @@ def run_browser(browser_type, browser_name, base_url):
     ]
     assert len(toggle_patches) == 4, toggle_patches
     edit_patches = [m for m in family_mutations if m[0] == "PATCH" and "name" in json.loads(m[2] or "{}")]
-    assert len(edit_patches) == 1, edit_patches
+    assert len(edit_patches) == 2, edit_patches  # no-phone reception/confirmed edit + henna seats edit
     delete_patches = [m for m in family_mutations if m[0] == "PATCH" and "deleted_at" in json.loads(m[2] or "{}")]
     assert len(delete_patches) == 2, delete_patches  # soft-delete + restore
-    assert methods.count("PATCH") == 10, methods
+    assert methods.count("PATCH") == 11, methods
     browser.close()
     print(
         f"PASS {browser_name}: v22.1 — cards show 🏛(reception)/🌿(henna) chips, no ⛪ chip; "
