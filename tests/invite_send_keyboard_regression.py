@@ -165,10 +165,6 @@ def run_browser(browser_type, browser_name, base_url):
     def sent_patches():
         return [m for m in family_mutations if m[0] == "PATCH" and "invite_sent" in (m[2] or "")]
 
-    def on(locator):
-        # token-exact class check — the "reception" class literally contains "on"
-        return "on" in (locator.get_attribute("class") or "").split()
-
     page.goto(base_url, wait_until="domcontentloaded")
     page.evaluate("openOrg()")
     page.wait_for_function("all.length === 3")
@@ -240,10 +236,29 @@ def run_browser(browser_type, browser_name, base_url):
     # organizer chips carry text labels
     assert "Reception" in henna_row.locator(".card-chip.reception").inner_text()
     assert "Henna" in henna_row.locator(".card-chip.henna").inner_text()
-    # organizer row reception quick-toggle (🏛) is ON iff invited to the reception
-    assert "🏛" in henna_row.locator(".cot").inner_text()
-    assert on(henna_row.locator(".cot"))
-    assert not on(church_row.locator(".cot"))
+
+    # ── v23: cards are READ-ONLY indicators — no +/− count buttons, no 🌿/🏛 quick-toggles;
+    # only ✏️ Edit and 📨 Send invite are interactive. Count renders as plain text.
+    assert henna_row.locator(".cnt button").count() == 0
+    assert henna_row.locator(".cot").count() == 0
+    assert henna_row.locator(".ev2t").count() == 0
+    assert henna_row.locator(".cnt").inner_text().strip() == "2"
+    assert henna_row.locator(".edit-btn").count() == 1
+    assert henna_row.locator(".send-invite").count() == 1
+
+    # ── v23: missing-number card is red (.nophone); a sent family stays green (.sent wins)
+    assert "nophone" in (nophone_row.get_attribute("class") or "")
+    assert "nophone" not in (henna_row.get_attribute("class") or "")
+
+    # ── v23: default sort (📵 first) floats missing-number families to the top
+    assert page.locator("#sortNoPhone").count() == 1
+    assert "No Phone Family" in page.locator("#fullList .fam").first.inner_text()
+    # A–Z sort orders by displayName; the no-phone family is no longer forced first
+    page.evaluate("setSort('az')")
+    az_names = page.evaluate("() => [...document.querySelectorAll('#fullList .fam .info b')].map(b => b.textContent)")
+    assert az_names == sorted(az_names, key=str.lower), az_names
+    page.evaluate("setSort('nophone')")
+    assert "No Phone Family" in page.locator("#fullList .fam").first.inner_text()
 
     # ── Addendum #2: bilingual names — displayName follows the UI language toggle
     assert page.evaluate("displayName(all.find(r => r.id === 'henna-family'))") == "Henna Test Family"
@@ -274,8 +289,11 @@ def run_browser(browser_type, browser_name, base_url):
     page.wait_for_selector("#inviteChannels button")
     assert page.locator("#inviteX").get_attribute("aria-label") == "Close"
     assert page.locator("#invitePrev").count() == 1 and page.locator("#inviteNext").count() == 1
+    # nav follows the current rendered order (default 📵-first sort ⇒ no-phone family first)
     nav_ids = page.evaluate("inviteNav")
-    assert nav_ids == [f["id"] for f in FAMILIES]
+    assert len(nav_ids) == 3 and set(nav_ids) == {f["id"] for f in FAMILIES}
+    assert nav_ids[0] == "no-phone-family"
+    assert page.evaluate("inviteRow.id") == nav_ids[0]
     assert page.evaluate("inviteNavIdx") == 0
     assert page.locator("#invitePos").inner_text() == "1 / 3"
     assert page.locator("#invitePrev").is_disabled()

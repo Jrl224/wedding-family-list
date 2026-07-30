@@ -74,15 +74,11 @@
   .phone-big{direction:ltr;text-align:center;letter-spacing:.04em}
   .check-row{display:flex;align-items:center;gap:10px;margin:12px 0 2px;font-size:15px;color:var(--ivory);cursor:pointer;font-weight:700}
   .check-row input[type=checkbox]{width:22px;height:22px;accent-color:var(--gold);cursor:pointer;flex:0 0 auto}
-  .fam .ev2t{background:none;border:1px solid var(--line);border-radius:50%;width:32px;height:32px;font-size:15px;cursor:pointer;opacity:.35}
-  .fam .ev2t.on{opacity:1;border-color:#5aa66c;background:rgba(90,166,108,.15)}
   .fam .card-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
   .fam .card-chip{font-size:11px;padding:1px 7px;border-radius:6px;border:1px solid var(--line);background:var(--card2);color:var(--dim)}
   .fam .card-chip.reception{border-color:rgba(201,162,39,.5);background:rgba(201,162,39,.13);color:var(--gold-b)}
   .fam .card-chip.henna{border-color:#5aa66c;background:rgba(90,166,108,.15);color:#8be6ad}
   .fam .nophone-badge{font-size:11px;margin-inline-start:5px;padding:1px 6px;border-radius:6px;background:rgba(201,106,106,.18);border:1px solid rgba(201,106,106,.5);color:#e6a3a3;vertical-align:middle}
-  .fam .cot{background:none;border:1px solid var(--line);border-radius:50%;width:32px;height:32px;font-size:15px;cursor:pointer;opacity:.35}
-  .fam .cot.on{opacity:1;border-color:#9a82dc;background:rgba(150,130,220,.15)}
   .check{
     width:92px;height:92px;border-radius:50%;margin:4px auto 16px;display:flex;align-items:center;justify-content:center;
     border:1.5px solid var(--gold);background:radial-gradient(circle at 35% 30%, #16273f, var(--deep));
@@ -103,13 +99,13 @@
   }
   .fam.sendable{flex-wrap:wrap}
   .fam.b{border-inline-start:4px solid var(--bride)} .fam.g{border-inline-start:4px solid var(--groom)}
+  .fam.nophone{border-color:rgba(224,138,138,.55);background:rgba(224,138,138,.08)}
   .fam.sent{border-color:rgba(37,211,102,.55);background:rgba(37,211,102,.09)}
   .fam .info{flex:1;min-width:0}
   .fam b{font-size:15.5px;display:block;overflow-wrap:anywhere}
   .fam .meta{color:var(--dim);font-size:12.5px}
   .fam .meta span[dir=ltr]{unicode-bidi:isolate;direction:ltr}
   .fam .cnt{display:flex;align-items:center;gap:5px}
-  .fam .cnt button{width:32px;height:32px;border-radius:50%;border:1px solid var(--gold);background:none;color:var(--gold-b);font-size:17px;font-weight:700;cursor:pointer}
   .fam .cnt span{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--gold-b);min-width:20px;text-align:center}
   .fam .edit-btn{background:none;border:0;color:var(--gold-b);font-size:20px;padding:4px 6px;cursor:pointer}
   .fam .send-invite{
@@ -140,6 +136,9 @@
   .filters{display:flex;gap:6px;justify-content:center;margin-bottom:10px}
   .filters button{padding:6px 14px;border-radius:999px;border:1px solid var(--line);background:none;color:var(--dim);font-size:12.5px;font-family:inherit;cursor:pointer}
   .filters button.on{border-color:var(--gold);color:var(--gold-b);background:rgba(201,162,39,.08)}
+  .sortbar{display:flex;gap:6px;margin:0 0 10px;flex-wrap:wrap}
+  .sortbar button{padding:6px 12px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--dim);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer}
+  .sortbar button.on{border-color:var(--gold);background:rgba(201,162,39,.14);color:var(--gold-b)}
   .pulse{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--green);margin-inline-start:8px;animation:pp 2s infinite}
   @keyframes pp{50%{opacity:.3}}
   .search{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:rgba(9,18,32,.8);color:var(--ivory);font-size:15px;margin-bottom:10px;font-family:inherit}
@@ -362,6 +361,11 @@
       <button id="fUnsent" onclick="setFilter('unsent')"></button>
       <button id="fNoPhone" onclick="setFilter('nophone')">📵</button>
     </div>
+    <div class="sortbar" id="sortBar">
+      <button id="sortNoPhone" class="on" onclick="setSort('nophone')"></button>
+      <button id="sortAZ" onclick="setSort('az')"></button>
+      <button id="sortLast" onclick="setSort('last')"></button>
+    </div>
     <input class="search" id="search" oninput="renderAll()">
     <div id="fullList" style="text-align:start"></div>
     <h2 class="sec" id="photosTitle"></h2>
@@ -554,7 +558,7 @@ const STR = {
     orgBar:"🔒 للمنظمين", orgPill:"🔒 المنظمين", orgPillOn:"📊 المنظمين",
     orgBack:"‹ رجوع لتسجيل العائلات", orgTitle:"القائمة الكاملة لايف",
     lB:"طرف العروسة · فرد", lG:"طرف العريس · فرد", lA:"الإجمالي · فرد",
-    fAll:"الكل", fB:"العروسة", fG:"العريس", searchPh:"🔍 دوروا على اسم",
+    fAll:"الكل", fB:"العروسة", fG:"العريس", sortNoPhone:"📵 الأول", sortAZ:"أ–ي", sortLast:"اسم العيلة", searchPh:"🔍 دوروا على اسم",
     listEmpty:"لسه مفيش حد هنا", photosTitle:"📷 الصور المرفوعة", photosEmpty:"مفيش صور لسه",
     prevTitle:"لقينا العائلات دي 👇", prevSub:"عدّلوا العدد بـ + و − أو شيلوا اللي مش مظبوط، وبعدين احفظوا.",
     saveAll:n=>`احفظوا ${n} عيلة ✓`, cancel:"إلغاء",
@@ -614,7 +618,7 @@ const STR = {
     orgBar:"🔒 Organizers", orgPill:"🔒 Organizers", orgPillOn:"📊 Organizers",
     orgBack:"‹ Back to adding families", orgTitle:"Full list — live",
     lB:"Bride side · people", lG:"Groom side · people", lA:"Total · people",
-    fAll:"All", fB:"Bride", fG:"Groom", searchPh:"🔍 Search a name",
+    fAll:"All", fB:"Bride", fG:"Groom", sortNoPhone:"📵 first", sortAZ:"A–Z", sortLast:"Last name", searchPh:"🔍 Search a name",
     listEmpty:"Nobody here yet", photosTitle:"📷 Uploaded photos", photosEmpty:"No photos yet",
     prevTitle:"We found these families 👇", prevSub:"Adjust counts with + and −, remove anything wrong, then save.",
     saveAll:n=>`Save ${n} families ✓`, cancel:"Cancel",
@@ -676,7 +680,7 @@ function applyLang(){
   set("sortBtn","sort"); set("pickBtn","pick"); set("fileBtn","fileB");
   set("orgBarBtn","orgBar"); set("orgBack","orgBack"); set("orgTitle","orgTitle");
   set("lB","lB"); set("lG","lG"); set("lA","lA");
-  set("fAll","fAll"); set("fB","fB"); set("fG","fG"); $("search").placeholder = t("searchPh");
+  set("fAll","fAll"); set("fB","fB"); set("fG","fG"); set("sortNoPhone","sortNoPhone"); set("sortAZ","sortAZ"); set("sortLast","sortLast"); $("search").placeholder = t("searchPh");
   set("photosTitle","photosTitle");
   set("prevTitle","prevTitle"); set("prevSub","prevSub"); set("prevCancel","cancel");
   set("dupTitle","dupTitle"); set("dupSub","dupSub"); set("dupGo","dupGo"); set("dupCancel","dupCancel");
@@ -768,7 +772,7 @@ let device = localStorage.getItem("wedDevice");
 if (!device) { device = "d" + Math.random().toString(36).slice(2, 10); localStorage.setItem("wedDevice", device); }
 let mySide = localStorage.getItem("wedSide") || "";
 let cc = localStorage.getItem("wedCC") || "+20";
-let mine = [], all = [], filter = "all", n = 2, orgTimer = null, pending = [], step = 1, photoTick = 0;
+let mine = [], all = [], filter = "all", sortMode = "nophone", n = 2, orgTimer = null, pending = [], step = 1, photoTick = 0;
 
 const $ = id => document.getElementById(id);
 const orgRole = () => { const r = localStorage.getItem("wedOrg"); return ["master","bride","groom"].includes(r) ? r : ""; };
@@ -1055,11 +1059,6 @@ async function refreshAll(){
   } catch(e) {}
   if (photoTick++ % 3 === 0) loadPhotos();
 }
-async function patchCount(row, newCount){
-  row.count = newCount; renderMine(); renderAll();
-  try { await fetch(`${SUPA}?id=eq.${row.id}`, { method: "PATCH", headers: H, body: JSON.stringify({ count: newCount }) }); } catch(e) {}
-  refreshMine(); if (isOrg()) refreshAll();
-}
 async function removeRow(row){
   mine = mine.filter(r => r.id !== row.id); all = all.filter(r => r.id !== row.id);
   renderMine(); renderAll();
@@ -1331,12 +1330,12 @@ function closeInvite(){
   }, { passive: true });
 })();
 function famRow(r, canDelete, navIds){
+  const noNumber = !whatsappNumber(r.phone);
   const row = document.createElement("div");
-  row.className = "fam " + (r.side === "bride" ? "b" : "g") + (isInviteSent(r) ? " sent" : "");
+  row.className = "fam " + (r.side === "bride" ? "b" : "g") + (isInviteSent(r) ? " sent" : (noNumber ? " nophone" : ""));
   const info = document.createElement("div");
   info.className = "info";
   const sideWord = r.side === "bride" ? t("sideWordB") : t("sideWordG");
-  const noNumber = !whatsappNumber(r.phone);
   const orgCtx = isOrg() && !$("orgView").hidden;
   const chip = (cls, emoji, key) => `<span class="card-chip ${cls}">${emoji}${orgCtx ? " " + t(key) : ""}</span>`;
   const chips = (!r.church_only ? chip("reception", "🏛", "chipReception") : "")
@@ -1344,32 +1343,10 @@ function famRow(r, canDelete, navIds){
   info.innerHTML = `<b>${esc(displayName(r))}</b><div class="meta">${sideWord}${r.phone ? ` · <span dir="ltr">${esc(r.phone)}</span>` : ""}${noNumber ? ` <span class="nophone-badge">${t("noPhoneBadge")}</span>` : ""}</div>${chips ? `<div class="card-chips">${chips}</div>` : ""}`;
   const cnt = document.createElement("div");
   cnt.className = "cnt";
-  const minus = document.createElement("button"); minus.textContent = "−";
-  minus.onclick = () => patchCount(r, Math.max(1, r.count - 1));
-  const num = document.createElement("span"); num.textContent = r.count;
-  const plus = document.createElement("button"); plus.textContent = "+";
-  plus.onclick = () => patchCount(r, Math.min(30, r.count + 1));
-  cnt.append(minus, num, plus);
+  const num = document.createElement("span");
+  num.textContent = r.count;
+  cnt.append(num);
   row.append(info, cnt);
-  if (canDelete && isOrg() && !$("orgView").hidden) {
-    const ev = document.createElement("button");
-    ev.className = "ev2t" + (r.event2 ? " on" : "");
-    ev.textContent = "🌿";
-    ev.onclick = async () => {
-      r.event2 = !r.event2; renderAll(); renderMine();
-      try { await fetch(`${SUPA}?id=eq.${r.id}`, { method: "PATCH", headers: H, body: JSON.stringify({ event2: r.event2 }) }); } catch(e) {}
-    };
-    row.append(ev);
-    const co = document.createElement("button");
-    co.className = "cot" + (!r.church_only ? " on" : "");
-    co.textContent = "🏛";
-    co.onclick = async () => {
-      r.church_only = !r.church_only; renderAll(); renderMine();
-      try { await fetch(`${SUPA}?id=eq.${r.id}`, { method: "PATCH", headers: H, body: JSON.stringify({ church_only: r.church_only }) }); } catch(e) {}
-      refreshSideTotals();
-    };
-    row.append(co);
-  }
   if (canDelete) {
     const ed = document.createElement("button");
     ed.className = "edit-btn"; ed.textContent = "✏️";
@@ -1437,6 +1414,16 @@ function renderMine(){
   const mineIds = mine.map(r => r.id);
   mine.forEach(r => el.appendChild(famRow(r, true, mineIds)));
 }
+function sortRows(rows){
+  const dn = r => displayName(r).toLowerCase();
+  const last = r => { const p = displayName(r).trim().split(/\s+/); return (p[p.length - 1] || "").toLowerCase(); };
+  const lc = L === "ar" ? "ar" : "en";
+  const out = rows.slice();
+  if (sortMode === "az") return out.sort((a, b) => dn(a).localeCompare(dn(b), lc));
+  if (sortMode === "last") return out.sort((a, b) => last(a).localeCompare(last(b), lc));
+  // default: missing-number families first, otherwise stable original order
+  return out.sort((a, b) => (whatsappNumber(a.phone) ? 1 : 0) - (whatsappNumber(b.phone) ? 1 : 0));
+}
 function renderAll(){
   if ($("orgView").hidden) return;
   const role = orgRole() || "master";
@@ -1489,8 +1476,9 @@ function renderAll(){
   const show = vis.filter(r => matchesFilter(r) && (!q || nm(r.name).includes(q) || nm(r.name_en).includes(q) || (r.phone || "").includes(q)));
   el.innerHTML = "";
   if (!show.length) { el.innerHTML = `<p class="empty">${t("listEmpty")}</p>`; return; }
-  const showIds = show.map(r => r.id);
-  show.forEach(r => el.appendChild(famRow(r, true, showIds)));
+  const ordered = sortRows(show);
+  const showIds = ordered.map(r => r.id);
+  ordered.forEach(r => el.appendChild(famRow(r, true, showIds)));
   renderCaps();
 }
 function setFilter(f){
@@ -1501,6 +1489,13 @@ function setFilter(f){
   $("fSent").className = f === "sent" ? "on" : "";
   $("fUnsent").className = f === "unsent" ? "on" : "";
   $("fNoPhone").className = f === "nophone" ? "on" : "";
+  renderAll();
+}
+function setSort(m){
+  sortMode = m;
+  $("sortNoPhone").className = m === "nophone" ? "on" : "";
+  $("sortAZ").className = m === "az" ? "on" : "";
+  $("sortLast").className = m === "last" ? "on" : "";
   renderAll();
 }
 
