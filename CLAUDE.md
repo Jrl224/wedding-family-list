@@ -20,6 +20,7 @@ Work ONLY the topmost unshipped version. Do not start the next until the current
 6. Soft delete: Edit's Delete PATCHes deleted_at (no API DELETE anywhere); default views/counts/caps/nav/export exclude deleted; 🗑 filter (exclusive) shows dimmed cards with Restore/استرجاع; undo = PATCH null. Column `deleted_at` exists.
 7. Unified stacking filters: Bride/Groom side selector becomes chips in the one filter row; multi-select AND semantics; exclusive pairs auto-swap (Sent/Not-sent, Bride/Groom, 🗑 vs rest); chips: Sent/Not-sent/✅/🌿/🏛 Reception/⛪ only/📵/🗑 + live counts; sort control 📵-first (default) / A–Z / Last name (last token of displayName, localeCompare per UI lang).
 8. **Henna headcount (MUST — Joseph 07-30, pulled forward from v26):** per-family henna seats. In Edit, when 🌿 Henna Party is checked, a mini stepper next to it (range 0..count) writes `seats` jsonb, v26-spec semantics scoped to henna: no key = full count (dim/inherited); override = {"henna": n} (gold); stepping to count deletes the key; stepping to 0 unchecks Henna (event2=false) and deletes the key; count changes re-clamp in the same PATCH. Card henna chip shows the number when overridden (🌿 ٣ / 🌿 3). Export: Henna column "YES (3)" when overridden. Driving case: شنوده مسعود / ملكه سلامه — 5 at the wedding, immediate family only at the henna. Column `seats` exists. Message copy unchanged.
+9. **Invalid-number indicator (Joseph 07-30):** distinct from 📵 missing. Validate digit count per country code (+20 ⇒ local mobile 10 digits starting with 1; +1 ⇒ 10 digits; else lenient 8–15). Mismatch ⇒ amber `⚠️` badge on the card (en `⚠️ Check number`, ar `⚠️ راجعوا الرقم`) + amber card border (below red/green precedence: green sent > red missing > amber wrong), counted in a ⚠️ filter chip. Never blocks saving or sending. Suspects driving this: 5 families with +20 numbers of wrong length (possibly +20 slapped on non-Egyptian numbers).
 - Version ٢٣٫٠ · 23.0.
 
 ### v24 — Tags + Waitlist
@@ -44,8 +45,6 @@ Full spec (labeled "V26" INSIDE the same file — numbering offset, seating is O
 - INVITE_TEMPLATE_VERSION bumps only when message copy changes.
 
 ## OPEN ITEMS (Joseph, not implementers)
-- Confirm روماني برسيم = روماني برسوم (phone +201220900401 applied to برسوم).
-- People counts for new rows مارينا ميلاد, استفانوس (both inserted as 1).
-- Recheck 5 malformed numbers: كيرستين برسوم، برسوم سلامه، ماري ميخائيل، نيفين مكرم، ملكه سلامه.
-- wooow site: delete 0000 duplicates, then import `~/Downloads/Wooow Import — Guests Awaiting Numbers.csv` rows as numbers arrive.
-- Mark church-only families (Reception checkbox off) — 0 marked so far.
+- ~~روماني برسوم~~ CONFIRMED correct 07-30. ~~wooow 0000 dupes~~ DELETED by Joseph 07-30 — import file now usable as numbers arrive. ~~new-family counts~~ Joseph adds manually.
+- Recheck 5 malformed numbers (possibly +20 prefixed onto non-EG numbers): كيرستين برسوم، برسوم سلامه، ماري ميخائيل، نيفين مكرم، ملكه سلامه — v23 item 9 will surface these with ⚠️.
+- Church-only: NO current guests are church-only (all invited to church + reception). The ⛪-off path stays available for the groom side later.
