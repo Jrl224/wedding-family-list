@@ -9,8 +9,8 @@ Work ONLY the topmost unshipped version. Do not start the next until the current
 ### 🔥 v23.1 — HOTFIX (ACTIVE — jumps everything; v24 WIP stashed)
 Root cause of live "nothing saves" (2026-07-30): saveEdit PATCHed `seats:null`; column was NOT NULL → PostgREST rejected the whole payload → every Edit save silently rolled back. DB fixed by Nova (seats now nullable, verified end-to-end in the live UI). App fixes: (1) member-input accumulation (6 inputs rendered for count-4; idempotent render required); (2) member semantics = contact IS person #1 → count−1 inputs, contact displayName shown as fixed line 1, send-modal/export dedupe, one-time normalization of over-length members arrays; (3) suite hardening — mocked Supabase enforces live column constraints (400 on null into NOT NULL) + full-default-family save round-trip test. Version ٢٣٫١ · 23.1.
 
-### v23.2 — Relationships + filter panel (spec: design fleet wf_75d34c19-df5, Nova pastes path on completion)
-Multi-level family relationships ("Semsem family inside the Shafik family" — tree/relationship model, NOT flat group_name) + the 11-chip strip replaced by a compact multi-check dropdown filter panel with live counts and active-summary trigger. Joseph's direct ask; jumps ahead of v24.
+### v23.2 — Relationships + filter sheet
+Full spec: `/private/tmp/claude-501/-Users-josephlabib/550cbbf3-ffef-4e7d-96fb-e4e5fa426dad/tasks/wxjycydkz.output` (read it — verified against the live schema and current index.html line anchors). Core: `parent_id` self-FK (ALREADY MIGRATED by Nova, indexed) — the container IS a card; native-select parent picker in Edit's More options (replaces group_name row); breadcrumb + rollup chips; Tree sort; cycle safety ×3; mom's wizard LOSES the group field. Filter chip strip replaced by a bottom-sheet with typed controls (segments for exclusive pairs, zero-count rows hidden, live-apply, Done·N count, removable mini-chip echo). ONE release: parent picker in + every group_name surface out together. Totals/caps sum individual rows only. Version ٢٣٫٢ · 23.2.
 
 ### v24 — Tags + Waitlist (STASHED WIP — resume after v23.2)
 
