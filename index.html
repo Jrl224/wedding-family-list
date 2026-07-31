@@ -91,7 +91,12 @@
   .fam .card-chip.reception{border-color:rgba(201,162,39,.5);background:rgba(201,162,39,.13);color:var(--gold-b)}
   .fam .card-chip.henna{border-color:#5aa66c;background:rgba(90,166,108,.15);color:#8be6ad}
   .fam .card-chip.confirmed{border-color:rgba(37,211,102,.5);background:rgba(37,211,102,.13);color:#8be6ad}
-  .fam .card-chip.group{border-color:rgba(150,130,220,.5);background:rgba(150,130,220,.13);color:#c3b3f0}
+  .fam .card-chip.crumb{border-style:dashed;border-color:var(--line);background:none;color:var(--dim);position:relative;cursor:pointer}
+  .fam .card-chip.crumb.trashed{opacity:.5}
+  .fam .card-chip.rollup{border-color:rgba(150,130,220,.5);background:rgba(150,130,220,.13);color:#c3b3f0;cursor:pointer;position:relative}
+  .fam .card-chip.crumb::before,.fam .card-chip.rollup::before{content:"";position:absolute;inset:-12px}
+  .fam.flash{animation:famflash .6s ease}
+  @keyframes famflash{0%,100%{background:linear-gradient(180deg,var(--card2),var(--card))}50%{background:rgba(201,162,39,.22)}}
   .fam .nophone-badge{font-size:11px;margin-inline-start:5px;padding:1px 6px;border-radius:6px;background:rgba(201,106,106,.18);border:1px solid rgba(201,106,106,.5);color:#e6a3a3;vertical-align:middle}
   .fam .wrong-badge{font-size:11px;margin-inline-start:5px;padding:1px 6px;border-radius:6px;background:rgba(224,178,90,.18);border:1px solid rgba(224,178,90,.5);color:#e6c67a;vertical-align:middle}
   .check{
@@ -151,13 +156,31 @@
   .tot b{display:block;font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600}
   .tot span{font-size:11px;color:var(--dim)}
   .tot.b b{color:var(--bride)} .tot.g b{color:var(--groom)} .tot.a b{color:var(--gold-b)}
-  .filters{display:flex;gap:6px;justify-content:center;margin-bottom:10px}
-  .filters button{padding:6px 14px;border-radius:999px;border:1px solid var(--line);background:none;color:var(--dim);font-size:12.5px;font-family:inherit;cursor:pointer}
-  .filters button.on{border-color:var(--gold);color:var(--gold-b);background:rgba(201,162,39,.08)}
+  .fbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+  .fs-trigger{display:flex;align-items:center;gap:4px;min-height:36px;padding:7px 15px;border-radius:999px;border:1px solid var(--line);background:none;color:var(--dim);font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer}
+  .fs-trigger.on{border-color:var(--gold);color:var(--gold-b);background:rgba(201,162,39,.08)}
+  .fs-badge{color:var(--gold-b)}
+  .fs-echo{display:flex;flex-wrap:wrap;gap:6px}
+  .fs-echo .echo-chip{display:inline-flex;align-items:center;gap:5px;min-height:30px;padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:var(--card2);color:var(--dim);font-size:12px;font-family:inherit;cursor:pointer}
+  .modal.filter-sheet{max-height:70vh;display:flex;flex-direction:column;overflow:hidden;padding:20px 16px 12px}
+  .filter-sheet .fs-body{flex:1;min-height:0;overflow-y:auto;padding-bottom:6px}
+  .fs-section{margin-bottom:18px}
+  .fs-label{color:var(--gold-b);font-size:12.5px;font-weight:700;margin-bottom:8px;text-align:start}
+  .segment{display:flex;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .segment button{flex:1;min-height:44px;border:0;background:var(--card);color:var(--dim);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer}
+  .segment button.on{background:linear-gradient(120deg,var(--gold),var(--gold-b));color:#0b1524}
+  .segment button:disabled{opacity:.4;cursor:not-allowed}
+  .fs-row{display:flex;align-items:center;gap:10px;min-height:44px;cursor:pointer}
+  .fs-row span:first-of-type{flex:1;text-align:start;color:var(--ivory);font-size:14px}
+  .fs-row .fs-count{color:var(--dim);font-size:12.5px;text-align:end}
+  .fs-row input[type=checkbox]{width:20px;height:20px;accent-color:var(--gold);cursor:pointer;flex:0 0 auto}
+  .fs-row.fs-disabled{opacity:.4}
+  .fs-row.fs-disabled input{cursor:not-allowed}
+  .fs-footer{position:sticky;bottom:0;display:flex;gap:10px;padding-top:12px;background:var(--bg);border-top:1px solid var(--line)}
+  .fs-footer button{flex:1;min-height:48px;border-radius:12px;font-size:15px;font-weight:800;font-family:inherit;cursor:pointer}
   .sortbar{display:flex;gap:6px;margin:0 0 10px;flex-wrap:wrap}
   .sortbar button{padding:6px 12px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--dim);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer}
   .sortbar button.on{border-color:var(--gold);background:rgba(201,162,39,.14);color:var(--gold-b)}
-  .group-head{font-family:'Amiri',serif;color:var(--gold-b);font-size:14px;font-weight:700;margin:14px 0 6px;padding-inline-start:2px}
   .pulse{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--green);margin-inline-start:8px;animation:pp 2s infinite}
   @keyframes pp{50%{opacity:.3}}
   .search{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:rgba(9,18,32,.8);color:var(--ivory);font-size:15px;margin-bottom:10px;font-family:inherit}
@@ -317,11 +340,9 @@
     <label class="check-row"><input type="checkbox" id="recChk" checked onchange="setChurch(!this.checked)"><span id="churchLabel"></span></label>
     <label class="check-row"><input type="checkbox" id="ev2Chk" onchange="setEv2(this.checked)"><span id="ev2Label"></span></label>
     <details class="more-opts" id="wMore"><summary id="wMoreSummary"></summary>
-      <input class="wiz-in" id="wGroup" list="groupList" autocomplete="off">
       <p class="more-lbl" id="wMembersLbl"></p>
       <div class="member-inputs" id="wMembers"></div>
     </details>
-    <datalist id="groupList"></datalist>
     <button class="next" onclick="saveFamily()" id="saveBtn"></button>
     <button class="skip" onclick="saveFamily(true)" id="skipBtn"></button>
   </div>
@@ -377,24 +398,17 @@
       <div class="cap-line"><b id="orgCapGName"></b><span><span id="orgCapGUsed">0</span> / <span id="orgCapGMax">200</span> · <span class="cap-left" id="orgCapGLeft"></span><span class="cap-church" id="orgCapGChurch"></span></span></div>
       <div class="cap-bar"><div class="cap-fill ok" id="orgCapGFill"></div></div>
     </div>
-    <div class="filters" id="filters">
-      <button id="fB" onclick="toggleFilter('bride')"></button>
-      <button id="fG" onclick="toggleFilter('groom')"></button>
-      <button id="fSent" onclick="toggleFilter('sent')"></button>
-      <button id="fUnsent" onclick="toggleFilter('unsent')"></button>
-      <button id="fConfirmed" onclick="toggleFilter('confirmed')"></button>
-      <button id="fE2" onclick="toggleFilter('ev2')">🌿</button>
-      <button id="fRec" onclick="toggleFilter('reception')"></button>
-      <button id="fCo" onclick="toggleFilter('church')">⛪</button>
-      <button id="fNoPhone" onclick="toggleFilter('nophone')">📵</button>
-      <button id="fWrong" onclick="toggleFilter('wrong')">⚠️</button>
-      <button id="fDeleted" onclick="toggleFilter('deleted')">🗑</button>
+    <div class="fbar" id="filterBar">
+      <button type="button" class="fs-trigger" id="filtersBtn" onclick="openFilterSheet()">
+        <span id="filtersBtnLbl"></span><span class="fs-badge" id="filtersBadge" hidden></span>
+      </button>
+      <div class="fs-echo" id="filtersEcho"></div>
     </div>
     <div class="sortbar" id="sortBar">
       <button id="sortNoPhone" class="on" onclick="setSort('nophone')"></button>
       <button id="sortAZ" onclick="setSort('az')"></button>
       <button id="sortLast" onclick="setSort('last')"></button>
-      <button id="sortGroup" onclick="toggleGroupView()" hidden></button>
+      <button id="sortTree" onclick="toggleTreeView()" hidden></button>
     </div>
     <input class="search" id="search" oninput="renderAll()">
     <div id="fullList" style="text-align:start"></div>
@@ -406,7 +420,53 @@
     </div>
   </div>
 
-  <p class="ver">٢٣٫١ · 23.1</p>
+  <p class="ver">٢٣٫٢ · 23.2</p>
+</div>
+
+<div class="modal-bg" id="filterBg" hidden onmousedown="if(event.target===this) closeFilterSheet()">
+  <div class="modal filter-sheet">
+    <h3 id="filterSheetTitle"></h3>
+    <div class="fs-body">
+      <div class="fs-section" id="fsSideSec">
+        <p class="fs-label" id="fsSideLbl"></p>
+        <div class="segment">
+          <button type="button" id="segSideAll" onclick="setSegment(['bride','groom'],'')"></button>
+          <button type="button" id="segSideBride" onclick="setSegment(['bride','groom'],'bride')"></button>
+          <button type="button" id="segSideGroom" onclick="setSegment(['bride','groom'],'groom')"></button>
+        </div>
+      </div>
+      <div class="fs-section">
+        <p class="fs-label" id="fsInviteLbl"></p>
+        <div class="segment">
+          <button type="button" id="segInviteAll" onclick="setSegment(['sent','unsent'],'')"></button>
+          <button type="button" id="segInviteSent" onclick="setSegment(['sent','unsent'],'sent')"></button>
+          <button type="button" id="segInviteNot" onclick="setSegment(['sent','unsent'],'unsent')"></button>
+        </div>
+      </div>
+      <div class="fs-section">
+        <p class="fs-label" id="fsEventsLbl"></p>
+        <label class="fs-row" id="rowFReception"><input type="checkbox" id="cbFReception" onchange="toggleFilterCb('reception',this.checked)"><span id="rowFReceptionLbl"></span><span class="fs-count" id="cntFReception"></span></label>
+        <label class="fs-row" id="rowFEv2"><input type="checkbox" id="cbFEv2" onchange="toggleFilterCb('ev2',this.checked)"><span id="rowFEv2Lbl"></span><span class="fs-count" id="cntFEv2"></span></label>
+        <label class="fs-row" id="rowFChurch"><input type="checkbox" id="cbFChurch" onchange="toggleFilterCb('church',this.checked)"><span id="rowFChurchLbl"></span><span class="fs-count" id="cntFChurch"></span></label>
+      </div>
+      <div class="fs-section">
+        <p class="fs-label" id="fsStatusLbl"></p>
+        <label class="fs-row" id="rowFConfirmed"><input type="checkbox" id="cbFConfirmed" onchange="toggleFilterCb('confirmed',this.checked)"><span id="rowFConfirmedLbl"></span><span class="fs-count" id="cntFConfirmed"></span></label>
+      </div>
+      <div class="fs-section">
+        <p class="fs-label" id="fsIssuesLbl"></p>
+        <label class="fs-row" id="rowFNoPhone"><input type="checkbox" id="cbFNoPhone" onchange="toggleFilterCb('nophone',this.checked)"><span id="rowFNoPhoneLbl"></span><span class="fs-count" id="cntFNoPhone"></span></label>
+        <label class="fs-row" id="rowFWrong"><input type="checkbox" id="cbFWrong" onchange="toggleFilterCb('wrong',this.checked)"><span id="rowFWrongLbl"></span><span class="fs-count" id="cntFWrong"></span></label>
+      </div>
+      <div class="fs-section">
+        <label class="fs-row" id="rowFTrash"><input type="checkbox" id="cbFTrash" onchange="toggleTrashFilter(this.checked)"><span id="rowFTrashLbl"></span><span class="fs-count" id="cntFTrash"></span></label>
+      </div>
+    </div>
+    <div class="fs-footer">
+      <button type="button" class="m-cancel" onclick="clearAllFilters()" id="filterClearBtn"></button>
+      <button type="button" class="m-ok" onclick="closeFilterSheet()" id="filterDoneBtn"></button>
+    </div>
+  </div>
 </div>
 
 <div class="modal-bg" id="previewBg" hidden>
@@ -458,7 +518,8 @@
     <div class="check-row-seats"><label class="check-row"><input type="checkbox" id="eEv2Chk" onchange="setEEv2(this.checked)"><span id="eEv2Label"></span></label><span class="seat-step" id="eHennaSeatsRow" hidden><button type="button" onclick="hennaBump(-1)">−</button><span id="eHennaSeats"></span><button type="button" onclick="hennaBump(1)">+</button></span></div>
     <label class="check-row"><input type="checkbox" id="eConfirmedChk"><span id="eConfirmedLabel"></span></label>
     <details class="more-opts" id="eMore"><summary id="eMoreSummary"></summary>
-      <input class="wiz-in" id="eGroup" list="groupList" autocomplete="off">
+      <p class="more-lbl" id="eParentLabel"></p>
+      <select class="wiz-in" id="eParent"></select>
       <p class="more-lbl" id="eMembersLbl"></p>
       <div class="member-inputs" id="eMembers"></div>
     </details>
@@ -622,7 +683,11 @@ const STR = {
     includedLabel:"الدعوة شاملة",
     pillHenna:"🌿 حفلة الحنة", pillReception:"🏛 حفل الزفاف",
     fChurchOnly:"⛪ بس",
-    fReception:"🏛 حفل", fConfirmed:"✅ مؤكد", fDeleted:"🗑 المحذوفين", restore:"استرجاع", moreOpts:"＋ خيارات إضافية", membersLbl:"أسماء الأفراد (اختياري)", groupPh:"المجموعة (اختياري)", byGroup:"👪 بالمجموعة", groupNone:"من غير مجموعة",
+    fReception:"🏛 حفل", fConfirmed:"✅ مؤكد", fDeleted:"🗑 المحذوفين", restore:"استرجاع", moreOpts:"＋ خيارات إضافية", membersLbl:"أسماء الأفراد (اختياري)", tree:"🌳 شجرة", eParentLabel:"العائلة الأم", cycleErr:"دايرة",
+    filtersLbl:"فلاتر", fSideLbl:"الجهة", fInviteLbl:"الدعوة", fEventsLbl:"المناسبات", fStatusLbl:"الحالة", fIssuesLbl:"تنبيهات",
+    segAll:"الكل", segBride:"عروسة", segGroom:"عريس", segSent:"مُرسلة", segNotSent:"غير مُرسلة",
+    eventsReceptionLbl:"🏛 الحفل", eventsHennaLbl:"🌿 الحنة", issueChurchOnly:"⛪ كنيسة فقط", issueNoPhone:"📵 بدون رقم", issueWrong:"⚠️ رقم غلط", trashLbl:"🗑 السلة",
+    clearLbl:"مسح", doneLbl:"تم",
     chipReception:"الحفل", chipHenna:"الحنة", confirmedLabel:"✅ أكدوا", chipConfirmed:"مؤكد", checkNumberBadge:"⚠️ راجعوا الرقم",
     noPhoneBadge:"📵 من غير رقم", deleteFamily:"حذف العيلة", closeAria:"إغلاق",
     stepChan:"هتبعتوها منين؟",
@@ -683,7 +748,11 @@ const STR = {
     includedLabel:"Included",
     pillHenna:"🌿 Henna Party", pillReception:"🏛 Reception",
     fChurchOnly:"⛪ only",
-    fReception:"🏛 Reception", fConfirmed:"✅ Confirmed", fDeleted:"🗑 Deleted", restore:"Restore", moreOpts:"＋ More options", membersLbl:"Name the people (optional)", groupPh:"Group (optional)", byGroup:"👪 By group", groupNone:"No group",
+    fReception:"🏛 Reception", fConfirmed:"✅ Confirmed", fDeleted:"🗑 Deleted", restore:"Restore", moreOpts:"＋ More options", membersLbl:"Name the people (optional)", tree:"🌳 Tree", eParentLabel:"Parent family", cycleErr:"Circular",
+    filtersLbl:"Filters", fSideLbl:"Side", fInviteLbl:"Invite", fEventsLbl:"Events", fStatusLbl:"Status", fIssuesLbl:"Issues",
+    segAll:"All", segBride:"Bride", segGroom:"Groom", segSent:"Sent", segNotSent:"Not sent",
+    eventsReceptionLbl:"🏛 Reception", eventsHennaLbl:"🌿 Henna", issueChurchOnly:"⛪ Church only", issueNoPhone:"📵 No number", issueWrong:"⚠️ Wrong number", trashLbl:"🗑 Trash",
+    clearLbl:"Clear", doneLbl:"Done",
     chipReception:"Reception", chipHenna:"Henna", confirmedLabel:"✅ Confirmed", chipConfirmed:"Confirmed", checkNumberBadge:"⚠️ Check number",
     noPhoneBadge:"📵 No number", deleteFamily:"Delete family", closeAria:"Close",
     stepChan:"Where do you want to send it?",
@@ -718,21 +787,28 @@ function applyLang(){
   set("sortBtn","sort"); set("pickBtn","pick"); set("fileBtn","fileB");
   set("orgBarBtn","orgBar"); set("orgBack","orgBack"); set("orgTitle","orgTitle");
   set("lB","lB"); set("lG","lG"); set("lA","lA");
-  set("sortNoPhone","sortNoPhone"); set("sortAZ","sortAZ"); set("sortLast","sortLast"); set("sortGroup","byGroup"); $("search").placeholder = t("searchPh");
+  set("sortNoPhone","sortNoPhone"); set("sortAZ","sortAZ"); set("sortLast","sortLast"); set("sortTree","tree"); $("search").placeholder = t("searchPh");
   set("photosTitle","photosTitle");
   set("prevTitle","prevTitle"); set("prevSub","prevSub"); set("prevCancel","cancel");
   set("dupTitle","dupTitle"); set("dupSub","dupSub"); set("dupGo","dupGo"); set("dupCancel","dupCancel");
   set("fbTitle","fbTitle"); set("fbSub","fbSub"); set("photoShareBtn","fbShare"); set("fbBack","fbBack");
   set("pinTitle","pinTitle"); set("pinSub","pinSub"); set("pinOpen","pinOpen"); set("pinBack","pinBack"); set("pinErr","pinErr");
   set("editTitle","editTitle"); set("editSave","editSave"); set("editCancel","cancel"); set("editDelete","deleteFamily");
+  set("eParentLabel","eParentLabel");
   set("eConfirmedLabel","confirmedLabel");
+  set("filtersBtnLbl","filtersLbl"); set("filterSheetTitle","filtersLbl");
+  set("fsSideLbl","fSideLbl"); set("fsInviteLbl","fInviteLbl"); set("fsEventsLbl","fEventsLbl"); set("fsStatusLbl","fStatusLbl"); set("fsIssuesLbl","fIssuesLbl");
+  set("segSideAll","segAll"); set("segSideBride","segBride"); set("segSideGroom","segGroom");
+  set("segInviteAll","segAll"); set("segInviteSent","segSent"); set("segInviteNot","segNotSent");
+  set("rowFReceptionLbl","eventsReceptionLbl"); set("rowFEv2Lbl","eventsHennaLbl"); set("rowFChurchLbl","issueChurchOnly");
+  set("rowFConfirmedLbl","fConfirmed"); set("rowFNoPhoneLbl","issueNoPhone"); set("rowFWrongLbl","issueWrong"); set("rowFTrashLbl","trashLbl");
+  set("filterClearBtn","clearLbl");
   set("wMoreSummary","moreOpts"); set("eMoreSummary","moreOpts");
   set("wMembersLbl","membersLbl"); set("eMembersLbl","membersLbl");
   set("inviteTitle","inviteTitle"); set("inviteClose","cancel");
   set("switchPinBtn","switchPin");
   set("churchLabel","pillReception"); set("eChurchLabel","pillReception");
   set("ev2Label","pillHenna"); set("eEv2Label","pillHenna");
-  $("wGroup").placeholder = t("groupPh"); $("eGroup").placeholder = t("groupPh");
   $("eName").placeholder = t("q1ph"); $("eNameEn").placeholder = t("nameEnPh"); $("ePhone").placeholder = t("phoneOpt");
   $("backBtn").textContent = L === "ar" ? "‹ رجوع" : "‹ Back";
   $("platformTip").innerHTML = /iPhone|iPad|iPod/.test(navigator.userAgent) ? t("tipIOS") : t("tipAnd");
@@ -831,7 +907,8 @@ let device = localStorage.getItem("wedDevice");
 if (!device) { device = "d" + Math.random().toString(36).slice(2, 10); localStorage.setItem("wedDevice", device); }
 let mySide = localStorage.getItem("wedSide") || "";
 let cc = localStorage.getItem("wedCC") || "+20";
-let mine = [], all = [], activeFilters = new Set(), sortMode = "nophone", groupView = false, n = 2, orgTimer = null, pending = [], step = 1, photoTick = 0;
+let mine = [], all = [], activeFilters = new Set(), sortMode = "nophone", treeView = false, n = 2, orgTimer = null, pending = [], step = 1, photoTick = 0;
+let collapsed = new Set(JSON.parse(localStorage.getItem("wedCollapsed") || "[]"));
 
 const $ = id => document.getElementById(id);
 const orgRole = () => { const r = localStorage.getItem("wedOrg"); return ["master","bride","groom"].includes(r) ? r : ""; };
@@ -852,11 +929,7 @@ function toast(msg, err, action){
   clearTimeout(el._h); el._h = setTimeout(()=> el.style.display = "none", action ? 8000 : 2600);
 }
 function esc(s){ const d = document.createElement("span"); d.textContent = s; return d.innerHTML; }
-function refreshGroupList(){
-  const el = $("groupList"); if (!el) return;
-  const names = [...new Set(all.filter(r => !r.deleted_at && r.group_name).map(r => r.group_name))].sort();
-  el.innerHTML = names.map(n => `<option value="${esc(n)}"></option>`).join("");
-}
+function toggleCollapse(id){ if (collapsed.has(id)) collapsed.delete(id); else collapsed.add(id); localStorage.setItem("wedCollapsed", JSON.stringify([...collapsed])); renderAll(); }
 function renderMemberInputs(containerId, count, values, contactName){
   const el = $(containerId); if (!el) return;
   const vals = Array.isArray(values) ? values : [];
@@ -918,12 +991,11 @@ async function saveFamily(skipPhone){
   if (!name) { toStep(1); return; }
   const rawPhone = skipPhone ? "" : $("wPhone").value.trim();
   const phone = rawPhone ? normalizePhone(rawPhone, cc) : "";
-  const group_name = $("wGroup").value.trim() || null;
   const members = collectMembers("wMembers");
-  if (await insertRows([{ name, count: n, phone, event2: wEv2, church_only: wChurch, group_name, members }])) {
+  if (await insertRows([{ name, count: n, phone, event2: wEv2, church_only: wChurch, members }])) {
     setEv2(false); setChurch(false);
     $("doneName").textContent = name;
-    $("wName").value = ""; $("wPhone").value = ""; $("wGroup").value = ""; renderMemberInputs("wMembers", 2, [], "");
+    $("wName").value = ""; $("wPhone").value = ""; renderMemberInputs("wMembers", 2, [], "");
     $("wMore").open = false;
     n = 2; $("count").textContent = n;
     ["step1","step2","step3","mineWrap"].forEach(id => $(id).hidden = true);
@@ -1184,6 +1256,14 @@ function hennaSeats(row){ return row.seats && Number.isInteger(row.seats.henna) 
 function hennaOverridden(row){ return !!(row.event2 && row.seats && Number.isInteger(row.seats.henna) && row.seats.henna < row.count); }
 function localDigits(n){ return L === "ar" ? String(n).replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[d]) : String(n); }
 function displayName(row){ return (L === "en" ? (row.name_en || row.name) : row.name) || ""; }
+function famById(id){ return id ? all.find(r => r.id === id) : null; }
+function liveParent(row){ const p = row && row.parent_id ? famById(row.parent_id) : null; return p && !p.deleted_at ? p : null; }
+function ancestorIds(row){ const out = []; const seen = new Set(); let p = liveParent(row); while (p && !seen.has(p.id)) { seen.add(p.id); out.push(p.id); p = liveParent(p); } return out; }
+function descendantIds(id){ const out = new Set(); const walk = pid => all.forEach(r => { if (r.parent_id === pid && !out.has(r.id)) { out.add(r.id); walk(r.id); } }); walk(id); return out; }
+function breadcrumb(row){ const names = []; const seen = new Set(); let p = liveParent(row); while (p && !seen.has(p.id)) { seen.add(p.id); names.unshift(displayName(p)); p = liveParent(p); } return names; }
+function subtree(row){ let fams = 0, people = 0; const seen = new Set(); const walk = r => { if (!r || r.deleted_at || seen.has(r.id)) return; seen.add(r.id); fams++; people += (r.count || 0); all.forEach(c => { if (c.parent_id === r.id) walk(c); }); }; walk(row); return { fams, people }; }
+function hasLiveChildren(row){ return all.some(r => r.parent_id === row.id && !r.deleted_at); }
+function crumbArrow(){ return L === "ar" ? "↲" : "↳"; } // U+21B3 isn't bidi-mirrored — swap glyph manually per direction
 function memNorm(s){ return String(s == null ? "" : s).normalize("NFC").trim().toLowerCase(); }
 
 /* ── message text ── */
@@ -1249,6 +1329,14 @@ function markInviteSent(){
 function unmarkInviteSent(){
   if (!inviteRow) return;
   setSent(inviteRow, null);
+}
+
+function fillParentOptions(row){
+  const sel = $("eParent"); if (!sel) return;
+  const excl = new Set([row.id, ...descendantIds(row.id)]);
+  const opts = all.filter(r => !r.deleted_at && !excl.has(r.id)).sort((a, b) => displayName(a).localeCompare(displayName(b), L === "ar" ? "ar" : "en"));
+  sel.innerHTML = `<option value="">—</option>` + opts.map(r => `<option value="${r.id}">${esc(displayName(r))}</option>`).join("");
+  sel.value = row.parent_id || "";
 }
 
 /* ── channels ── */
@@ -1441,6 +1529,7 @@ function closeInvite(){
 function famRow(r, canDelete, navIds){
   const st = numberState(r);
   const row = document.createElement("div");
+  row.dataset.id = r.id;
   row.className = "fam " + (r.side === "bride" ? "b" : "g") + (isInviteSent(r) ? " sent" : (st === "missing" ? " nophone" : (st === "wrong" ? " wrong" : "")));
   const info = document.createElement("div");
   info.className = "info";
@@ -1450,7 +1539,12 @@ function famRow(r, canDelete, navIds){
   const chips = (!r.church_only ? chip("reception", "🏛", "chipReception") : "")
     + (r.event2 ? chip("henna", "🌿" + (hennaOverridden(r) ? " " + localDigits(r.seats.henna) : ""), "chipHenna") : "")
     + (r.confirmed ? chip("confirmed", "✅", "chipConfirmed") : "")
-    + (r.group_name ? `<span class="card-chip group">👪 ${esc(r.group_name)}</span>` : "");
+    + (orgCtx && liveParent(r)
+        ? `<span class="card-chip crumb" data-parent="${liveParent(r).id}">${crumbArrow()} ${esc(breadcrumb(r).join(" › "))}</span>`
+        : (orgCtx && r.parent_id && famById(r.parent_id)
+            ? `<span class="card-chip crumb trashed">${crumbArrow()} ${esc(displayName(famById(r.parent_id)))}</span>`
+            : ""))
+    + (orgCtx && hasLiveChildren(r) ? (() => { const s = subtree(r); return `<span class="card-chip rollup" data-sub="${r.id}">👪 ${localDigits(s.fams)} · ${localDigits(s.people)}</span>`; })() : "");
   const numBadge = st === "missing" ? ` <span class="nophone-badge">${t("noPhoneBadge")}</span>`
     : (st === "wrong" ? ` <span class="wrong-badge">${t("checkNumberBadge")}</span>` : "");
   info.innerHTML = `<b>${esc(displayName(r))}</b><div class="meta">${sideWord}${r.phone ? ` · <span dir="ltr">${esc(r.phone)}</span>` : ""}${numBadge}</div>${chips ? `<div class="card-chips">${chips}</div>` : ""}`;
@@ -1490,6 +1584,10 @@ function famRow(r, canDelete, navIds){
       row.append(badge);
     }
   }
+  const crumb = row.querySelector(".card-chip.crumb");
+  if (crumb) crumb.onclick = e => { e.stopPropagation(); const pid = crumb.getAttribute("data-parent"); const el = document.querySelector(`#fullList .fam[data-id="${pid}"]`); if (el) { el.scrollIntoView({ behavior: "smooth", block: "center" }); el.classList.add("flash"); setTimeout(() => el.classList.remove("flash"), 600); } };
+  const roll = row.querySelector(".card-chip.rollup");
+  if (roll) roll.onclick = e => { e.stopPropagation(); toggleCollapse(r.id); };
   return row;
 }
 
@@ -1502,10 +1600,14 @@ function openEdit(r){
   setEEv2(!!r.event2); setEChurch(!!r.church_only);
   $("eName").value = r.name; $("eNameEn").value = r.name_en || ""; $("ePhone").value = r.phone || ""; $("eCount").textContent = eCount;
   $("eConfirmedChk").checked = !!r.confirmed;
-  $("eGroup").value = r.group_name || "";
+  fillParentOptions(r);
+  // v23.2 acceptance #9: contributor PIN edits (mineWrap re-uses this same modal) never show the
+  // parent picker — relationships stay an organizer-only affordance, keeping mom's flow simplest.
+  const showParent = isOrg();
+  $("eParentLabel").hidden = !showParent;
+  $("eParent").hidden = !showParent;
   renderMemberInputs("eMembers", eCount, Array.isArray(r.members) ? r.members : [], displayName(r));
-  $("eMore").open = !!(r.group_name || (Array.isArray(r.members) && r.members.some(v => v)));
-  refreshGroupList();
+  $("eMore").open = !!((showParent && r.parent_id) || (Array.isArray(r.members) && r.members.some(v => v)));
   $("editBg").hidden = false;
   setTimeout(()=> $("eName").focus(), 60);
 }
@@ -1516,16 +1618,17 @@ async function saveEdit(){
   const name_en = $("eNameEn").value.trim();
   const phone = $("ePhone").value.trim() ? normalizePhone($("ePhone").value.trim(), "") : "";
   const confirmed = $("eConfirmedChk").checked;
-  const group_name = $("eGroup").value.trim() || null;
+  const parent_id = $("eParent").value || null;
   const members = collectMembers("eMembers");
+  if (parent_id) { const chosen = famById(parent_id); if (chosen && (parent_id === editing.id || ancestorIds(chosen).includes(editing.id))) { toast(t("cycleErr"), true); return; } }
   const seats = editing.seats && typeof editing.seats === "object" && !Array.isArray(editing.seats) ? { ...editing.seats } : {};
   if (eEv2 && eHenna > 0 && eHenna < eCount) seats.henna = eHenna; else delete seats.henna;
   const seatsVal = Object.keys(seats).length ? seats : null;
   $("editBg").hidden = true;
-  editing.name = name; editing.name_en = name_en || null; editing.count = eCount; editing.phone = phone; editing.event2 = eEv2; editing.church_only = eChurch; editing.confirmed = confirmed; editing.seats = seatsVal; editing.group_name = group_name; editing.members = members;
+  editing.name = name; editing.name_en = name_en || null; editing.count = eCount; editing.phone = phone; editing.event2 = eEv2; editing.church_only = eChurch; editing.confirmed = confirmed; editing.seats = seatsVal; editing.parent_id = parent_id; editing.members = members;
   renderMine(); renderAll();
   try {
-    await fetch(`${SUPA}?id=eq.${editing.id}`, { method: "PATCH", headers: H, body: JSON.stringify({ name, name_en: name_en || null, count: eCount, phone, event2: eEv2, church_only: eChurch, confirmed, seats: seatsVal, group_name, members }) });
+    await fetch(`${SUPA}?id=eq.${editing.id}`, { method: "PATCH", headers: H, body: JSON.stringify({ name, name_en: name_en || null, count: eCount, phone, event2: eEv2, church_only: eChurch, confirmed, seats: seatsVal, parent_id, members }) });
     toast(t("edited"));
   } catch(e) { toast(t("netErr"), true); }
   refreshMine(); if (isOrg()) refreshAll();
@@ -1560,12 +1663,11 @@ function sortRows(rows){
 }
 function renderAll(){
   if ($("orgView").hidden) return;
-  refreshGroupList();
   const role = orgRole() || "master";
   const live = all.filter(r => !r.deleted_at);
-  const anyGroup = live.some(r => r.group_name);
-  $("sortGroup").hidden = !anyGroup;
-  if (!anyGroup) groupView = false;
+  const anyTree = live.some(r => r.parent_id);
+  $("sortTree").hidden = !anyTree;
+  if (!anyTree) treeView = false;
   const vis = role === "master" ? live : live.filter(r => r.side === role);
   const bp = live.filter(r => r.side === "bride").reduce((s, r) => s + r.count, 0);
   const gp = live.filter(r => r.side === "groom").reduce((s, r) => s + r.count, 0);
@@ -1575,30 +1677,17 @@ function renderAll(){
   document.querySelector(".tot.a").hidden = role !== "master";
   $("orgCapB").hidden = role === "groom";
   $("orgCapG").hidden = role === "bride";
-  document.querySelector(".filters").hidden = false;
-  $("fB").hidden = $("fG").hidden = role !== "master";
   const c = pred => vis.filter(pred).length;
-  $("fB").textContent = t("fB") + " " + c(FILTER_PREDS.bride);
-  $("fG").textContent = t("fG") + " " + c(FILTER_PREDS.groom);
-  $("fSent").textContent = t("fSent") + " " + c(FILTER_PREDS.sent);
-  $("fUnsent").textContent = t("fUnsent") + " " + c(FILTER_PREDS.unsent);
-  $("fConfirmed").textContent = t("fConfirmed") + " " + c(FILTER_PREDS.confirmed);
-  $("fE2").textContent = "🌿 " + c(FILTER_PREDS.ev2);
-  $("fRec").textContent = t("fReception") + " " + c(FILTER_PREDS.reception);
-  $("fCo").textContent = t("fChurchOnly") + " " + c(FILTER_PREDS.church);
-  $("fNoPhone").textContent = "📵 " + c(FILTER_PREDS.nophone);
-  $("fWrong").textContent = "⚠️ " + c(FILTER_PREDS.wrong);
   const delRows = (role === "master" ? all : all.filter(r => r.side === role)).filter(r => r.deleted_at);
-  $("fDeleted").textContent = t("fDeleted") + " " + delRows.length;
-  [["fB", "bride"], ["fG", "groom"], ["fSent", "sent"], ["fUnsent", "unsent"], ["fConfirmed", "confirmed"], ["fE2", "ev2"], ["fRec", "reception"], ["fCo", "church"], ["fNoPhone", "nophone"], ["fWrong", "wrong"], ["fDeleted", "deleted"]].forEach(([id, k]) => { $(id).className = activeFilters.has(k) ? "on" : ""; });
-  const nameGroups = {}, phoneGroups = {};
+  renderFilterSheet(role, c, delRows.length);
+  const nameBuckets = {}, phoneBuckets = {};
   vis.forEach(r => {
-    const nk = normName(r.name); if (nk) (nameGroups[nk] = nameGroups[nk] || []).push(r);
-    const pk = phoneKey(r.phone); if (pk) (phoneGroups[pk] = phoneGroups[pk] || []).push(r);
+    const nk = normName(r.name); if (nk) (nameBuckets[nk] = nameBuckets[nk] || []).push(r);
+    const pk = phoneKey(r.phone); if (pk) (phoneBuckets[pk] = phoneBuckets[pk] || []).push(r);
   });
   const seenSets = new Set();
   const dupes = [];
-  [...Object.values(phoneGroups), ...Object.values(nameGroups)].filter(g => g.length > 1).forEach(g => {
+  [...Object.values(phoneBuckets), ...Object.values(nameBuckets)].filter(g => g.length > 1).forEach(g => {
     const sig = g.map(x => x.id).sort().join("|");
     if (!seenSets.has(sig)) { seenSets.add(sig); dupes.push(g); }
   });
@@ -1610,22 +1699,27 @@ function renderAll(){
   const nm = s => (s || "").toLowerCase().replace(/\s+/g, " ").trim();
   const base = activeFilters.has("deleted") ? delRows : vis;
   const preds = [...activeFilters].filter(k => FILTER_PREDS[k]).map(k => FILTER_PREDS[k]);
-  const show = base.filter(r => preds.every(p => p(r)) && (!q || nm(r.name).includes(q) || nm(r.name_en).includes(q) || (r.phone || "").includes(q)));
+  const show = base.filter(r => preds.every(p => p(r)) && (!q || nm(r.name).includes(q) || nm(r.name_en).includes(q) || (r.phone || "").includes(q) || nm(breadcrumb(r).join(" ")).includes(q)));
+  $("filterDoneBtn").textContent = t("doneLbl") + " · " + localDigits(show.length);
   el.innerHTML = "";
   if (!show.length) { el.innerHTML = `<p class="empty">${t("listEmpty")}</p>`; return; }
   const ordered = sortRows(show);
   const showIds = ordered.map(r => r.id);
-  if (groupView && anyGroup && !activeFilters.has("deleted")) {
-    const groups = {};
-    ordered.forEach(r => { const g = r.group_name || "—"; (groups[g] = groups[g] || []).push(r); });
-    Object.keys(groups).sort((a, b) => a === "—" ? 1 : b === "—" ? -1 : a.localeCompare(b)).forEach(g => {
-      const rows = groups[g];
-      const head = document.createElement("div");
-      head.className = "group-head";
-      head.textContent = `${g === "—" ? t("groupNone") : g} · ${rows.length} · ${rows.reduce((s, r) => s + r.count, 0)}`;
-      el.appendChild(head);
-      rows.forEach(r => el.appendChild(famRow(r, true, showIds)));
-    });
+  if (treeView && anyTree && !activeFilters.has("deleted")) {
+    const shown = new Set(ordered.map(r => r.id));
+    const childrenOf = pid => ordered.filter(r => (r.parent_id || null) === pid).sort((a, b) => displayName(a).localeCompare(displayName(b), L === "ar" ? "ar" : "en"));
+    const rendered = new Set();
+    const emit = (r, depth) => {
+      if (rendered.has(r.id)) return; rendered.add(r.id);
+      const card = famRow(r, true, showIds);
+      if (depth > 0) { card.style.marginInlineStart = Math.min(depth, 3) * 16 + "px"; card.style.borderInlineStart = "2px solid " + (r.side === "bride" ? "var(--bride)" : "var(--groom)"); }
+      el.appendChild(card);
+      if (!collapsed.has(r.id)) childrenOf(r.id).forEach(c => emit(c, depth + 1));
+    };
+    const roots = ordered.filter(r => !liveParent(r) || !shown.has(liveParent(r).id)).sort((a, b) => displayName(a).localeCompare(displayName(b), L === "ar" ? "ar" : "en"));
+    roots.filter(r => childrenOf(r.id).length > 0).forEach(r => emit(r, 0)); // trees first
+    roots.filter(r => childrenOf(r.id).length === 0).forEach(r => emit(r, 0)); // unlinked families flat below
+    ordered.forEach(r => { if (!rendered.has(r.id)) el.appendChild(famRow(r, true, showIds)); });
   } else {
     ordered.forEach(r => el.appendChild(famRow(r, true, showIds)));
   }
@@ -1643,17 +1737,65 @@ const FILTER_PREDS = {
   nophone: r => numberState(r) === "missing",
   wrong: r => numberState(r) === "wrong",
 };
-const FILTER_EXCLUSIVE = { sent: "unsent", unsent: "sent", bride: "groom", groom: "bride" };
-function toggleFilter(k){
-  if (k === "deleted") {
-    if (activeFilters.has("deleted")) activeFilters.delete("deleted");
-    else { activeFilters.clear(); activeFilters.add("deleted"); }
-  } else {
-    activeFilters.delete("deleted");
-    if (activeFilters.has(k)) activeFilters.delete(k);
-    else { if (FILTER_EXCLUSIVE[k]) activeFilters.delete(FILTER_EXCLUSIVE[k]); activeFilters.add(k); }
-  }
+// v23.2: typed filter-sheet controls write/clear activeFilters directly — exclusivity is
+// enforced by the control itself (segment / trash), so the old FILTER_EXCLUSIVE swap-map is gone.
+function setSegment(keys, val){
+  keys.forEach(k => activeFilters.delete(k));
+  activeFilters.delete("deleted");
+  if (val) activeFilters.add(val);
   renderAll();
+}
+function toggleFilterCb(k, on){
+  activeFilters.delete("deleted");
+  if (on) activeFilters.add(k); else activeFilters.delete(k);
+  renderAll();
+}
+function toggleTrashFilter(on){
+  if (on) { activeFilters.clear(); activeFilters.add("deleted"); }
+  else activeFilters.delete("deleted");
+  renderAll();
+}
+function clearAllFilters(){ activeFilters.clear(); renderAll(); }
+function removeActiveFilter(k){ activeFilters.delete(k); renderAll(); }
+function openFilterSheet(){ $("filterBg").hidden = false; }
+function closeFilterSheet(){ $("filterBg").hidden = true; }
+function filterChipLabel(k){
+  return {
+    bride: t("segBride"), groom: t("segGroom"), sent: t("segSent"), unsent: t("segNotSent"),
+    reception: t("eventsReceptionLbl"), ev2: t("eventsHennaLbl"), church: t("issueChurchOnly"),
+    confirmed: t("fConfirmed"), nophone: t("issueNoPhone"), wrong: t("issueWrong"), deleted: t("trashLbl"),
+  }[k] || k;
+}
+function renderFilterSheet(role, c, trashCount){
+  const trashOn = activeFilters.has("deleted");
+  $("fsSideSec").hidden = role !== "master";
+  $("segSideAll").className = (!activeFilters.has("bride") && !activeFilters.has("groom")) ? "on" : "";
+  $("segSideBride").className = activeFilters.has("bride") ? "on" : "";
+  $("segSideGroom").className = activeFilters.has("groom") ? "on" : "";
+  $("segInviteAll").className = (!activeFilters.has("sent") && !activeFilters.has("unsent")) ? "on" : "";
+  $("segInviteSent").className = activeFilters.has("sent") ? "on" : "";
+  $("segInviteNot").className = activeFilters.has("unsent") ? "on" : "";
+  [$("segSideAll"), $("segSideBride"), $("segSideGroom"), $("segInviteAll"), $("segInviteSent"), $("segInviteNot")].forEach(b => b.disabled = trashOn);
+  const cbRow = (rowId, cbId, cntId, key, count) => {
+    $(rowId).hidden = count === 0;
+    $(cbId).checked = activeFilters.has(key);
+    $(cbId).disabled = trashOn;
+    $(cntId).textContent = localDigits(count);
+    $(rowId).classList.toggle("fs-disabled", trashOn);
+  };
+  cbRow("rowFReception", "cbFReception", "cntFReception", "reception", c(FILTER_PREDS.reception));
+  cbRow("rowFEv2", "cbFEv2", "cntFEv2", "ev2", c(FILTER_PREDS.ev2));
+  cbRow("rowFChurch", "cbFChurch", "cntFChurch", "church", c(FILTER_PREDS.church));
+  cbRow("rowFConfirmed", "cbFConfirmed", "cntFConfirmed", "confirmed", c(FILTER_PREDS.confirmed));
+  cbRow("rowFNoPhone", "cbFNoPhone", "cntFNoPhone", "nophone", c(FILTER_PREDS.nophone));
+  cbRow("rowFWrong", "cbFWrong", "cntFWrong", "wrong", c(FILTER_PREDS.wrong));
+  $("cbFTrash").checked = trashOn;
+  $("cntFTrash").textContent = localDigits(trashCount);
+  const n = activeFilters.size;
+  $("filtersBadge").hidden = n === 0;
+  if (n) $("filtersBadge").textContent = "· " + localDigits(n);
+  $("filtersBtn").className = "fs-trigger" + (n ? " on" : "");
+  $("filtersEcho").innerHTML = [...activeFilters].map(k => `<button type="button" class="echo-chip" onclick="removeActiveFilter('${k}')">${esc(filterChipLabel(k))} ✕</button>`).join("");
 }
 function setSort(m){
   sortMode = m;
@@ -1662,7 +1804,7 @@ function setSort(m){
   $("sortLast").className = m === "last" ? "on" : "";
   renderAll();
 }
-function toggleGroupView(){ groupView = !groupView; $("sortGroup").className = groupView ? "on" : ""; renderAll(); }
+function toggleTreeView(){ treeView = !treeView; $("sortTree").className = treeView ? "on" : ""; renderAll(); }
 
 /* ── organizer ── */
 function switchPin(){
@@ -1838,13 +1980,13 @@ async function handleFiles(files){
 
 /* ── exports ── */
 function exportExcel(){
-  const head = ["Name (الاسم)", "Name (English)", "Side (الطرف)", "People (الأفراد)", "WhatsApp", ev2Name(), "Church Only (الكنيسة فقط)", "Confirmed (مؤكد)", "Group (المجموعة)", "Members (الأفراد بالاسم)", "Invite Sent (اتبعتت)", "Sent On (تاريخ الإرسال)", "Added"];
+  const head = ["Name (الاسم)", "Name (English)", "Side (الطرف)", "People (الأفراد)", "WhatsApp", ev2Name(), "Church Only (الكنيسة فقط)", "Confirmed (مؤكد)", "Family (العائلة)", "Members (الأفراد بالاسم)", "Invite Sent (اتبعتت)", "Sent On (تاريخ الإرسال)", "Added"];
   const xrole = orgRole() || "master";
   const xrows = (xrole === "master" ? all : all.filter(r => r.side === xrole)).filter(r => !r.deleted_at);
   const rows_ = xrows.map(r => {
     const entry = sentEntry(r);
     const sentAt = entry && entry.at ? entry.at : "";
-    return [r.name, r.name_en || "", r.side === "bride" ? "Bride عروسة" : "Groom عريس", r.count, r.phone || "", r.event2 ? (hennaOverridden(r) ? "YES (" + r.seats.henna + ")" : "YES") : "", r.church_only ? "YES" : "", r.confirmed ? "YES" : "", r.group_name || "", (Array.isArray(r.members) ? r.members.filter(v => v && memNorm(v) !== memNorm(r.name) && memNorm(v) !== memNorm(r.name_en)).join(", ") : ""),
+    return [r.name, r.name_en || "", r.side === "bride" ? "Bride عروسة" : "Groom عريس", r.count, r.phone || "", r.event2 ? (hennaOverridden(r) ? "YES (" + r.seats.henna + ")" : "YES") : "", r.church_only ? "YES" : "", r.confirmed ? "YES" : "", [...breadcrumb(r), displayName(r)].join(" › "), (Array.isArray(r.members) ? r.members.filter(v => v && memNorm(v) !== memNorm(r.name) && memNorm(v) !== memNorm(r.name_en)).join(", ") : ""),
       entry ? "YES" : "", sentAt.slice(0, 10), (r.created_at || "").slice(0, 10)];
   });
   const csv = "﻿" + [head, ...rows_].map(row => row.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\r\n");

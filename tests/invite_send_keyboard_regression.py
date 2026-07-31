@@ -46,7 +46,7 @@ CHURCH_LINK = (
     "?cat=3eff4b55-85f1-4322-8ab6-f1bf8fd8c85c"
     "&g=rsvp-7110440c-c1ca-4577-abac-3cae79bce03c"
 )
-VERSION = "٢٣٫١ · 23.1"
+VERSION = "٢٣٫٢ · 23.2"
 TEMPLATE_VERSION = "21.0"
 ARABIC = re.compile(r"[؀-ۿ]")
 FAMILIES = [
@@ -60,7 +60,6 @@ FAMILIES = [
         "event2": True,
         "church_only": False,
         "confirmed": True,
-        "group_name": "Makram",
         "members": ["Shenouda", "Malak"],
         "added_by": "fixture",
         "invite_sent": {},
@@ -75,6 +74,7 @@ FAMILIES = [
         "event2": False,
         "church_only": True,
         "confirmed": False,
+        "parent_id": "henna-family",
         "added_by": "fixture",
         "invite_sent": {},
     },
@@ -184,6 +184,8 @@ def run_browser(browser_type, browser_name, base_url):
         return [m for m in family_mutations if m[0] == "PATCH" and "invite_sent" in (m[2] or "")]
 
     page.goto(base_url, wait_until="domcontentloaded")
+    # v23.2: the Filters trigger lives inside orgView — contributors never see it
+    assert page.locator("#filtersBtn").is_hidden()
     page.evaluate("openOrg()")
     page.wait_for_function("all.length === 3")
     page.wait_for_function("document.querySelectorAll('#fullList .send-invite').length === 3")
@@ -227,36 +229,77 @@ def run_browser(browser_type, browser_name, base_url):
     assert henna_lines[1].startswith("يسرنا")
     assert henna_text.index("You’re invited") < henna_text.index("يسرنا")
 
-    # ── D1: missing-number badge + no-phone filter chip
-    henna_row = page.locator("#fullList .fam").filter(has_text="Henna Test Family")
-    church_row = page.locator("#fullList .fam").filter(has_text="Church Test Family")
-    nophone_row = page.locator("#fullList .fam").filter(has_text="No Phone Family")
+    # ── D1: missing-number badge
+    henna_row = page.locator("#fullList .fam[data-id='henna-family']")
+    church_row = page.locator("#fullList .fam[data-id='church-family']")
+    nophone_row = page.locator("#fullList .fam[data-id='no-phone-family']")
     assert henna_row.locator(".nophone-badge").count() == 0
     assert nophone_row.locator(".nophone-badge").inner_text() == "📵 No number"
-    assert page.locator("#fNoPhone").inner_text() == "📵 1"
-    page.evaluate("toggleFilter('nophone')")
+
+    # ── v23.2: filter sheet replaces the 11-chip strip — trigger pill, hidden badge, bottom sheet.
+    # The sheet itself starts closed (#filterBg hidden), so descendant text/visibility is read via
+    # JS DOM properties below (innerText/is_hidden would report through the hidden ancestor).
+    def sheet_prop(id_, prop):
+        return page.evaluate(f"document.getElementById('{id_}').{prop}")
+    assert page.locator("#filters").count() == 0  # old chip strip is gone
+    assert page.locator("#filtersBtn").inner_text().strip() == "Filters"
+    assert page.locator("#filtersBadge").is_hidden()  # no active filters ⇒ badge hidden
+    assert sheet_prop("fsSideSec", "hidden") is False  # master role sees the Side segment
+    assert sheet_prop("cntFNoPhone", "textContent") == "1"
+    # zero-count checkbox rows are hidden — no wrong-number family exists yet
+    assert sheet_prop("rowFWrong", "hidden") is True
+    assert sheet_prop("cntFWrong", "textContent") == "0"
+    # segment options always render even when a segment's count would read 0
+    assert sheet_prop("segSideGroom", "hidden") is False
+
+    # ── v23.2: checkbox rows stay AND-stacking on the same activeFilters Set
+    page.evaluate("toggleFilterCb('nophone', true)")
     assert page.locator("#fullList .fam").count() == 1
     assert "No Phone Family" in page.locator("#fullList .fam").first.inner_text()
-    page.evaluate("toggleFilter('nophone')")  # multi-select: toggling off clears it
+    assert not page.locator("#filtersBadge").is_hidden()
+    assert page.locator("#filtersBadge").inner_text() == "· 1"
+    assert page.locator("#filtersBtn").get_attribute("class") == "fs-trigger on"
+    echo = page.locator("#filtersEcho .echo-chip")
+    assert echo.count() == 1 and "No number" in echo.inner_text()
+    page.evaluate("removeActiveFilter('nophone')")  # the mini-chip's own ✕ handler
     page.wait_for_function("document.querySelectorAll('#fullList .fam').length === 3")
+    assert page.locator("#filtersBadge").is_hidden()
 
-    # ── v23 item 7: multi-select AND filters + exclusive pairs + 🗑 exclusivity
-    page.evaluate("toggleFilter('ev2'); toggleFilter('unsent')")  # henna AND not-sent
+    # ── v23.2: exclusive pairs are segments now — FILTER_EXCLUSIVE is gone, the control
+    # itself makes Sent+Not-sent / Bride+Groom unrepresentable; same activeFilters Set underneath
+    page.evaluate("toggleFilterCb('ev2', true); setSegment(['sent','unsent'],'unsent')")  # henna AND not-sent
     assert page.evaluate("[...activeFilters].sort().join(',')") == "ev2,unsent"
     assert page.locator("#fullList .fam").count() == 1
     assert "Henna Test Family" in page.locator("#fullList .fam").first.inner_text()
-    page.evaluate("toggleFilter('sent')")  # Sent/Not-sent are mutually exclusive
+    page.evaluate("setSegment(['sent','unsent'],'sent')")  # picking Sent clears Not-sent — same keys
     assert page.evaluate("activeFilters.has('unsent')") is False
     assert page.evaluate("activeFilters.has('sent')") is True
-    page.evaluate("toggleFilter('bride'); toggleFilter('groom')")  # Bride/Groom exclusive
+    assert sheet_prop("segInviteSent", "className") == "on"
+    assert sheet_prop("segInviteNot", "className") == ""
+    page.evaluate("setSegment(['bride','groom'],'bride'); setSegment(['bride','groom'],'groom')")  # Bride/Groom exclusive
     assert page.evaluate("activeFilters.has('bride')") is False
     assert page.evaluate("activeFilters.has('groom')") is True
-    page.evaluate("toggleFilter('deleted')")  # 🗑 clears everything else
+
+    # ── v23.2: Trash is an exclusive control that clears AND disables every other row
+    page.evaluate("toggleTrashFilter(true)")
     assert page.evaluate("[...activeFilters]") == ["deleted"]
-    page.evaluate("toggleFilter('ev2')")  # any normal chip clears 🗑
-    assert page.evaluate("activeFilters.has('deleted')") is False
-    page.evaluate("activeFilters.clear(); renderAll()")
+    assert sheet_prop("cbFTrash", "checked") is True
+    assert "fs-disabled" in sheet_prop("rowFReception", "className")
+    assert sheet_prop("cbFReception", "disabled") is True
+    assert sheet_prop("segSideBride", "disabled") is True
+    page.evaluate("toggleTrashFilter(false)")
+    assert page.evaluate("activeFilters.size") == 0
+    assert sheet_prop("cbFReception", "disabled") is False
+
+    # ── v23.2: Done shows the live result count; Clear does a full reset
+    page.evaluate("toggleFilterCb('confirmed', true)")
+    assert page.locator("#fullList .fam").count() == 1
+    assert sheet_prop("filterDoneBtn", "textContent") == "Done · 1"
+    page.evaluate("clearAllFilters()")
+    assert page.evaluate("activeFilters.size") == 0
     page.wait_for_function("document.querySelectorAll('#fullList .fam').length === 3")
+    assert page.locator("#filtersBadge").is_hidden()
+    assert sheet_prop("filterDoneBtn", "textContent") == "Done · 3"
 
     # ── D3: no inline delete button remains in any row (delete moved into Edit)
     assert page.locator("#fullList .fam .del").count() == 0
@@ -286,17 +329,19 @@ def run_browser(browser_type, browser_name, base_url):
     assert page.evaluate("numberState({phone: '+20 200 123 4567'})") == "wrong"  # EG mobile must start with 1
     # amber card + ⚠️ badge render for a wrong number (mutate church family, then restore)
     page.evaluate("all.find(r => r.id === 'church-family').phone = '+20 200 123 4567'; renderAll()")
-    wrong_row = page.locator("#fullList .fam").filter(has_text="Church Test Family")
+    wrong_row = page.locator("#fullList .fam[data-id='church-family']")
     assert "wrong" in (wrong_row.get_attribute("class") or "")
     assert wrong_row.locator(".wrong-badge").count() == 1
-    # ⚠️ filter chip counts and isolates wrong-number families
-    assert page.locator("#fWrong").inner_text() == "⚠️ 1"
-    page.evaluate("toggleFilter('wrong')")
+    # ── v23.2: the Issues row appears once its live count leaves zero, and isolates wrong-number families
+    assert sheet_prop("rowFWrong", "hidden") is False
+    assert sheet_prop("cntFWrong", "textContent") == "1"
+    page.evaluate("toggleFilterCb('wrong', true)")
     assert page.locator("#fullList .fam").count() == 1
     assert "Church Test Family" in page.locator("#fullList .fam").first.inner_text()
-    page.evaluate("toggleFilter('wrong')")
+    page.evaluate("toggleFilterCb('wrong', false)")
     page.evaluate("all.find(r => r.id === 'church-family').phone = '+20 100 123 4567'; renderAll()")
-    assert "wrong" not in (page.locator("#fullList .fam").filter(has_text="Church Test Family").get_attribute("class") or "")
+    assert "wrong" not in (page.locator("#fullList .fam[data-id='church-family']").get_attribute("class") or "")
+    assert sheet_prop("rowFWrong", "hidden") is True  # count back to zero ⇒ hidden again
 
     # ── v23 item 8: henna headcount helpers + card chip number when overridden
     assert page.evaluate("hennaSeats({count: 5, seats: {henna: 3}})") == 3
@@ -308,17 +353,49 @@ def run_browser(browser_type, browser_name, base_url):
     page.evaluate("all.find(r => r.id === 'henna-family').seats = null; renderAll()")
     assert "🌿 1" not in henna_row.locator(".card-chip.henna").inner_text()
 
-    # ── v23 item 1: group chip on the card + "By group" grouped view
-    assert henna_row.locator(".card-chip.group").count() == 1
-    assert "Makram" in henna_row.locator(".card-chip.group").inner_text()
-    assert church_row.locator(".card-chip.group").count() == 0
-    assert not page.locator("#sortGroup").is_hidden()  # a group exists → toggle available
-    page.evaluate("toggleGroupView()")
-    page.wait_for_function("document.querySelectorAll('#fullList .group-head').length >= 1")
-    heads = page.evaluate("() => [...document.querySelectorAll('#fullList .group-head')].map(h => h.textContent)")
-    assert any("Makram" in h for h in heads), heads
-    page.evaluate("toggleGroupView()")
-    page.wait_for_function("document.querySelectorAll('#fullList .group-head').length === 0")
+    # ── v23.2: relationship tree — parent shows a 👪 rollup chip, child shows a ↳ breadcrumb chip
+    assert henna_row.locator(".card-chip.rollup").count() == 1        # henna is Church's parent
+    assert "👪" in henna_row.locator(".card-chip.rollup").inner_text()
+    assert church_row.locator(".card-chip.crumb").count() == 1        # church is inside henna
+    assert "Henna Test Family" in church_row.locator(".card-chip.crumb").inner_text()
+    assert "↳" in church_row.locator(".card-chip.crumb").inner_text()  # LTR glyph in the EN UI
+    assert nophone_row.locator(".card-chip.rollup").count() == 0      # root, no children
+    assert nophone_row.locator(".card-chip.crumb").count() == 0
+    # Tree view: a parent exists → the toggle is available; children render indented under the root
+    assert not page.locator("#sortTree").is_hidden()
+    page.evaluate("toggleTreeView()")
+    page.wait_for_function("() => { const c = document.querySelector('#fullList .fam[data-id=\"church-family\"]'); return c && c.style.marginInlineStart && c.style.marginInlineStart !== '0px'; }")
+    # in the tree, the child renders immediately after its parent; the unlinked (childless, parentless)
+    # no-phone family is not part of any tree and renders flat, below the tree — not interleaved A–Z with it
+    order = page.evaluate("() => [...document.querySelectorAll('#fullList .fam')].map(f => f.dataset.id)")
+    assert order.index("church-family") == order.index("henna-family") + 1, order
+    assert order.index("no-phone-family") > order.index("church-family"), order
+    no_phone_card = page.locator("#fullList .fam[data-id='no-phone-family']")
+    assert not no_phone_card.get_attribute("style") or "margin-inline-start" not in (no_phone_card.get_attribute("style") or "")
+    page.evaluate("toggleTreeView()")
+    page.wait_for_function("() => { const c = document.querySelector('#fullList .fam[data-id=\"church-family\"]'); return !c.style.marginInlineStart || c.style.marginInlineStart === '0px'; }")
+
+    # ── v23.2: a trashed parent leaves its child at root with a GREYED breadcrumb; Restore reassembles
+    page.evaluate("all.find(r => r.id === 'henna-family').deleted_at = new Date().toISOString(); renderAll()")
+    crumb = page.locator("#fullList .fam[data-id='church-family'] .card-chip.crumb")
+    assert crumb.count() == 1                                      # breadcrumb retained (not dropped)
+    assert "trashed" in (crumb.get_attribute("class") or "")      # greyed
+    assert page.locator("#fullList .fam[data-id='church-family']").count() == 1  # child still visible at root
+    page.evaluate("all.find(r => r.id === 'henna-family').deleted_at = null; renderAll()")
+    crumb2 = page.locator("#fullList .fam[data-id='church-family'] .card-chip.crumb")
+    assert crumb2.count() == 1 and "trashed" not in (crumb2.get_attribute("class") or "")  # reassembled — live
+
+    # ── v23.2: filtering never severs trees — a matching child surfaces flat with its
+    # breadcrumb chip even when its root doesn't match the active filter (church_only
+    # matches only church-family; its parent henna-family is not church_only)
+    page.evaluate("toggleFilterCb('church', true)")
+    page.wait_for_function("document.querySelectorAll('#fullList .fam').length === 1")
+    severed_child = page.locator("#fullList .fam[data-id='church-family']")
+    assert severed_child.count() == 1
+    assert severed_child.locator(".card-chip.crumb").count() == 1
+    assert "Henna Test Family" in severed_child.locator(".card-chip.crumb").inner_text()
+    page.evaluate("toggleFilterCb('church', false)")
+    page.wait_for_function("document.querySelectorAll('#fullList .fam').length === 3")
 
     # ── v23: cards are READ-ONLY indicators — no +/− count buttons, no 🌿/🏛 quick-toggles;
     # only ✏️ Edit and 📨 Send invite are interactive. Count renders as plain text.
@@ -350,7 +427,10 @@ def run_browser(browser_type, browser_name, base_url):
     page.evaluate("toggleLang(); renderAll(); renderMine()")
     assert page.evaluate("L") == "ar"
     assert page.evaluate("displayName(all.find(r => r.id === 'henna-family'))") == "عيلة الحنة"
-    assert page.locator("#fullList .fam").filter(has_text="عيلة الحنة").count() == 1
+    assert "عيلة الحنة" in page.locator("#fullList .fam[data-id='henna-family'] b").first.inner_text()
+    # v23.2: the breadcrumb arrow isn't Unicode bidi-mirrored (U+21B3) — the app swaps the glyph
+    # itself so it still points toward reading-start under RTL
+    assert "↲" in page.locator("#fullList .fam[data-id='church-family'] .card-chip.crumb").inner_text()
     # search by ENGLISH name while the UI is Arabic still finds the family
     page.fill("#search", "Henna Test")
     page.wait_for_function("document.querySelectorAll('#fullList .fam').length === 1")
@@ -532,13 +612,16 @@ def run_browser(browser_type, browser_name, base_url):
     # ── D2: the sent row is now a green sent-card and carries the bigger badge
     assert "sent" in (henna_row.get_attribute("class") or "")
     assert henna_row.locator(".sent-badge").inner_text().startswith("✓ Sent")
-    assert page.locator("#fSent").inner_text() == "✓ Sent 1"
-    assert page.locator("#fUnsent").inner_text() == "◻︎ Not sent 2"
+    # v23.2: Invite is a segment now (Sent/Not-sent have no per-option count, only checkbox rows do)
+    assert page.evaluate("all.filter(FILTER_PREDS.sent).length") == 1
+    assert page.evaluate("all.filter(FILTER_PREDS.unsent).length") == 2
 
-    page.evaluate("toggleFilter('sent')")
+    page.evaluate("setSegment(['sent','unsent'],'sent')")
+    assert page.locator("#segInviteSent").get_attribute("class") == "on"
     assert page.locator("#fullList .fam").count() == 1
     assert "Henna Test Family" in page.locator("#fullList .fam").first.inner_text()
-    page.evaluate("toggleFilter('sent')")
+    page.evaluate("setSegment(['sent','unsent'],'')")
+    assert page.locator("#segInviteAll").get_attribute("class") == "on"
     page.wait_for_function("document.querySelectorAll('#fullList .fam').length === 3")
 
     # ── undo clears the mark back out of the database
@@ -593,9 +676,13 @@ def run_browser(browser_type, browser_name, base_url):
     assert not page.locator("#eConfirmedChk").is_checked()  # no-phone fixture is unconfirmed
     page.fill("#eNameEn", "No Phone Family EN")
     page.locator("#eConfirmedChk").check()  # v23: mark confirmed
-    # ── v23 items 1+2: group + member names save in the same Edit PATCH
+    # ── v23.2 relationships + v23 members save in the same Edit PATCH
     page.evaluate("document.getElementById('eMore').open = true")
-    page.fill("#eGroup", "Cousins")
+    # parent picker never lists self (cycle safety layer 1)
+    parent_opts = page.evaluate("() => [...document.querySelectorAll('#eParent option')].map(o => o.value)")
+    assert "no-phone-family" not in parent_opts, parent_opts   # excludes self
+    assert "henna-family" in parent_opts                       # other families offered
+    page.select_option("#eParent", "henna-family")             # file no-phone under henna
     assert "No Phone Family" in page.locator("#eMembers .member-contact").inner_text()  # contact = person #1
     member_inputs = page.locator("#eMembers input.member-in")
     assert member_inputs.count() == 2  # count - 1 additional-member inputs (contact is #1)
@@ -608,9 +695,29 @@ def run_browser(browser_type, browser_name, base_url):
     assert edit_body.get("church_only") is True and "name" in edit_body, mut
     assert edit_body.get("name_en") == "No Phone Family EN", mut
     assert edit_body.get("confirmed") is True, mut
-    assert edit_body.get("group_name") == "Cousins", mut
+    assert edit_body.get("parent_id") == "henna-family", mut
     assert edit_body.get("members") and edit_body["members"][0] == "Mina", mut
     page.wait_for_function("document.getElementById('editBg').hidden")
+
+    # ── v23.2 cycle safety: a parent's picker excludes its own descendants (layer 1)
+    henna_row.locator(".edit-btn").click()
+    page.wait_for_function("!document.getElementById('editBg').hidden")
+    page.evaluate("document.getElementById('eMore').open = true")
+    henna_opts = page.evaluate("() => [...document.querySelectorAll('#eParent option')].map(o => o.value)")
+    assert "henna-family" not in henna_opts and "church-family" not in henna_opts, henna_opts  # self + descendant excluded
+    page.locator("#editCancel").click()
+    page.wait_for_function("document.getElementById('editBg').hidden")
+
+    # ── v23.2 acceptance #9: contributor PIN edits never show the parent picker (mineWrap's own-family
+    # edit button re-uses this same #editBg modal, so relationships must stay organizer-only there)
+    page.evaluate("localStorage.removeItem('wedOrg')")
+    page.evaluate("openEdit(all.find(r => r.id === 'no-phone-family'))")
+    page.wait_for_function("!document.getElementById('editBg').hidden")
+    assert page.locator("#eParentLabel").is_hidden()
+    assert page.locator("#eParent").is_hidden()
+    page.locator("#editCancel").click()
+    page.wait_for_function("document.getElementById('editBg').hidden")
+    page.evaluate("localStorage.setItem('wedOrg', 'master')")  # restore organizer context
 
     # ── v23 item 8: the Edit henna stepper writes seats {henna:n} in the PATCH
     henna_row.locator(".edit-btn").click()
@@ -652,9 +759,9 @@ def run_browser(browser_type, browser_name, base_url):
     assert page.evaluate("document.getElementById('editBg').hidden") is True
     # the row leaves the default list once the soft delete round-trips
     page.wait_for_function("document.querySelectorAll('#fullList .fam').length === 2")
-    assert page.locator("#fullList .fam").filter(has_text="No Phone Family").count() == 0
-    # ── v23 item 6: 🗑 filter shows the deleted family dimmed with a Restore button (no Edit/Send)
-    page.evaluate("toggleFilter('deleted')")
+    assert page.locator("#fullList .fam[data-id='no-phone-family']").count() == 0
+    # ── v23 item 6: 🗑 Trash shows the deleted family dimmed with a Restore button (no Edit/Send)
+    page.evaluate("toggleTrashFilter(true)")
     page.wait_for_function("document.querySelectorAll('#fullList .fam').length === 1")
     del_card = page.locator("#fullList .fam").first
     assert "deleted" in (del_card.get_attribute("class") or "")
@@ -666,7 +773,7 @@ def run_browser(browser_type, browser_name, base_url):
     del_card.locator(".restore-btn").click()
     mut = wait_new_mutation(n)
     assert mut[0] == "PATCH" and json.loads(mut[2]) == {"deleted_at": None}, mut
-    page.evaluate("toggleFilter('deleted')")  # leave the 🗑 view
+    page.evaluate("toggleTrashFilter(false)")  # leave the 🗑 view
     page.wait_for_function("document.querySelectorAll('#fullList .fam').length === 3")
 
     # ── Excel export: "Name (English)" + "Confirmed" columns + henna override "YES (n)"
@@ -677,9 +784,9 @@ def run_browser(browser_type, browser_name, base_url):
     header_line = export_text.splitlines()[0]
     assert '"Name (الاسم)","Name (English)"' in header_line, header_line
     assert "Confirmed" in header_line, header_line
-    assert "Group" in header_line and "Members" in header_line, header_line  # v23 columns
+    assert "Family" in header_line and "Members" in header_line, header_line  # v23.2: Family path column
     assert "Henna Test Family" in export_text  # a name_en value made it into the export
-    assert "Makram" in export_text  # group_name exported
+    assert "Henna Test Family › Church Test Family" in export_text  # v23.2: full family path
     assert "Shenouda" in export_text  # members exported
     assert "YES (1)" in export_text  # henna override renders the seat count
     page.evaluate("all.find(r => r.id === 'henna-family').seats = null; renderAll()")
@@ -715,15 +822,22 @@ def run_browser(browser_type, browser_name, base_url):
     assert st_null == 200, st_null   # nullable columns accept null both ways
     browser.close()
     print(
-        f"PASS {browser_name}: v23.1 — HOTFIX: default-family Edit save round-trips (mock 400s "
-        "null→NOT NULL, guarding the seats bug); members = contact is person #1 (count-1 inputs, "
-        "contact line, over-length arrays trimmed, send-modal/export dedupe). Plus v23: read-only cards (count text, only Send+Edit); red 📵 + "
-        "amber ⚠️ + green sent precedence, 📵-first/A–Z/last-name sort; ✅ Confirmed; soft delete "
-        "via deleted_at (no API DELETE) + 🗑 dimmed Restore; multi-select AND filter row "
-        "(Bride/Groom/Sent/Not-sent/✅/🌿/🏛/⛪ only/📵/⚠️/🗑, exclusive pairs, counts); henna "
-        "headcount stepper → seats {henna:n}, card 🌿 n, export YES (n); family groups (chip, "
-        "By-group view, datalist) + member names (Edit inputs, send-modal, export); all on top "
-        "of v22.1 bilingual names + church-universal model"
+        f"PASS {browser_name}: v23.2 — relationships (parent_id self-FK): native parent picker in "
+        "Edit's More options replaces group_name, cycle safety (self+descendants excluded from the "
+        "picker, save-time ancestor-walk toast, corrupt-cycle-safe renderer), breadcrumb + rollup "
+        "chips (RTL-correct arrow glyph swap), Tree sort (trees A–Z, unlinked families flat below, "
+        "trashed-parent orphans stay visible + Restore reassembles), breadcrumb search, CSV family-path "
+        "column, mom's wizard loses the group field entirely. Filter sheet replaces the 11-chip strip: "
+        "Filters trigger pill + badge, segments for Side/Invite (FILTER_EXCLUSIVE retired), checkboxes "
+        "for Events/Status/Issues with zero-count rows hidden, Trash exclusive (clears+disables the "
+        "rest), live Done-count + Clear, removable mini-chip echo, filtering never severs trees. Plus "
+        "v23.1 HOTFIX: default-family Edit save round-trips (mock 400s null→NOT NULL, guarding the "
+        "seats bug); members = contact is person #1 (count-1 inputs, contact line, over-length arrays "
+        "trimmed, send-modal/export dedupe). Plus v23: read-only cards (count text, only Send+Edit); "
+        "red 📵 + amber ⚠️ + green sent precedence, 📵-first/A–Z/last-name sort; ✅ Confirmed; soft "
+        "delete via deleted_at (no API DELETE) + 🗑 dimmed Restore; henna headcount stepper → seats "
+        "{henna:n}, card 🌿 n, export YES (n); member names (Edit inputs, send-modal, export); all on "
+        "top of v22.1 bilingual names + church-universal model"
     )
 
 
