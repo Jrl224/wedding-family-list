@@ -57,7 +57,7 @@ CHURCH_LINK = (
     "?cat=3eff4b55-85f1-4322-8ab6-f1bf8fd8c85c"
     "&g=rsvp-7110440c-c1ca-4577-abac-3cae79bce03c"
 )
-VERSION = "٢٤٫٠ · 24.0"
+VERSION = "٢٥٫٠ · 25.0"
 TEMPLATE_VERSION = "21.0"
 ARABIC = re.compile(r"[؀-ۿ]")
 FAMILIES = [
@@ -210,9 +210,12 @@ def run_browser(browser_type, browser_name, base_url):
         return [m for m in family_mutations if m[0] == "PATCH" and "invite_sent" in (m[2] or "")]
 
     page.goto(base_url, wait_until="domcontentloaded")
-    # v23.2: the Filters trigger lives inside orgView — contributors never see it
+    # v25: #add is the default landing screen for every role; the organizer #list screen
+    # (and its Filters trigger) is unreachable until navigated to explicitly via the router
+    assert page.evaluate("location.hash") == "#add"
+    assert page.locator("#scrList").is_hidden()
     assert page.locator("#filtersBtn").is_hidden()
-    page.evaluate("openOrg()")
+    page.evaluate("location.hash = '#list'")
     page.wait_for_function("all.length === 3")
     page.wait_for_function("document.querySelectorAll('#fullList .send-invite').length === 3")
 
@@ -601,7 +604,8 @@ def run_browser(browser_type, browser_name, base_url):
     assert page.evaluate("document.querySelector(\"iframe[src^='sms:']\").src").startswith(
         "sms:+12025550123?&body="
     )
-    assert page.url.rstrip("/") == base_url.rstrip("/")
+    # v25: the hash router means page.url carries a #screen fragment now — compare paths only
+    assert page.url.split("#")[0].rstrip("/") == base_url.rstrip("/")
     assert not page.locator("#inviteBg").is_hidden()
     assert page.evaluate("inviteChannelUsed") == "imessage"
     page.wait_for_function(f"window.__copied.length === {copies_before + 1}")
@@ -859,15 +863,22 @@ def run_browser(browser_type, browser_name, base_url):
     assert page.evaluate("all.find(r => r.id === 'church-family').hasOwnProperty('tags')")
     assert page.evaluate("all.find(r => r.id === 'church-family').hasOwnProperty('waitlist')")
 
-    # ── acceptance #1: guest add wizard payload carries neither tags nor waitlist
+    # ── acceptance #1: one-screen add payload carries neither tags nor waitlist
+    page.evaluate("location.hash = '#add'")
+    page.wait_for_function("!document.getElementById('scrAdd').hidden")
     n = len(family_mutations)
-    page.evaluate("document.getElementById('wName').value = 'عيلة اختبار الوسم'")
-    page.evaluate("saveFamily()")
+    page.fill("#addName", "عيلة اختبار الوسم")
+    page.evaluate("saveFamilyOneScreen()")
     mut = wait_new_mutation(n)
     assert mut[0] == "POST", mut
     posted = json.loads(mut[2])
     posted_row = posted[0] if isinstance(posted, list) else posted
     assert "tags" not in posted_row and "waitlist" not in posted_row, posted_row
+
+    # back to #list so renderAll()/refreshAll() (gated on the #list screen being active) keep
+    # #fullList live for the rest of this suite
+    page.evaluate("location.hash = '#list'")
+    page.wait_for_function("!document.getElementById('scrList').hidden")
 
     # ── acceptance #1 (cont'd): master-only — hidden for the guest/contributor context and for
     # side-role orgs; mom's flows and side-org Edit are otherwise byte-identical
@@ -1111,9 +1122,300 @@ def run_browser(browser_type, browser_name, base_url):
         " renderAll();"
     )
 
+    # ══════════════════════════ v25: IA restructure ══════════════════════════
+    # Router: deep links, back/forward, reload, and role-gated redirects. Still master + #list.
+    assert page.evaluate("location.hash") == "#list"
+
+    # ── deep-link + role gating: #waitlist/#deleted re-home the existing filter-sheet states
+    # into the router; #tags opens the filter sheet (no single-tag "screen" exists to route to)
+    page.evaluate("location.hash = '#waitlist'")
+    page.wait_for_function("[...activeFilters].join(',') === 'waitlist'")
+    assert not page.locator("#scrList").is_hidden()
+    page.evaluate("location.hash = '#deleted'")
+    page.wait_for_function("[...activeFilters].join(',') === 'deleted'")
+    page.evaluate("location.hash = '#tags'")
+    page.wait_for_function("!document.getElementById('filterBg').hidden")
+    assert page.evaluate("activeFilters.size") == 0
+    page.evaluate("closeFilterSheet()")
+
+    # ── migration shim: stale cached handlers from the old 3-step wizard (toStep/backStep)
+    # must not throw against the new one-screen add
+    page.evaluate("toStep(1); toStep(2); toStep(3); backStep();")
+    assert page.evaluate("!!window.toStep && !!window.backStep")
+
+    # ── back/forward across screens; reload preserves the deep link
+    page.evaluate("location.hash = '#add'")
+    page.wait_for_function("!document.getElementById('scrAdd').hidden")
+    page.evaluate("location.hash = '#list'")
+    page.wait_for_function("!document.getElementById('scrList').hidden")
+    page.go_back()
+    page.wait_for_function("location.hash === '#add'")
+    assert not page.locator("#scrAdd").is_hidden()
+    assert page.locator("#scrList").is_hidden()
+    page.go_forward()
+    page.wait_for_function("location.hash === '#list'")
+    assert not page.locator("#scrList").is_hidden()
+    page.evaluate("location.hash = '#photos'")
+    page.wait_for_function("!document.getElementById('scrPhotos').hidden")
+    page.reload(wait_until="domcontentloaded")
+    page.wait_for_function("!document.getElementById('scrPhotos').hidden")
+    assert page.evaluate("location.hash") == "#photos"
+
+    # ── role gating: a de-authenticated device hitting #list/#waitlist redirects to #add;
+    # re-navigating to #list once master again reaches it cleanly
+    page.evaluate("localStorage.removeItem('wedOrg')")
+    page.evaluate("location.hash = '#list'")
+    page.wait_for_function("location.hash === '#add'")
+    assert not page.locator("#scrAdd").is_hidden()
+    page.evaluate("location.hash = '#waitlist'")
+    page.wait_for_function("location.hash === '#add'")
+    page.evaluate("localStorage.setItem('wedOrg', 'master')")
+    page.evaluate("location.hash = '#list'")
+    page.wait_for_function("all.length === 3")
+
+    # ── per-role hamburger menu contents (exact rows, no dead Tables/Settings rows for v26/v27)
+    def menu_labels():
+        return page.evaluate(
+            "[...document.querySelectorAll('#menuRows .menu-row > span:first-child')]"
+            ".map(s => s.textContent)"
+        )
+
+    page.click("#hamburgerBtn")
+    page.wait_for_function("!document.getElementById('menuScrim').hidden")
+    master_rows = menu_labels()
+    assert master_rows == [
+        "List", "Add", "Fast entry", "Photos", "Waitlist", "Deleted", "Tags",
+        "Excel", "Snapshot", "PIN", "بالعربي",
+    ], master_rows
+    assert "Tables" not in master_rows and "Settings" not in master_rows
+    page.evaluate("closeMenu()")
+
+    page.evaluate("localStorage.setItem('wedOrg', 'bride')")
+    page.evaluate("location.hash = '#list'")
+    page.wait_for_function("all.length >= 3")
+    page.click("#hamburgerBtn")
+    page.wait_for_function("!document.getElementById('menuScrim').hidden")
+    side_rows = menu_labels()
+    assert side_rows == ["List", "Add", "Fast entry", "Photos", "Excel", "Snapshot", "PIN", "بالعربي"], side_rows
+    page.evaluate("closeMenu()")
+
+    # contributor (no PIN, side-locked): 3 rows max, never an Organizers row on a fresh device
+    page.evaluate("localStorage.removeItem('wedOrg')")
+    assert page.evaluate("localStorage.getItem('wedEverPin')") in (None, "")
+    page.evaluate("location.hash = '#add'")
+    page.wait_for_function("location.hash === '#add'")
+    page.click("#hamburgerBtn")
+    page.wait_for_function("!document.getElementById('menuScrim').hidden")
+    contrib_rows = menu_labels()
+    assert contrib_rows == ["Photos", "Fast entry", "بالعربي"], contrib_rows
+    page.evaluate("closeMenu()")
+
+    # once a PIN has EVER been entered on this device, a 4th Organizers row appears; tapping it
+    # opens the real PIN modal (mom herself never triggers this — she never types a PIN)
+    page.evaluate("localStorage.setItem('wedEverPin', '1')")
+    page.click("#hamburgerBtn")
+    page.wait_for_function("!document.getElementById('menuScrim').hidden")
+    assert menu_labels() == ["Photos", "Fast entry", "بالعربي", "Organizers"]
+    page.locator("#menuRows .menu-row", has_text="Organizers").click()
+    page.wait_for_function("!document.getElementById('pinBg').hidden")
+    page.fill("#pinIn", "1994")
+    page.click("#pinOpen")
+    page.wait_for_function("location.hash === '#list'")
+    page.wait_for_function("all.length === 3")
+    assert page.evaluate("localStorage.getItem('wedOrg')") == "master"
+
+    # ── Excel/Snapshot/PIN/Lang menu rows are ACTIONS, not navigable screens
+    page.click("#hamburgerBtn")
+    page.wait_for_function("!document.getElementById('menuScrim').hidden")
+    with page.expect_download():
+        page.locator("#menuRows .menu-row", has_text="Excel").click()
+    assert page.evaluate("location.hash") == "#list"
+    assert page.locator("#menuScrim").is_hidden()  # action rows close the menu behind them
+
+    # ══════════════════════════ v25: one-screen add ══════════════════════════
+    page.evaluate("location.hash = '#add'")
+    page.wait_for_function("!document.getElementById('scrAdd').hidden")
+
+    # master sees a Bride/Groom side segment; side-locked roles get a read-only pill instead
+    assert not page.locator("#addSideSeg").is_hidden()
+    assert page.locator("#addSidePillRo").is_hidden()
+    assert page.get_attribute("#addSideBride", "class") == "on"
+
+    # Save disabled while name is empty (or whitespace-only)
+    page.fill("#addName", "")
+    assert page.locator("#addSaveBtn").is_disabled()
+    page.fill("#addName", "   ")
+    assert page.locator("#addSaveBtn").is_disabled()
+
+    # Church pill toggle DIMS the Reception pill — that dimming is the church_only explanation
+    # (no sentence anywhere on this screen); Henna toggles independently; count stepper works
+    page.fill("#addName", "Church Dim Probe")
+    assert page.get_attribute("#pillReceptionBtn", "class") == "event-pill locked on"
+    page.click("#pillChurchBtn")
+    assert page.get_attribute("#pillReceptionBtn", "class") == "event-pill locked on dimmed"
+    assert "on" in page.get_attribute("#pillChurchBtn", "class")
+    page.click("#pillHennaBtn")
+    assert "on" in page.get_attribute("#pillHennaBtn", "class")
+    # count stepper: default 2, [+]/[−] adjust it, floor at 1
+    assert page.inner_text("#addCount") == "2"
+    page.locator("#scrAdd .count-row button", has_text="+").click()
+    assert page.inner_text("#addCount") == "3"
+    page.locator("#scrAdd .count-row button", has_text="−").click()
+    page.locator("#scrAdd .count-row button", has_text="−").click()
+    page.locator("#scrAdd .count-row button", has_text="−").click()
+    assert page.inner_text("#addCount") == "1"  # floors at 1, never 0 or negative
+    page.locator("#scrAdd .count-row button", has_text="+").click()
+    assert page.inner_text("#addCount") == "2"
+    n = len(family_mutations)
+    page.click("#addSaveBtn")
+    mut = wait_new_mutation(n)
+    posted = json.loads(mut[2])[0]
+    assert posted["church_only"] is True and posted["event2"] is True, posted
+    assert posted["side"] == "bride", posted
+    # form resets after a successful save (waits for the POST's response round-trip, not just
+    # the request having been sent): name refocused/cleared, pills off
+    page.wait_for_function("document.getElementById('addName').value === ''")
+    assert page.input_value("#addName") == ""
+    assert page.get_attribute("#pillReceptionBtn", "class") == "event-pill locked on"
+    assert page.get_attribute("#pillHennaBtn", "class") == "event-pill"
+    assert page.get_attribute("#pillChurchBtn", "class") == "event-pill"
+    assert page.evaluate("document.activeElement.id") == "addName"
+
+    # empty phone still saves (kills the old separate skip button — phone is just optional)
+    page.fill("#addName", "No Phone Probe")
+    n = len(family_mutations)
+    page.click("#addSaveBtn")
+    mut = wait_new_mutation(n)
+    posted = json.loads(mut[2])[0]
+    assert posted["phone"] == "", posted
+
+    # master's segmented side pill controls which side the row is saved under
+    page.click("#addSideGroom")
+    assert page.get_attribute("#addSideGroom", "class") == "on"
+    page.fill("#addName", "Groom Side Probe")
+    n = len(family_mutations)
+    page.click("#addSaveBtn")
+    mut = wait_new_mutation(n)
+    posted = json.loads(mut[2])[0]
+    assert posted["side"] == "groom", posted
+    page.click("#addSideBride")
+
+    # duplicate guard: a matching phone (household fingerprint, script-agnostic) surfaces the
+    # inline "Exists" chip WITHOUT saving; a second Save tap saves anyway (never a modal here —
+    # #fast keeps the blocking dup modal, this screen never does). church-family, not
+    # henna-family: the v23.1 nullable-column probe further down nulls henna-family's name_en.
+    page.fill("#addName", "Some New Household")
+    page.fill("#addPhone", "+20 100 123 4567")  # same number as the church-family fixture
+    n = len(family_mutations)
+    page.click("#addSaveBtn")
+    page.wait_for_timeout(120)
+    assert not page.locator("#addExistsChip").is_hidden()
+    assert "Church Test Family" in page.inner_text("#addExistsChip")
+    assert len(family_mutations) == n  # first tap never saves
+    page.click("#addSaveBtn")
+    mut = wait_new_mutation(n)
+    assert mut[0] == "POST", mut
+    page.wait_for_function("document.getElementById('addExistsChip').hidden")  # clears post-save
+
+    # duplicate guard, name path: a diacritic/hamza variant of an existing Arabic name also
+    # matches (normName folds ة/ه, أ/إ/آ/ا, and strips the "family" prefix on both sides)
+    page.fill("#addName", "عيله الكنيسه")  # variant of "عيلة الكنيسة" — ta-marbuta folded to ه
+    page.fill("#addPhone", "+1 555 999 0001")  # deliberately NOT a phone match — proves name path
+    n = len(family_mutations)
+    page.click("#addSaveBtn")
+    page.wait_for_timeout(120)
+    assert not page.locator("#addExistsChip").is_hidden()
+    assert "Church Test Family" in page.inner_text("#addExistsChip")
+    assert len(family_mutations) == n
+    page.click("#addSaveBtn")
+    wait_new_mutation(n)
+    page.wait_for_function("document.getElementById('addExistsChip').hidden")
+    page.fill("#addPhone", "")
+
+    # cap guard: side at cap → Save turns amber, the row saves with waitlist:true, chip shown —
+    # never blocking
+    page.evaluate("CAPS.bride = 0; renderCaps()")
+    assert "amber" in page.get_attribute("#addSaveBtn", "class")
+    assert not page.locator("#addWaitlistChip").is_hidden()
+    page.fill("#addName", "Cap Guard Probe")
+    n = len(family_mutations)
+    page.click("#addSaveBtn")
+    mut = wait_new_mutation(n)
+    posted = json.loads(mut[2])[0]
+    assert posted["waitlist"] is True, posted
+    page.evaluate("CAPS.bride = 200; renderCaps()")
+    assert "amber" not in page.get_attribute("#addSaveBtn", "class")
+
+    # ══════════════════════════ v25: photos screen ══════════════════════════
+    def mock_photo_list(route):
+        route.fulfill(
+            status=200,
+            content_type="application/json",
+            body=json.dumps([{"name": "bride-fixture-1.jpg"}, {"name": "groom-fixture-1.jpg"}]),
+        )
+
+    page.route("**/storage/v1/object/list/guest-photos", mock_photo_list)
+    page.evaluate("location.hash = '#photos'")
+    page.wait_for_function("!document.getElementById('scrPhotos').hidden")
+    page.wait_for_function("document.querySelectorAll('#photoGrid a').length === 2")
+    assert page.locator("#photosUploadBtn").count() == 1  # its own upload entry point
+    assert page.locator("#photoGrid .pdel").count() == 2  # master keeps delete
+
+    page.evaluate("localStorage.setItem('wedOrg', 'bride'); loadPhotos()")
+    page.wait_for_timeout(150)
+    assert page.locator("#photoGrid a").count() == 1  # side-scoped: only bride's own photo
+    assert page.locator("#photoGrid .pdel").count() == 0  # non-master: no delete
+    page.evaluate("localStorage.setItem('wedOrg', 'master'); loadPhotos()")
+    page.wait_for_timeout(150)
+    page.unroute("**/storage/v1/object/list/guest-photos", mock_photo_list)
+
+    # ══════════════════════════ v25: fast entry screen ══════════════════════════
+    page.evaluate("location.hash = '#fast'")
+    page.wait_for_function("!document.getElementById('scrFast').hidden")
+    assert page.locator("#pasteArea").count() == 1
+
+    page.fill("#pasteArea", "Fast Lane Family 3\nAnother Fast Family +1 202 555 0199 2")
+    page.click("#sortBtn")
+    page.wait_for_function("!document.getElementById('previewBg').hidden")
+    assert page.locator("#previewList .fam").count() == 2
+    n = len(family_mutations)
+    page.click("#previewOk")
+    mut = wait_new_mutation(n)
+    assert mut[0] == "POST", mut
+    posted = json.loads(mut[2])
+    assert {r["name"] for r in posted} == {"Fast Lane Family", "Another Fast Family"}, posted
+    page.wait_for_function("document.getElementById('previewBg').hidden")
+
+    # dup modal is unchanged: a phone match surfaces it; the default (checked) skips the
+    # duplicate, Save all inserts only the clean row
+    page.fill("#pasteArea", "Duplicate By Phone +1 202 555 0123\nBrand New Fast Family 4")
+    page.click("#sortBtn")
+    page.wait_for_function("!document.getElementById('previewBg').hidden")
+    n = len(family_mutations)
+    page.click("#previewOk")
+    page.wait_for_function("!document.getElementById('dupBg').hidden")
+    assert "Duplicate By Phone" in page.inner_text("#dupList")
+    page.click("#dupGo")
+    mut = wait_new_mutation(n)
+    posted = json.loads(mut[2])
+    assert len(posted) == 1 and posted[0]["name"] == "Brand New Fast Family", posted
+    page.wait_for_function("document.getElementById('previewBg').hidden")
+
     browser.close()
     print(
-        f"PASS {browser_name}: v24 — tags + waitlist: freeform master-only tags with Arabic-fold "
+        f"PASS {browser_name}: v25 — IA restructure: hash router (#list/#add/#fast/#photos/"
+        "#waitlist/#deleted/#tags) with role-gated redirects, deep links surviving reload, "
+        "back/forward navigation; ☰ hamburger menu built from one role table (contributor 3 "
+        "rows max + conditional Organizers row once a PIN was ever entered on the device, side "
+        "organizer, master with Waitlist/Deleted/Tags and no dead Tables/Settings rows), "
+        "Excel/Snapshot/PIN/Lang as actions not screens; one-screen Add replacing the 3-step "
+        "wizard (master Bride/Groom segment vs. side-locked read-only pill, count stepper, "
+        "Church pill dimming Reception with zero explainer text, empty-name disable, empty-phone "
+        "save, inline Exists dup chip with second-tap-saves-anyway instead of a blocking modal, "
+        "cap-guard amber Save + waitlist:true); #photos as its own screen with its own upload "
+        "entry point, side-scoped gallery, master-only delete; #fast promoting the old adv box "
+        "wholesale (paste/parse/preview, blocking dup modal unchanged). On top of v24 — tags + "
+        "waitlist: freeform master-only tags with Arabic-fold "
         "matchKey dedupe (typo/case/hamza variants toggle the existing tag, never a duplicate), "
         "zero-use tags vanishing from the Edit picker + filter row on reload, add-wizard/mine/"
         "side-role payloads carry neither key; ⏳ Waitlist exclusive like 🗑 Trash, invisible to "
