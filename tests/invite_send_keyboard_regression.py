@@ -23,11 +23,22 @@ Arabic UI, search matches either language, the Edit modal persists an optional
 name_en, and the Excel export gains a "Name (English)" column; and the v22.1
 label cleanup — no church-note text or ⛪ card chip, Reception/Henna are plain
 checkboxes in add/edit and the send modal, and the send modal has a pinned
-header (‹ N/M name › ✕) that stays visible while the body scrolls. Runs fully
-against a mocked Supabase, so no live guest row is ever touched.
+header (‹ N/M name › ✕) that stays visible while the body scrolls. Also covers
+v24 (tags + waitlist): freeform master-only tags with Arabic-fold matchKey
+dedupe (typo/case/hamza variants toggle the existing tag, never a duplicate),
+zero-use tags vanishing from the picker/filter row, a master-only ⏳ Waitlist
+toggle that is exclusive like 🗑 Trash and invisible to every cap/headcount
+and filter but its own (and to side-role org views entirely), unsendable
+waitlisted cards (dimmed, no Send button, openInvite a hard no-op), the
+promote/demote two-way lock against invite_sent, a tag-filter row inside the
+v23.2 filter sheet that ANDs with the existing controls (Dad's queue = one
+tag + Not sent → one forwardable WhatsApp snapshot sourced from exactly the
+filtered rows on screen), and the Tags/Waitlist Excel export columns. Runs
+fully against a mocked Supabase, so no live guest row is ever touched.
 """
 
 import argparse
+import csv
 import json
 import re
 import time
@@ -46,7 +57,7 @@ CHURCH_LINK = (
     "?cat=3eff4b55-85f1-4322-8ab6-f1bf8fd8c85c"
     "&g=rsvp-7110440c-c1ca-4577-abac-3cae79bce03c"
 )
-VERSION = "٢٣٫٢ · 23.2"
+VERSION = "٢٤٫٠ · 24.0"
 TEMPLATE_VERSION = "21.0"
 ARABIC = re.compile(r"[؀-ۿ]")
 FAMILIES = [
@@ -63,6 +74,8 @@ FAMILIES = [
         "members": ["Shenouda", "Malak"],
         "added_by": "fixture",
         "invite_sent": {},
+        "tags": None,
+        "waitlist": False,
     },
     {
         "id": "church-family",
@@ -77,6 +90,8 @@ FAMILIES = [
         "parent_id": "henna-family",
         "added_by": "fixture",
         "invite_sent": {},
+        "tags": None,
+        "waitlist": False,
     },
     {
         "id": "no-phone-family",
@@ -90,6 +105,8 @@ FAMILIES = [
         "confirmed": False,
         "added_by": "fixture",
         "invite_sent": {},
+        "tags": None,
+        "waitlist": False,
     },
 ]
 
@@ -137,14 +154,15 @@ def run_browser(browser_type, browser_name, base_url):
     )
 
     deleted = {}
+    patched = {}
 
     def mock_supabase(route):
         request = route.request
         if "wedding_families" in request.url and request.method != "GET":
             family_mutations.append((request.method, request.url, request.post_data))
             pbody = json.loads(request.post_data or "{}")
+            rid = request.url.split("id=eq.")[1].split("&")[0] if "id=eq." in request.url else None
             if request.method == "PATCH" and isinstance(pbody, dict) and "deleted_at" in pbody:
-                rid = request.url.split("id=eq.")[1].split("&")[0]
                 deleted[rid] = pbody["deleted_at"]
             # v23.1: mirror live NOT NULL constraints — a null here rejected the whole payload in prod
             # (waitlist is NOT NULL DEFAULT false, migrated for v24; confirmed likewise)
@@ -157,6 +175,11 @@ def run_browser(browser_type, browser_name, base_url):
                 state["fail_patch"] = False
                 route.fulfill(status=500, content_type="application/json", body="{}")
                 return
+            # v24: persist accepted PATCHes so a subsequent GET (including the periodic org
+            # auto-refresh) reflects them — mirrors real PostgREST instead of silently reverting
+            # fields the mock previously left untracked (deleted_at was the only one before v24).
+            if request.method == "PATCH" and isinstance(pbody, dict) and rid:
+                patched.setdefault(rid, {}).update(pbody)
         body = []
         if "wedding_settings" in request.url:
             body = [
@@ -168,7 +191,10 @@ def run_browser(browser_type, browser_name, base_url):
                 }
             ]
         elif "wedding_families" in request.url and request.method == "GET":
-            body = [dict(f, deleted_at=deleted.get(f["id"])) for f in FAMILIES]
+            body = [
+                dict(f, **{k: v for k, v in patched.get(f["id"], {}).items() if k != "deleted_at"}, deleted_at=deleted.get(f["id"]))
+                for f in FAMILIES
+            ]
         route.fulfill(status=200, content_type="application/json", body=json.dumps(body))
 
     page.route("**/*.supabase.co/**", mock_supabase)
@@ -820,19 +846,295 @@ def run_browser(browser_type, browser_name, base_url):
     assert st_conf == 400, st_conf   # confirmed NOT NULL → rejected
     st_null = page.evaluate("async () => (await fetch(SUPA + '?id=eq.henna-family', {method:'PATCH', headers:H, body: JSON.stringify({seats:null, members:null, tags:null, group_name:null, name_en:null, parent_id:null})})).status")
     assert st_null == 200, st_null   # nullable columns accept null both ways
+
+    # ══════════════════════════ v24: Tags + Waitlist ══════════════════════════
+    # The 4-second org auto-refresh would otherwise race the assertions below (refreshAll()
+    # replaces `all` wholesale from the mock's GET; anything not PATCHed to the mock server —
+    # e.g. probe rows injected below via all.push — would be silently wiped mid-test).
+    page.evaluate("if (orgTimer) { clearInterval(orgTimer); orgTimer = null; }")
+
+    # ── widened fetch: refreshSideTotals now selects waitlist (refreshAll's select=* already
+    # covers tags+waitlist trivially — confirmed by the fixture round-trip below)
+    assert "waitlist" in page.evaluate("refreshSideTotals.toString()")
+    assert page.evaluate("all.find(r => r.id === 'church-family').hasOwnProperty('tags')")
+    assert page.evaluate("all.find(r => r.id === 'church-family').hasOwnProperty('waitlist')")
+
+    # ── acceptance #1: guest add wizard payload carries neither tags nor waitlist
+    n = len(family_mutations)
+    page.evaluate("document.getElementById('wName').value = 'عيلة اختبار الوسم'")
+    page.evaluate("saveFamily()")
+    mut = wait_new_mutation(n)
+    assert mut[0] == "POST", mut
+    posted = json.loads(mut[2])
+    posted_row = posted[0] if isinstance(posted, list) else posted
+    assert "tags" not in posted_row and "waitlist" not in posted_row, posted_row
+
+    # ── acceptance #1 (cont'd): master-only — hidden for the guest/contributor context and for
+    # side-role orgs; mom's flows and side-org Edit are otherwise byte-identical
+    page.evaluate("localStorage.removeItem('wedOrg')")
+    page.evaluate("openEdit(all.find(r => r.id === 'church-family'))")
+    page.wait_for_function("!document.getElementById('editBg').hidden")
+    assert page.locator("#eTagsSec").is_hidden()
+    assert page.locator("#eWaitlistSec").is_hidden()
+    page.locator("#editCancel").click()
+    page.wait_for_function("document.getElementById('editBg').hidden")
+
+    page.evaluate("localStorage.setItem('wedOrg', 'bride')")
+    page.evaluate("refreshAll()")
+    page.wait_for_function("all.length >= 3")
+    assert page.locator("#fsTagsSec").is_hidden()
+    assert page.locator("#rowFWaitlist").is_hidden()
+    page.evaluate("openEdit(all.find(r => r.id === 'church-family'))")
+    page.wait_for_function("!document.getElementById('editBg').hidden")
+    assert page.locator("#eTagsSec").is_hidden()
+    assert page.locator("#eWaitlistSec").is_hidden()
+    page.locator("#editCancel").click()
+    page.wait_for_function("document.getElementById('editBg').hidden")
+    page.evaluate("localStorage.setItem('wedOrg', 'master')")
+    page.evaluate("refreshAll()")
+    page.wait_for_function("document.querySelectorAll('#fullList .fam').length === 3")
+
+    # ── acceptance #2: tags CRUD via Edit; normalize-on-commit is NFC → trim → collapse whitespace
+    page.evaluate("openEdit(all.find(r => r.id === 'no-phone-family'))")
+    page.wait_for_function("!document.getElementById('editBg').hidden")
+    assert not page.locator("#eTagsSec").is_hidden()
+    assert not page.locator("#eWaitlistSec").is_hidden()
+    assert page.locator("#eTagPills .add-tag").inner_text().strip() == "+ Tag"
+    # openEdit's own delayed focus() on #eName (pre-existing, unrelated to tags) can steal focus
+    # from a tag input opened too soon after — let that settle first
+    page.wait_for_timeout(120)
+    page.locator("#eTagPills .add-tag").click()
+    page.locator("#eTagPills input").fill("  أصحاب بابا  ")
+    page.locator("#eTagPills input").press("Enter")
+    assert page.evaluate("editingTags") == ["أصحاب بابا"]
+    assert page.locator("#eTagPills .tag-pill.on").inner_text().strip() == "أصحاب بابا"
+    n = len(family_mutations)
+    page.locator("#editSave").click()
+    mut = wait_new_mutation(n)
+    edit_body = json.loads(mut[2])
+    assert edit_body.get("tags") == ["أصحاب بابا"], edit_body
+    page.wait_for_function("document.getElementById('editBg').hidden")
+    page.wait_for_function("JSON.stringify(all.find(r => r.id === 'no-phone-family').tags) === JSON.stringify(['أصحاب بابا'])")
+    page.wait_for_timeout(200)   # let saveEdit's own refreshAll() settle before the next direct mutation
+
+    # ── acceptance #2 (cont'd): matchKey dedupe — a typo'd/hamza'd/re-cased variant of an
+    # existing tag toggles the SAME tag (keeping its original spelling), never a duplicate
+    page.evaluate("openEdit(all.find(r => r.id === 'church-family'))")
+    page.wait_for_function("!document.getElementById('editBg').hidden")
+    page.wait_for_timeout(120)   # let openEdit's delayed #eName focus() settle first
+    vocab_before = page.evaluate("tagVocabulary().length")
+    page.locator("#eTagPills .add-tag").click()
+    page.locator("#eTagPills input").fill("اصحاب بابا")   # bare alef instead of أ, no padding whitespace
+    page.locator("#eTagPills input").press("Enter")
+    assert page.evaluate("tagVocabulary().length") == vocab_before   # no new vocabulary entry
+    assert page.locator("#eTagPills .tag-pill.on").count() == 1
+    assert page.locator("#eTagPills .tag-pill.on").inner_text().strip() == "أصحاب بابا"   # original spelling kept
+    n = len(family_mutations)
+    page.locator("#editSave").click()
+    mut = wait_new_mutation(n)
+    assert json.loads(mut[2]).get("tags") == ["أصحاب بابا"], mut
+    page.wait_for_function("document.getElementById('editBg').hidden")
+    page.wait_for_function("JSON.stringify(all.find(r => r.id === 'church-family').tags) === JSON.stringify(['أصحاب بابا'])")
+    page.wait_for_timeout(200)
+
+    # ── acceptance #3: removing a tag from its last family removes it from the Edit picker (the
+    # picker's vocabulary is computed from live `all` rows, not the local edit buffer)
+    page.evaluate("all.find(r => r.id === 'no-phone-family').tags = null; all.find(r => r.id === 'church-family').tags = null; renderAll()")
+    assert page.evaluate("tagVocabulary().some(v => v.name === 'أصحاب بابا')") is False
+    page.evaluate("openEdit(all.find(r => r.id === 'no-phone-family'))")
+    page.wait_for_function("!document.getElementById('editBg').hidden")
+    assert page.locator("#eTagPills .tag-pill.on").count() == 0
+    assert page.locator("#eTagPills button", has_text="أصحاب بابا").count() == 0
+    page.locator("#editCancel").click()
+    page.wait_for_function("document.getElementById('editBg').hidden")
+
+    # ── acceptance #4 + waitlist exclusion from headcounts: setting Waitlist=Yes removes the
+    # row from "all" and every filter except ⏳; header totals + cap bars drop by its count.
+    # henna-family is used here (not church-family, which is church_only:true from the v23.2
+    # fixtures and so never counts toward the reception cap either way — a poor probe for this
+    # specific delta). #tB (all bride headcount) and #orgCapBUsed (reception-cap usage,
+    # church_only excluded) are compared against their OWN pre-waitlist baselines.
+    bp_before = int(page.locator("#tB").inner_text())
+    capB_before = int(page.locator("#orgCapBUsed").inner_text())
+    henna_count = page.evaluate("all.find(r => r.id === 'henna-family').count")
+    page.evaluate("openEdit(all.find(r => r.id === 'henna-family'))")
+    page.wait_for_function("!document.getElementById('editBg').hidden")
+    assert not page.locator("#eWaitYes").is_disabled()   # not currently sent
+    page.locator("#eWaitYes").click()
+    assert page.evaluate("eWaitlistVal") is True
+    n = len(family_mutations)
+    page.locator("#editSave").click()
+    mut = wait_new_mutation(n)
+    assert json.loads(mut[2]).get("waitlist") is True, mut
+    page.wait_for_function("document.getElementById('editBg').hidden")
+    page.wait_for_function("all.find(r => r.id === 'henna-family').waitlist === true")
+    page.wait_for_function(f"Number(document.getElementById('tB').textContent) === {bp_before - henna_count}")
+    page.wait_for_function(f"Number(document.getElementById('orgCapBUsed').textContent) === {capB_before - henna_count}")
+    assert page.locator("#fullList .fam[data-id='henna-family']").count() == 0
+    page.evaluate("toggleFilterCb('ev2', true)")   # any other AND-stacking filter still excludes it
+    assert page.locator("#fullList .fam[data-id='henna-family']").count() == 0
+    page.evaluate("toggleFilterCb('ev2', false)")
+    # henna-family stays parked — the default view now shows only the 2 non-waitlisted families
+    page.wait_for_function("document.querySelectorAll('#fullList .fam').length === 2")
+    page.wait_for_timeout(200)
+
+    # ── acceptance #5 + #6 + ⏳ exclusivity + no-send: a fresh waitlisted probe row (injected —
+    # never PATCHed, so it can never appear via the network)
+    page.evaluate(
+        "all.push({ id: 'wl-probe', name: 'عيلة تجريبية للانتظار', name_en: 'WL Probe Family',"
+        " phone: '+1 202-555-0177', side: 'groom', count: 3, event2: false, church_only: false,"
+        " confirmed: false, waitlist: true, tags: null, invite_sent: {}, deleted_at: null,"
+        " added_by: 'fixture' }); renderAll();"
+    )
+    assert page.locator("#fullList .fam[data-id='wl-probe']").count() == 0   # invisible outside ⏳
+    page.evaluate("toggleWaitlistFilter(true)")
+    # henna-family (parked above) + wl-probe are BOTH waitlisted — the ⏳ view shows exactly them
+    page.wait_for_function("document.querySelectorAll('#fullList .fam').length === 2")
+    wl_card = page.locator("#fullList .fam[data-id='wl-probe']")
+    assert "waitlisted" in (wl_card.get_attribute("class") or "")
+    assert wl_card.locator(".card-chip.waitlist").count() == 1
+    assert "Waitlist" in wl_card.locator(".card-chip.waitlist").inner_text()
+    assert wl_card.locator(".send-invite").count() == 0   # absent, not disabled
+    assert wl_card.locator(".edit-btn").count() == 1
+    assert page.evaluate("[...activeFilters]") == ["waitlist"]
+    assert sheet_prop("cbFTrash", "disabled") is True   # exclusive like Trash — disables everything else
+    assert sheet_prop("segSideBride", "disabled") is True
+    page.evaluate("openInvite(all.find(r => r.id === 'wl-probe'))")   # belt-and-suspenders guard
+    assert page.locator("#inviteBg").is_hidden()
+    page.evaluate("toggleWaitlistFilter(false)")
+    # henna-family is still parked at this point — default view is the 2 non-waitlisted families
+    page.wait_for_function("document.querySelectorAll('#fullList .fam').length === 2")
+
+    # ── acceptance #7 (deleted-waitlist under 🗑 only): a row that is BOTH deleted AND
+    # waitlisted shows only in Trash, never resurfaces under ⏳
+    page.evaluate("all.find(r => r.id === 'wl-probe').deleted_at = new Date().toISOString(); renderAll()")
+    page.evaluate("toggleWaitlistFilter(true)")
+    assert page.locator("#fullList .fam[data-id='wl-probe']").count() == 0
+    page.evaluate("toggleWaitlistFilter(false)")
+    page.evaluate("toggleTrashFilter(true)")
+    assert page.locator("#fullList .fam[data-id='wl-probe']").count() == 1
+    page.evaluate("toggleTrashFilter(false)")
+    page.evaluate("all = all.filter(r => r.id !== 'wl-probe'); renderAll()")   # drop the probe row
+    # henna-family is STILL parked (promotion happens next) — default view stays at 2
+    page.wait_for_function("document.querySelectorAll('#fullList .fam').length === 2")
+
+    # ── acceptance #6 (two-way lock): a sent family's Waitlist Yes chip is disabled in Edit;
+    # a save leaves waitlist:false even after clicking it. henna-family is currently parked, so
+    # no-phone-family stands in as the "sent" probe here.
+    page.evaluate(
+        "all.find(r => r.id === 'no-phone-family').invite_sent ="
+        " { overall: { at: new Date().toISOString(), via: 'test', link: INVITE_LINK, template: INVITE_TEMPLATE_VERSION } };"
+        " renderAll();"
+    )
+    page.evaluate("openEdit(all.find(r => r.id === 'no-phone-family'))")
+    page.wait_for_function("!document.getElementById('editBg').hidden")
+    assert page.locator("#eWaitYes").is_disabled()
+    page.evaluate("setEWaitlist(true)")   # JS-level guard, defense in depth behind the disabled chip
+    assert page.evaluate("eWaitlistVal") is False
+    n = len(family_mutations)
+    page.locator("#editSave").click()
+    mut = wait_new_mutation(n)
+    assert json.loads(mut[2]).get("waitlist") is False, mut
+    page.wait_for_function("document.getElementById('editBg').hidden")
+    page.wait_for_timeout(200)
+    page.evaluate("all.find(r => r.id === 'no-phone-family').invite_sent = {}; renderAll()")   # restore
+
+    # ── acceptance #7 (promotion): Waitlist Yes → No brings the row back as unsent, Send
+    # reappears, caps increment back to their pre-waitlist baselines
+    page.evaluate("openEdit(all.find(r => r.id === 'henna-family'))")
+    page.wait_for_function("!document.getElementById('editBg').hidden")
+    assert page.evaluate("eWaitlistVal") is True
+    page.locator("#eWaitNo").click()
+    n = len(family_mutations)
+    page.locator("#editSave").click()
+    mut = wait_new_mutation(n)
+    assert json.loads(mut[2]).get("waitlist") is False, mut
+    page.wait_for_function("document.getElementById('editBg').hidden")
+    page.wait_for_function("all.find(r => r.id === 'henna-family').waitlist === false")
+    page.wait_for_function(f"Number(document.getElementById('tB').textContent) === {bp_before}")
+    page.wait_for_function(f"Number(document.getElementById('orgCapBUsed').textContent) === {capB_before}")
+    henna_after = page.locator("#fullList .fam[data-id='henna-family']")
+    assert henna_after.count() == 1
+    assert henna_after.locator(".send-invite").count() == 1
+    page.wait_for_timeout(200)
+
+    # ── acceptance #8 (Dad's queue): a tag pill ANDed with Not-sent shows exactly the
+    # intersection; the WhatsApp snapshot contains exactly those rows and never a waitlist row
+    page.evaluate("all.find(r => r.id === 'no-phone-family').tags = ['أصحاب بابا']; renderAll()")
+    page.evaluate("all.find(r => r.id === 'church-family').tags = ['أصحاب بابا']; renderAll()")
+    page.evaluate(
+        "all.push({ id: 'wl-dad-probe', name: 'وسيط الانتظار', name_en: 'Dad Queue Waitlist Probe',"
+        " phone: '+1 202-555-0188', side: 'groom', count: 2, event2: false, church_only: false,"
+        " confirmed: false, waitlist: true, tags: ['أصحاب بابا'], invite_sent: {}, deleted_at: null,"
+        " added_by: 'fixture' }); renderAll();"
+    )
+    page.evaluate("setSegment(['sent','unsent'], 'unsent'); setTagFilter('أصحاب بابا')")
+    shown_ids = page.evaluate("() => [...document.querySelectorAll('#fullList .fam')].map(f => f.dataset.id)")
+    assert set(shown_ids) == {"no-phone-family", "church-family"}, shown_ids
+    snap_ids = page.evaluate("snapshotRows().map(r => r.id)")
+    assert set(snap_ids) == {"no-phone-family", "church-family"}, snap_ids
+    snap_msg = page.evaluate("snapshotMessage()")
+    dad_probe_display = page.evaluate("displayName({name: 'وسيط الانتظار', name_en: 'Dad Queue Waitlist Probe'})")
+    assert "wl-dad-probe" not in snap_msg and dad_probe_display not in snap_msg
+    np_display = page.evaluate("displayName(all.find(r => r.id === 'no-phone-family'))")
+    ch_display = page.evaluate("displayName(all.find(r => r.id === 'church-family'))")
+    assert np_display in snap_msg and ch_display in snap_msg, (np_display, ch_display, snap_msg)
+    page.evaluate("all = all.filter(r => r.id !== 'wl-dad-probe'); setSegment(['sent','unsent'], ''); setTagFilter('أصحاب بابا')")
+    page.wait_for_function("document.querySelectorAll('#fullList .fam').length === 3")
+
+    # ── RTL @ 390px: the tag filter row + waitlist row live inside the existing filter sheet —
+    # no separate horizontal strip, no body-level horizontal overflow
+    page.evaluate("openFilterSheet()")
+    page.wait_for_timeout(30)
+    assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 1")
+    page.evaluate("closeFilterSheet()")
+
+    # ── acceptance #9: Excel export gains Tags + Waitlist columns (positioned right after
+    # Church Only), a tagged + waitlisted row exports its tags joined by "، " and "YES"
+    page.evaluate("all.find(r => r.id === 'church-family').waitlist = true; renderAll()")
+    with page.expect_download() as dl:
+        page.evaluate("exportExcel()")
+    export_text = Path(dl.value.path()).read_text(encoding="utf-8").lstrip("﻿")
+    export_rows = list(csv.reader(export_text.splitlines()))
+    header = export_rows[0]
+    church_idx = header.index("Church Only (الكنيسة فقط)")
+    assert header[church_idx + 1] == "Tags (تصنيفات)", header
+    assert header[church_idx + 2] == "Waitlist (انتظار)", header
+    tag_idx, wait_idx, name_idx = header.index("Tags (تصنيفات)"), header.index("Waitlist (انتظار)"), header.index("Name (الاسم)")
+    church_csv_row = next(r for r in export_rows[1:] if r[name_idx] == "عيلة الكنيسة")
+    assert church_csv_row[tag_idx] == "أصحاب بابا", church_csv_row
+    assert church_csv_row[wait_idx] == "YES", church_csv_row
+    page.evaluate(
+        "all.find(r => r.id === 'church-family').waitlist = false;"
+        " all.find(r => r.id === 'church-family').tags = null;"
+        " all.find(r => r.id === 'no-phone-family').tags = null;"
+        " renderAll();"
+    )
+
     browser.close()
     print(
-        f"PASS {browser_name}: v23.2 — relationships (parent_id self-FK): native parent picker in "
-        "Edit's More options replaces group_name, cycle safety (self+descendants excluded from the "
-        "picker, save-time ancestor-walk toast, corrupt-cycle-safe renderer), breadcrumb + rollup "
-        "chips (RTL-correct arrow glyph swap), Tree sort (trees A–Z, unlinked families flat below, "
-        "trashed-parent orphans stay visible + Restore reassembles), breadcrumb search, CSV family-path "
-        "column, mom's wizard loses the group field entirely. Filter sheet replaces the 11-chip strip: "
-        "Filters trigger pill + badge, segments for Side/Invite (FILTER_EXCLUSIVE retired), checkboxes "
-        "for Events/Status/Issues with zero-count rows hidden, Trash exclusive (clears+disables the "
-        "rest), live Done-count + Clear, removable mini-chip echo, filtering never severs trees. Plus "
-        "v23.1 HOTFIX: default-family Edit save round-trips (mock 400s null→NOT NULL, guarding the "
-        "seats bug); members = contact is person #1 (count-1 inputs, contact line, over-length arrays "
+        f"PASS {browser_name}: v24 — tags + waitlist: freeform master-only tags with Arabic-fold "
+        "matchKey dedupe (typo/case/hamza variants toggle the existing tag, never a duplicate), "
+        "zero-use tags vanishing from the Edit picker + filter row on reload, add-wizard/mine/"
+        "side-role payloads carry neither key; ⏳ Waitlist exclusive like 🗑 Trash, invisible to "
+        "headcounts/caps/every filter but its own and to side-role org views entirely, unsendable "
+        "waitlisted cards (dimmed, no Send button, openInvite a hard no-op), the sent⇒waitlist "
+        "two-way lock, promote/demote round-trips caps back to baseline, a deleted+waitlisted row "
+        "surfaces under 🗑 only; a tag-filter row inside the v23.2 filter sheet ANDs with the "
+        "existing controls (Dad's queue = one tag + Not sent → one forwardable WhatsApp snapshot "
+        "sourced from exactly the filtered rows on screen, never a waitlist row); Tags/Waitlist "
+        "Excel export columns; widened select= fetches. On top of v23.2 — relationships "
+        "(parent_id self-FK): native parent picker in Edit's More options replaces group_name, "
+        "cycle safety (self+descendants excluded from the picker, save-time ancestor-walk toast, "
+        "corrupt-cycle-safe renderer), breadcrumb + rollup chips (RTL-correct arrow glyph swap), "
+        "Tree sort (trees A–Z, unlinked families flat below, trashed-parent orphans stay visible + "
+        "Restore reassembles), breadcrumb search, CSV family-path column, mom's wizard loses the "
+        "group field entirely. Filter sheet replaces the 11-chip strip: Filters trigger pill + "
+        "badge, segments for Side/Invite (FILTER_EXCLUSIVE retired), checkboxes for Events/Status/"
+        "Issues with zero-count rows hidden, Trash exclusive (clears+disables the rest), live "
+        "Done-count + Clear, removable mini-chip echo, filtering never severs trees. Plus v23.1 "
+        "HOTFIX: default-family Edit save round-trips (mock 400s null→NOT NULL, guarding the seats "
+        "bug); members = contact is person #1 (count-1 inputs, contact line, over-length arrays "
         "trimmed, send-modal/export dedupe). Plus v23: read-only cards (count text, only Send+Edit); "
         "red 📵 + amber ⚠️ + green sent precedence, 📵-first/A–Z/last-name sort; ✅ Confirmed; soft "
         "delete via deleted_at (no API DELETE) + 🗑 dimmed Restore; henna headcount stepper → seats "

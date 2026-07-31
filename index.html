@@ -91,6 +91,8 @@
   .fam .card-chip.reception{border-color:rgba(201,162,39,.5);background:rgba(201,162,39,.13);color:var(--gold-b)}
   .fam .card-chip.henna{border-color:#5aa66c;background:rgba(90,166,108,.15);color:#8be6ad}
   .fam .card-chip.confirmed{border-color:rgba(37,211,102,.5);background:rgba(37,211,102,.13);color:#8be6ad}
+  .fam .card-chip.tag{border-style:dashed;border-color:var(--line);background:none;color:var(--dim)}
+  .fam .card-chip.waitlist{border-color:rgba(224,178,90,.5);background:rgba(224,178,90,.13);color:#e6c67a}
   .fam .card-chip.crumb{border-style:dashed;border-color:var(--line);background:none;color:var(--dim);position:relative;cursor:pointer}
   .fam .card-chip.crumb.trashed{opacity:.5}
   .fam .card-chip.rollup{border-color:rgba(150,130,220,.5);background:rgba(150,130,220,.13);color:#c3b3f0;cursor:pointer;position:relative}
@@ -122,6 +124,7 @@
   .fam.nophone{border-color:rgba(224,138,138,.55);background:rgba(224,138,138,.08)}
   .fam.wrong{border-color:rgba(224,178,90,.55);background:rgba(224,178,90,.09)}
   .fam.deleted{opacity:.55}
+  .fam.waitlisted{opacity:.55}
   .fam.sent{border-color:rgba(37,211,102,.55);background:rgba(37,211,102,.09)}
   .fam .info{flex:1;min-width:0}
   .fam b{font-size:15.5px;display:block;overflow-wrap:anywhere}
@@ -170,6 +173,12 @@
   .segment button{flex:1;min-height:44px;border:0;background:var(--card);color:var(--dim);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer}
   .segment button.on{background:linear-gradient(120deg,var(--gold),var(--gold-b));color:#0b1524}
   .segment button:disabled{opacity:.4;cursor:not-allowed}
+  .tag-pills{display:flex;flex-wrap:wrap;gap:7px}
+  .tag-pill{padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--dim);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer}
+  .tag-pill.on{border-color:var(--gold);background:rgba(201,162,39,.14);color:var(--gold-b)}
+  .tag-pill:disabled{opacity:.4;cursor:not-allowed}
+  .tag-pill.add-tag-input{padding:4px 10px}
+  .tag-pill.add-tag-input input{background:none;border:0;color:var(--gold-b);font-family:inherit;font-size:13px;font-weight:700;outline:none;width:100px}
   .fs-row{display:flex;align-items:center;gap:10px;min-height:44px;cursor:pointer}
   .fs-row span:first-of-type{flex:1;text-align:start;color:var(--ivory);font-size:14px}
   .fs-row .fs-count{color:var(--dim);font-size:12.5px;text-align:end}
@@ -420,7 +429,7 @@
     </div>
   </div>
 
-  <p class="ver">٢٣٫٢ · 23.2</p>
+  <p class="ver">٢٤٫٠ · 24.0</p>
 </div>
 
 <div class="modal-bg" id="filterBg" hidden onmousedown="if(event.target===this) closeFilterSheet()">
@@ -457,6 +466,13 @@
         <p class="fs-label" id="fsIssuesLbl"></p>
         <label class="fs-row" id="rowFNoPhone"><input type="checkbox" id="cbFNoPhone" onchange="toggleFilterCb('nophone',this.checked)"><span id="rowFNoPhoneLbl"></span><span class="fs-count" id="cntFNoPhone"></span></label>
         <label class="fs-row" id="rowFWrong"><input type="checkbox" id="cbFWrong" onchange="toggleFilterCb('wrong',this.checked)"><span id="rowFWrongLbl"></span><span class="fs-count" id="cntFWrong"></span></label>
+      </div>
+      <div class="fs-section" id="fsTagsSec" hidden>
+        <p class="fs-label" id="fsTagsLbl"></p>
+        <div class="tag-pills" id="fsTagPills"></div>
+      </div>
+      <div class="fs-section">
+        <label class="fs-row" id="rowFWaitlist"><input type="checkbox" id="cbFWaitlist" onchange="toggleWaitlistFilter(this.checked)"><span id="rowFWaitlistLbl"></span><span class="fs-count" id="cntFWaitlist"></span></label>
       </div>
       <div class="fs-section">
         <label class="fs-row" id="rowFTrash"><input type="checkbox" id="cbFTrash" onchange="toggleTrashFilter(this.checked)"><span id="rowFTrashLbl"></span><span class="fs-count" id="cntFTrash"></span></label>
@@ -517,6 +533,17 @@
     <label class="check-row"><input type="checkbox" id="eRecChk" onchange="setEChurch(!this.checked)"><span id="eChurchLabel"></span></label>
     <div class="check-row-seats"><label class="check-row"><input type="checkbox" id="eEv2Chk" onchange="setEEv2(this.checked)"><span id="eEv2Label"></span></label><span class="seat-step" id="eHennaSeatsRow" hidden><button type="button" onclick="hennaBump(-1)">−</button><span id="eHennaSeats"></span><button type="button" onclick="hennaBump(1)">+</button></span></div>
     <label class="check-row"><input type="checkbox" id="eConfirmedChk"><span id="eConfirmedLabel"></span></label>
+    <div class="fs-section" id="eTagsSec" hidden>
+      <p class="fs-label" id="eTagsLabel"></p>
+      <div class="tag-pills" id="eTagPills"></div>
+    </div>
+    <div class="fs-section" id="eWaitlistSec" hidden>
+      <p class="fs-label" id="eWaitlistLabel"></p>
+      <div class="segment">
+        <button type="button" id="eWaitNo" onclick="setEWaitlist(false)"></button>
+        <button type="button" id="eWaitYes" onclick="setEWaitlist(true)"></button>
+      </div>
+    </div>
     <details class="more-opts" id="eMore"><summary id="eMoreSummary"></summary>
       <p class="more-lbl" id="eParentLabel"></p>
       <select class="wiz-in" id="eParent"></select>
@@ -700,6 +727,8 @@ const STR = {
     sentOn:(d,c)=>`✓ اتبعتت ${d} · ${c}`, unmark:"تراجع",
     sentSaved:"اتعلّمت إنها اتبعتت ✓", sentCleared:"شيلنا علامة الإرسال",
     rowSent:d=>`✓ اتبعتت${d ? " · " + d : ""}`, fSent:"✓ اتبعتت", fUnsent:"◻︎ لسه",
+    tagsLabel:"تصنيفات", addTag:"+ تصنيف", waitlistLabel:"قائمة الانتظار", waitNo:"لا", waitYes:"نعم",
+    chipWaitlist:"انتظار", issueWaitlist:"⏳ انتظار",
   },
   en: {
     kicker:"Guest List", sideQ:"Which side are you from? One minute to add your families.",
@@ -765,6 +794,8 @@ const STR = {
     sentOn:(d,c)=>`✓ Sent ${d} · ${c}`, unmark:"Undo",
     sentSaved:"Marked as sent ✓", sentCleared:"Sent mark removed",
     rowSent:d=>`✓ Sent${d ? " · " + d : ""}`, fSent:"✓ Sent", fUnsent:"◻︎ Not sent",
+    tagsLabel:"Tags", addTag:"+ Tag", waitlistLabel:"Waitlist", waitNo:"No", waitYes:"Yes",
+    chipWaitlist:"Waitlist", issueWaitlist:"⏳ Waitlist",
   }
 };
 let L = localStorage.getItem("wedLang") || "ar";
@@ -796,6 +827,9 @@ function applyLang(){
   set("editTitle","editTitle"); set("editSave","editSave"); set("editCancel","cancel"); set("editDelete","deleteFamily");
   set("eParentLabel","eParentLabel");
   set("eConfirmedLabel","confirmedLabel");
+  set("eTagsLabel","tagsLabel"); set("fsTagsLbl","tagsLabel");
+  set("eWaitlistLabel","waitlistLabel"); set("eWaitNo","waitNo"); set("eWaitYes","waitYes");
+  set("rowFWaitlistLbl","issueWaitlist");
   set("filtersBtnLbl","filtersLbl"); set("filterSheetTitle","filtersLbl");
   set("fsSideLbl","fSideLbl"); set("fsInviteLbl","fInviteLbl"); set("fsEventsLbl","fEventsLbl"); set("fsStatusLbl","fStatusLbl"); set("fsIssuesLbl","fIssuesLbl");
   set("segSideAll","segAll"); set("segSideBride","segBride"); set("segSideGroom","segGroom");
@@ -817,6 +851,7 @@ function applyLang(){
     $("adminPill").textContent = isOrg() ? t("orgPillOn") : t("orgPill");
   }
   if (typeof inviteRow !== "undefined" && inviteRow && !$("inviteBg").hidden) renderInviteModal();
+  if (typeof editing !== "undefined" && editing && !$("editBg").hidden) renderETagPills();
   renderMine(); renderAll(); renderCaps();
 }
 
@@ -859,13 +894,13 @@ function setChurch(v){ wChurch = v; $("recChk").checked = !v; }
 function setEChurch(v){ eChurch = v; $("eRecChk").checked = !v; }
 async function refreshSideTotals(){
   try {
-    const r = await fetch(SUPA + "?select=side,count,church_only,deleted_at", { headers: H });
+    const r = await fetch(SUPA + "?select=side,count,church_only,waitlist,deleted_at", { headers: H });
     if (!r.ok) return;
     const rows = await r.json();
     sideTotals = { bride: 0, groom: 0 };
     churchTotals = { bride: 0, groom: 0 };
     rows.forEach(x => {
-      if (x.deleted_at) return;
+      if (x.deleted_at || x.waitlist) return;   // waitlisted rows are invisible to cap/headcount math
       if (sideTotals[x.side] === undefined) return;
       if (x.church_only) churchTotals[x.side] += x.count;
       else sideTotals[x.side] += x.count;
@@ -907,12 +942,13 @@ let device = localStorage.getItem("wedDevice");
 if (!device) { device = "d" + Math.random().toString(36).slice(2, 10); localStorage.setItem("wedDevice", device); }
 let mySide = localStorage.getItem("wedSide") || "";
 let cc = localStorage.getItem("wedCC") || "+20";
-let mine = [], all = [], activeFilters = new Set(), sortMode = "nophone", treeView = false, n = 2, orgTimer = null, pending = [], step = 1, photoTick = 0;
+let mine = [], all = [], activeFilters = new Set(), sortMode = "nophone", treeView = false, n = 2, orgTimer = null, pending = [], step = 1, photoTick = 0, tagFilter = null;
 let collapsed = new Set(JSON.parse(localStorage.getItem("wedCollapsed") || "[]"));
 
 const $ = id => document.getElementById(id);
 const orgRole = () => { const r = localStorage.getItem("wedOrg"); return ["master","bride","groom"].includes(r) ? r : ""; };
 const isOrg = () => !!orgRole();
+const isMasterRole = () => isOrg() && (orgRole() || "master") === "master";
 if (localStorage.getItem("wedOrg") === "ok") localStorage.removeItem("wedOrg"); // legacy single-pin sessions re-authenticate
 function toast(msg, err, action){
   const el = $("toast");
@@ -1266,6 +1302,104 @@ function hasLiveChildren(row){ return all.some(r => r.parent_id === row.id && !r
 function crumbArrow(){ return L === "ar" ? "↲" : "↳"; } // U+21B3 isn't bidi-mirrored — swap glyph manually per direction
 function memNorm(s){ return String(s == null ? "" : s).normalize("NFC").trim().toLowerCase(); }
 
+/* ── tags: freeform, typo-proof via Arabic-fold matchKey (never stored — derived only) ── */
+function normalizeTag(s){ return String(s == null ? "" : s).normalize("NFC").trim().replace(/\s+/g, " "); }
+function tagMatchKey(s){
+  return normalizeTag(s).toLowerCase()
+    .replace(/[ً-ْ]/g, "")   // strip tashkeel
+    .replace(/ـ/g, "")            // strip tatweel
+    .replace(/[أإآ]/g, "ا").replace(/ى/g, "ي").replace(/ة/g, "ه");
+}
+function tagVocabulary(){
+  const counts = {}, names = {};
+  all.forEach(r => {
+    if (r.deleted_at) return;
+    (Array.isArray(r.tags) ? r.tags : []).forEach(tg => {
+      const mk = tagMatchKey(tg);
+      if (!mk) return;
+      counts[mk] = (counts[mk] || 0) + 1;
+      if (!names[mk]) names[mk] = normalizeTag(tg);
+    });
+  });
+  return Object.keys(counts).map(mk => ({ mk, name: names[mk], count: counts[mk] })).sort((a, b) => b.count - a.count);
+}
+
+/* ── Edit modal: tag pills (master-only) ── */
+let editingTags = [];
+function toggleEditTag(name){
+  const mk = tagMatchKey(name);
+  const idx = editingTags.findIndex(tg => tagMatchKey(tg) === mk);
+  if (idx >= 0) editingTags.splice(idx, 1); else editingTags.push(normalizeTag(name));
+  renderETagPills();
+}
+function commitNewTag(raw){
+  const val = normalizeTag(raw);
+  if (val) {
+    const mk = tagMatchKey(val);
+    const vocabHit = tagVocabulary().find(v => v.mk === mk);
+    const selHit = editingTags.find(tg => tagMatchKey(tg) === mk);
+    toggleEditTag(vocabHit ? vocabHit.name : (selHit || val));
+  } else renderETagPills();
+}
+function openTagInput(){
+  const el = $("eTagPills"); if (!el) return;
+  const old = el.querySelector(".add-tag"); if (!old) return;
+  const wrap = document.createElement("span");
+  wrap.className = "tag-pill add-tag-input";
+  const inp = document.createElement("input");
+  inp.type = "text"; inp.autocomplete = "off";
+  wrap.appendChild(inp);
+  el.replaceChild(wrap, old);
+  inp.focus();
+  let done = false;
+  const commit = () => { if (done) return; done = true; commitNewTag(inp.value); };
+  inp.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); commit(); } });
+  inp.addEventListener("blur", commit);
+}
+function renderETagPills(){
+  const el = $("eTagPills"); if (!el) return;
+  el.innerHTML = "";
+  const vocab = tagVocabulary();
+  const selKeys = new Set(editingTags.map(tagMatchKey));
+  const seen = new Set();
+  vocab.forEach(v => {
+    seen.add(v.mk);
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "tag-pill" + (selKeys.has(v.mk) ? " on" : "");
+    btn.textContent = v.name;
+    btn.onclick = () => toggleEditTag(v.name);
+    el.appendChild(btn);
+  });
+  editingTags.forEach(tg => {
+    const mk = tagMatchKey(tg);
+    if (seen.has(mk)) return;
+    seen.add(mk);
+    const btn = document.createElement("button");
+    btn.type = "button"; btn.className = "tag-pill on"; btn.textContent = tg;
+    btn.onclick = () => toggleEditTag(tg);
+    el.appendChild(btn);
+  });
+  const add = document.createElement("button");
+  add.type = "button"; add.className = "tag-pill add-tag"; add.textContent = t("addTag");
+  add.onclick = openTagInput;
+  el.appendChild(add);
+}
+
+/* ── Edit modal: waitlist segment (master-only) ── */
+let eWaitlistVal = false;
+function renderEWaitlistSeg(){
+  const sent = isInviteSent(editing);
+  $("eWaitNo").className = !eWaitlistVal ? "on" : "";
+  $("eWaitYes").className = eWaitlistVal ? "on" : "";
+  $("eWaitYes").disabled = sent;
+}
+function setEWaitlist(v){
+  if (v && isInviteSent(editing)) return;
+  eWaitlistVal = v;
+  renderEWaitlistSeg();
+}
+
 /* ── message text ── */
 function invitePairs(row){
   const pairs = [...(row.church_only ? INVITE_COPY.church : INVITE_COPY.full)];
@@ -1481,6 +1615,7 @@ function renderInviteModal(){
   }
 }
 function openInvite(row, navIds){
+  if (row.waitlist) return;
   inviteRow = row;
   inviteChannelUsed = null;
   inviteNav = Array.isArray(navIds) ? navIds.slice() : [row.id];
@@ -1530,15 +1665,20 @@ function famRow(r, canDelete, navIds){
   const st = numberState(r);
   const row = document.createElement("div");
   row.dataset.id = r.id;
-  row.className = "fam " + (r.side === "bride" ? "b" : "g") + (isInviteSent(r) ? " sent" : (st === "missing" ? " nophone" : (st === "wrong" ? " wrong" : "")));
+  const masterCtx = isOrg() && !$("orgView").hidden && isMasterRole();
+  row.className = "fam " + (r.side === "bride" ? "b" : "g") + (isInviteSent(r) ? " sent" : (st === "missing" ? " nophone" : (st === "wrong" ? " wrong" : ""))) + (masterCtx && r.waitlist ? " waitlisted" : "");
   const info = document.createElement("div");
   info.className = "info";
   const sideWord = r.side === "bride" ? t("sideWordB") : t("sideWordG");
   const orgCtx = isOrg() && !$("orgView").hidden;
   const chip = (cls, emoji, key) => `<span class="card-chip ${cls}">${emoji}${orgCtx ? " " + t(key) : ""}</span>`;
-  const chips = (!r.church_only ? chip("reception", "🏛", "chipReception") : "")
+  const tagList = masterCtx && Array.isArray(r.tags) ? r.tags.filter(Boolean) : [];
+  const chips = (masterCtx && r.waitlist ? chip("waitlist", "⏳", "chipWaitlist") : "")
+    + (!r.church_only ? chip("reception", "🏛", "chipReception") : "")
     + (r.event2 ? chip("henna", "🌿" + (hennaOverridden(r) ? " " + localDigits(r.seats.henna) : ""), "chipHenna") : "")
     + (r.confirmed ? chip("confirmed", "✅", "chipConfirmed") : "")
+    + tagList.slice(0, 2).map(tg => `<span class="card-chip tag">${esc(tg)}</span>`).join("")
+    + (tagList.length > 2 ? `<span class="card-chip tag">+${localDigits(tagList.length - 2)}</span>` : "")
     + (orgCtx && liveParent(r)
         ? `<span class="card-chip crumb" data-parent="${liveParent(r).id}">${crumbArrow()} ${esc(breadcrumb(r).join(" › "))}</span>`
         : (orgCtx && r.parent_id && famById(r.parent_id)
@@ -1568,7 +1708,7 @@ function famRow(r, canDelete, navIds){
     ed.onclick = () => openEdit(r);
     row.append(ed);
   }
-  if (canDelete && isOrg() && !$("orgView").hidden) {
+  if (canDelete && isOrg() && !$("orgView").hidden && !r.waitlist) {
     row.classList.add("sendable");
     const send = document.createElement("button");
     send.type = "button";
@@ -1606,6 +1746,16 @@ function openEdit(r){
   const showParent = isOrg();
   $("eParentLabel").hidden = !showParent;
   $("eParent").hidden = !showParent;
+  // v24: tags + waitlist are master-only — hidden for side roles, guests, and never in the add wizard
+  const showMasterFields = isMasterRole();
+  $("eTagsSec").hidden = !showMasterFields;
+  $("eWaitlistSec").hidden = !showMasterFields;
+  if (showMasterFields) {
+    editingTags = Array.isArray(r.tags) ? r.tags.slice() : [];
+    eWaitlistVal = !!r.waitlist;
+    renderETagPills();
+    renderEWaitlistSeg();
+  } else { editingTags = []; eWaitlistVal = false; }
   renderMemberInputs("eMembers", eCount, Array.isArray(r.members) ? r.members : [], displayName(r));
   $("eMore").open = !!((showParent && r.parent_id) || (Array.isArray(r.members) && r.members.some(v => v)));
   $("editBg").hidden = false;
@@ -1624,11 +1774,15 @@ async function saveEdit(){
   const seats = editing.seats && typeof editing.seats === "object" && !Array.isArray(editing.seats) ? { ...editing.seats } : {};
   if (eEv2 && eHenna > 0 && eHenna < eCount) seats.henna = eHenna; else delete seats.henna;
   const seatsVal = Object.keys(seats).length ? seats : null;
+  const masterFields = isMasterRole();
+  const body = { name, name_en: name_en || null, count: eCount, phone, event2: eEv2, church_only: eChurch, confirmed, seats: seatsVal, parent_id, members };
+  if (masterFields) { body.tags = editingTags.length ? editingTags : null; body.waitlist = eWaitlistVal; }
   $("editBg").hidden = true;
   editing.name = name; editing.name_en = name_en || null; editing.count = eCount; editing.phone = phone; editing.event2 = eEv2; editing.church_only = eChurch; editing.confirmed = confirmed; editing.seats = seatsVal; editing.parent_id = parent_id; editing.members = members;
+  if (masterFields) { editing.tags = body.tags; editing.waitlist = body.waitlist; }
   renderMine(); renderAll();
   try {
-    await fetch(`${SUPA}?id=eq.${editing.id}`, { method: "PATCH", headers: H, body: JSON.stringify({ name, name_en: name_en || null, count: eCount, phone, event2: eEv2, church_only: eChurch, confirmed, seats: seatsVal, parent_id, members }) });
+    await fetch(`${SUPA}?id=eq.${editing.id}`, { method: "PATCH", headers: H, body: JSON.stringify(body) });
     toast(t("edited"));
   } catch(e) { toast(t("netErr"), true); }
   refreshMine(); if (isOrg()) refreshAll();
@@ -1661,27 +1815,53 @@ function sortRows(rows){
   // default: missing-number families first, otherwise stable original order
   return out.sort((a, b) => (whatsappNumber(a.phone) ? 1 : 0) - (whatsappNumber(b.phone) ? 1 : 0));
 }
+/* v24: single source of truth for "what's visible right now" — master/side role split, the
+   waitlist global-exclusion rule (excluded everywhere except the exclusive ⏳ filter, entirely
+   excluded for side roles), and (in currentShow) the activeFilters/tagFilter/search predicate.
+   renderAll AND sendSnapshot both read through here so the WhatsApp snapshot always matches
+   exactly what's on screen. */
+function computeVisible(role){
+  const live = all.filter(r => !r.deleted_at);
+  const roleLive = role === "master" ? live : live.filter(r => r.side === role);
+  const countBase = roleLive.filter(r => !r.waitlist);
+  const waitlistOn = role === "master" && activeFilters.has("waitlist");
+  const vis = waitlistOn ? roleLive.filter(r => r.waitlist) : countBase;
+  const delRows = (role === "master" ? all : all.filter(r => r.side === role)).filter(r => r.deleted_at);
+  return { live, roleLive, countBase, vis, delRows, waitlistOn };
+}
+function currentShow(role){
+  const { vis, delRows } = computeVisible(role);
+  const base = activeFilters.has("deleted") ? delRows : vis;
+  const preds = [...activeFilters].filter(k => FILTER_PREDS[k]).map(k => FILTER_PREDS[k]);
+  const q = ($("search").value || "").toLowerCase().replace(/\s+/g, " ").trim();
+  const nm = s => (s || "").toLowerCase().replace(/\s+/g, " ").trim();
+  return base.filter(r => preds.every(p => p(r))
+    && (!tagFilter || (Array.isArray(r.tags) && r.tags.includes(tagFilter)))
+    && (!q || nm(r.name).includes(q) || nm(r.name_en).includes(q) || (r.phone || "").includes(q) || nm(breadcrumb(r).join(" ")).includes(q)));
+}
 function renderAll(){
   if ($("orgView").hidden) return;
   const role = orgRole() || "master";
-  const live = all.filter(r => !r.deleted_at);
+  const { live, countBase, delRows } = computeVisible(role);
   const anyTree = live.some(r => r.parent_id);
   $("sortTree").hidden = !anyTree;
   if (!anyTree) treeView = false;
-  const vis = role === "master" ? live : live.filter(r => r.side === role);
-  const bp = live.filter(r => r.side === "bride").reduce((s, r) => s + r.count, 0);
-  const gp = live.filter(r => r.side === "groom").reduce((s, r) => s + r.count, 0);
+  // header totals + filter-sheet counts always read the waitlist-excluded set, even while the
+  // exclusive ⏳ filter is showing only waitlisted rows below
+  const bp = countBase.filter(r => r.side === "bride").reduce((s, r) => s + r.count, 0);
+  const gp = countBase.filter(r => r.side === "groom").reduce((s, r) => s + r.count, 0);
   $("tB").textContent = bp; $("tG").textContent = gp; $("tA").textContent = bp + gp;
   document.querySelector(".tot.b").hidden = role === "groom";
   document.querySelector(".tot.g").hidden = role === "bride";
   document.querySelector(".tot.a").hidden = role !== "master";
   $("orgCapB").hidden = role === "groom";
   $("orgCapG").hidden = role === "bride";
-  const c = pred => vis.filter(pred).length;
-  const delRows = (role === "master" ? all : all.filter(r => r.side === role)).filter(r => r.deleted_at);
-  renderFilterSheet(role, c, delRows.length);
+  const c = pred => countBase.filter(pred).length;
+  const waitlistCount = all.filter(r => !r.deleted_at && r.waitlist && (role === "master" || r.side === role)).length;
+  renderFilterSheet(role, c, delRows.length, waitlistCount);
+  renderTagFilterRow(countBase);
   const nameBuckets = {}, phoneBuckets = {};
-  vis.forEach(r => {
+  countBase.forEach(r => {
     const nk = normName(r.name); if (nk) (nameBuckets[nk] = nameBuckets[nk] || []).push(r);
     const pk = phoneKey(r.phone); if (pk) (phoneBuckets[pk] = phoneBuckets[pk] || []).push(r);
   });
@@ -1695,11 +1875,7 @@ function renderAll(){
     ? `<div class="dupes-note"><b>${t("dupsBanner")(dupes.length)}</b> ${dupes.map(g => `"${esc(g[0].name)}" (${g.map(x => x.side === "bride" ? t("fB") : t("fG")).join(" + ")})`).join(" · ")} ${t("dupsHint")}</div>`
     : "";
   const el = $("fullList");
-  const q = ($("search").value || "").toLowerCase().replace(/\s+/g, " ").trim();
-  const nm = s => (s || "").toLowerCase().replace(/\s+/g, " ").trim();
-  const base = activeFilters.has("deleted") ? delRows : vis;
-  const preds = [...activeFilters].filter(k => FILTER_PREDS[k]).map(k => FILTER_PREDS[k]);
-  const show = base.filter(r => preds.every(p => p(r)) && (!q || nm(r.name).includes(q) || nm(r.name_en).includes(q) || (r.phone || "").includes(q) || nm(breadcrumb(r).join(" ")).includes(q)));
+  const show = currentShow(role);
   $("filterDoneBtn").textContent = t("doneLbl") + " · " + localDigits(show.length);
   el.innerHTML = "";
   if (!show.length) { el.innerHTML = `<p class="empty">${t("listEmpty")}</p>`; return; }
@@ -1738,15 +1914,17 @@ const FILTER_PREDS = {
   wrong: r => numberState(r) === "wrong",
 };
 // v23.2: typed filter-sheet controls write/clear activeFilters directly — exclusivity is
-// enforced by the control itself (segment / trash), so the old FILTER_EXCLUSIVE swap-map is gone.
+// enforced by the control itself (segment / trash / waitlist), so the old FILTER_EXCLUSIVE
+// swap-map is gone. v24: every non-exclusive control also drops "waitlist" so turning on any
+// AND-stacking filter exits the exclusive ⏳ view (mirrors the existing "deleted" behaviour).
 function setSegment(keys, val){
   keys.forEach(k => activeFilters.delete(k));
-  activeFilters.delete("deleted");
+  activeFilters.delete("deleted"); activeFilters.delete("waitlist");
   if (val) activeFilters.add(val);
   renderAll();
 }
 function toggleFilterCb(k, on){
-  activeFilters.delete("deleted");
+  activeFilters.delete("deleted"); activeFilters.delete("waitlist");
   if (on) activeFilters.add(k); else activeFilters.delete(k);
   renderAll();
 }
@@ -1755,8 +1933,14 @@ function toggleTrashFilter(on){
   else activeFilters.delete("deleted");
   renderAll();
 }
-function clearAllFilters(){ activeFilters.clear(); renderAll(); }
+function toggleWaitlistFilter(on){
+  if (on) { activeFilters.clear(); activeFilters.add("waitlist"); }
+  else activeFilters.delete("waitlist");
+  renderAll();
+}
+function clearAllFilters(){ activeFilters.clear(); tagFilter = null; renderAll(); }
 function removeActiveFilter(k){ activeFilters.delete(k); renderAll(); }
+function setTagFilter(name){ tagFilter = (tagFilter === name) ? null : name; renderAll(); }
 function openFilterSheet(){ $("filterBg").hidden = false; }
 function closeFilterSheet(){ $("filterBg").hidden = true; }
 function filterChipLabel(k){
@@ -1764,10 +1948,36 @@ function filterChipLabel(k){
     bride: t("segBride"), groom: t("segGroom"), sent: t("segSent"), unsent: t("segNotSent"),
     reception: t("eventsReceptionLbl"), ev2: t("eventsHennaLbl"), church: t("issueChurchOnly"),
     confirmed: t("fConfirmed"), nophone: t("issueNoPhone"), wrong: t("issueWrong"), deleted: t("trashLbl"),
+    waitlist: t("issueWaitlist"),
   }[k] || k;
 }
-function renderFilterSheet(role, c, trashCount){
+function renderTagFilterRow(countBase){
+  const sec = $("fsTagsSec"); if (!sec) return;
+  const role = orgRole() || "master";
+  const vocab = tagVocabulary();
+  sec.hidden = role !== "master" || vocab.length === 0;
+  if (sec.hidden) return;
+  const disabled = activeFilters.has("deleted") || activeFilters.has("waitlist");
+  const preds = [...activeFilters].filter(k => FILTER_PREDS[k]).map(k => FILTER_PREDS[k]);
+  const filtered = countBase.filter(r => preds.every(p => p(r)));
+  const tally = {};
+  filtered.forEach(r => (Array.isArray(r.tags) ? r.tags : []).forEach(tg => { const mk = tagMatchKey(tg); if (mk) tally[mk] = (tally[mk] || 0) + 1; }));
+  const pillsEl = $("fsTagPills");
+  pillsEl.innerHTML = "";
+  vocab.forEach(v => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "tag-pill" + (tagFilter === v.name ? " on" : "");
+    btn.disabled = disabled;
+    btn.textContent = v.name + " · " + localDigits(tally[v.mk] || 0);
+    btn.onclick = () => setTagFilter(v.name);
+    pillsEl.appendChild(btn);
+  });
+}
+function renderFilterSheet(role, c, trashCount, waitlistCount){
   const trashOn = activeFilters.has("deleted");
+  const waitlistOn = activeFilters.has("waitlist");
+  const anyExclusive = trashOn || waitlistOn;
   $("fsSideSec").hidden = role !== "master";
   $("segSideAll").className = (!activeFilters.has("bride") && !activeFilters.has("groom")) ? "on" : "";
   $("segSideBride").className = activeFilters.has("bride") ? "on" : "";
@@ -1775,13 +1985,13 @@ function renderFilterSheet(role, c, trashCount){
   $("segInviteAll").className = (!activeFilters.has("sent") && !activeFilters.has("unsent")) ? "on" : "";
   $("segInviteSent").className = activeFilters.has("sent") ? "on" : "";
   $("segInviteNot").className = activeFilters.has("unsent") ? "on" : "";
-  [$("segSideAll"), $("segSideBride"), $("segSideGroom"), $("segInviteAll"), $("segInviteSent"), $("segInviteNot")].forEach(b => b.disabled = trashOn);
+  [$("segSideAll"), $("segSideBride"), $("segSideGroom"), $("segInviteAll"), $("segInviteSent"), $("segInviteNot")].forEach(b => b.disabled = anyExclusive);
   const cbRow = (rowId, cbId, cntId, key, count) => {
     $(rowId).hidden = count === 0;
     $(cbId).checked = activeFilters.has(key);
-    $(cbId).disabled = trashOn;
+    $(cbId).disabled = anyExclusive;
     $(cntId).textContent = localDigits(count);
-    $(rowId).classList.toggle("fs-disabled", trashOn);
+    $(rowId).classList.toggle("fs-disabled", anyExclusive);
   };
   cbRow("rowFReception", "cbFReception", "cntFReception", "reception", c(FILTER_PREDS.reception));
   cbRow("rowFEv2", "cbFEv2", "cntFEv2", "ev2", c(FILTER_PREDS.ev2));
@@ -1790,12 +2000,34 @@ function renderFilterSheet(role, c, trashCount){
   cbRow("rowFNoPhone", "cbFNoPhone", "cntFNoPhone", "nophone", c(FILTER_PREDS.nophone));
   cbRow("rowFWrong", "cbFWrong", "cntFWrong", "wrong", c(FILTER_PREDS.wrong));
   $("cbFTrash").checked = trashOn;
+  $("cbFTrash").disabled = waitlistOn;
+  $("rowFTrash").classList.toggle("fs-disabled", waitlistOn);
   $("cntFTrash").textContent = localDigits(trashCount);
-  const n = activeFilters.size;
-  $("filtersBadge").hidden = n === 0;
-  if (n) $("filtersBadge").textContent = "· " + localDigits(n);
-  $("filtersBtn").className = "fs-trigger" + (n ? " on" : "");
-  $("filtersEcho").innerHTML = [...activeFilters].map(k => `<button type="button" class="echo-chip" onclick="removeActiveFilter('${k}')">${esc(filterChipLabel(k))} ✕</button>`).join("");
+  $("rowFWaitlist").hidden = role !== "master" || waitlistCount === 0;
+  $("cbFWaitlist").checked = waitlistOn;
+  $("cbFWaitlist").disabled = trashOn;
+  $("rowFWaitlist").classList.toggle("fs-disabled", trashOn);
+  $("cntFWaitlist").textContent = localDigits(waitlistCount);
+  const activeCount = activeFilters.size + (tagFilter ? 1 : 0);
+  $("filtersBadge").hidden = activeCount === 0;
+  if (activeCount) $("filtersBadge").textContent = "· " + localDigits(activeCount);
+  $("filtersBtn").className = "fs-trigger" + (activeCount ? " on" : "");
+  const echoEl = $("filtersEcho");
+  echoEl.innerHTML = "";
+  [...activeFilters].forEach(k => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "echo-chip";
+    b.textContent = filterChipLabel(k) + " ✕";
+    b.onclick = () => removeActiveFilter(k);
+    echoEl.appendChild(b);
+  });
+  if (tagFilter) {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "echo-chip";
+    b.textContent = tagFilter + " ✕";
+    b.onclick = () => setTagFilter(tagFilter);
+    echoEl.appendChild(b);
+  }
 }
 function setSort(m){
   sortMode = m;
@@ -1980,13 +2212,13 @@ async function handleFiles(files){
 
 /* ── exports ── */
 function exportExcel(){
-  const head = ["Name (الاسم)", "Name (English)", "Side (الطرف)", "People (الأفراد)", "WhatsApp", ev2Name(), "Church Only (الكنيسة فقط)", "Confirmed (مؤكد)", "Family (العائلة)", "Members (الأفراد بالاسم)", "Invite Sent (اتبعتت)", "Sent On (تاريخ الإرسال)", "Added"];
+  const head = ["Name (الاسم)", "Name (English)", "Side (الطرف)", "People (الأفراد)", "WhatsApp", ev2Name(), "Church Only (الكنيسة فقط)", "Tags (تصنيفات)", "Waitlist (انتظار)", "Confirmed (مؤكد)", "Family (العائلة)", "Members (الأفراد بالاسم)", "Invite Sent (اتبعتت)", "Sent On (تاريخ الإرسال)", "Added"];
   const xrole = orgRole() || "master";
   const xrows = (xrole === "master" ? all : all.filter(r => r.side === xrole)).filter(r => !r.deleted_at);
   const rows_ = xrows.map(r => {
     const entry = sentEntry(r);
     const sentAt = entry && entry.at ? entry.at : "";
-    return [r.name, r.name_en || "", r.side === "bride" ? "Bride عروسة" : "Groom عريس", r.count, r.phone || "", r.event2 ? (hennaOverridden(r) ? "YES (" + r.seats.henna + ")" : "YES") : "", r.church_only ? "YES" : "", r.confirmed ? "YES" : "", [...breadcrumb(r), displayName(r)].join(" › "), (Array.isArray(r.members) ? r.members.filter(v => v && memNorm(v) !== memNorm(r.name) && memNorm(v) !== memNorm(r.name_en)).join(", ") : ""),
+    return [r.name, r.name_en || "", r.side === "bride" ? "Bride عروسة" : "Groom عريس", r.count, r.phone || "", r.event2 ? (hennaOverridden(r) ? "YES (" + r.seats.henna + ")" : "YES") : "", r.church_only ? "YES" : "", (Array.isArray(r.tags) && r.tags.length ? r.tags.join("، ") : ""), r.waitlist ? "YES" : "", r.confirmed ? "YES" : "", [...breadcrumb(r), displayName(r)].join(" › "), (Array.isArray(r.members) ? r.members.filter(v => v && memNorm(v) !== memNorm(r.name) && memNorm(v) !== memNorm(r.name_en)).join(", ") : ""),
       entry ? "YES" : "", sentAt.slice(0, 10), (r.created_at || "").slice(0, 10)];
   });
   const csv = "﻿" + [head, ...rows_].map(row => row.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\r\n");
@@ -1996,17 +2228,26 @@ function exportExcel(){
   a.click();
   toast(t("xls"));
 }
-function sendSnapshot(){
+/* v24: the snapshot sources from the CURRENTLY SHOWN filtered set (same rows as renderAll's
+   `show`), not a role-scoped dump of everyone — this is what makes "tag + Not sent" into a
+   one-tap forwardable WhatsApp list (Dad's queue). Waitlist rows are guarded out unconditionally,
+   even if somehow reached via the exclusive ⏳ filter — a parked family must never be sendable. */
+function snapshotRows(){
   const srole = orgRole() || "master";
-  const src = (srole === "master" ? all : all.filter(r => r.side === srole)).filter(r => !r.deleted_at);
+  return currentShow(srole).filter(r => !r.waitlist);
+}
+function snapshotMessage(){
+  const src = snapshotRows();
   const part = side => src.filter(r => r.side === side);
   const fmt = list => list.map((r, i) => `${i+1}. ${displayName(r)} — ${r.count} أفراد${r.phone ? " — " + r.phone : ""}`).join("\n");
   const bp = part("bride"), gp = part("groom");
   const total = src.reduce((s, r) => s + r.count, 0);
   const church = src.filter(r => r.church_only);
   const churchP = church.reduce((s, r) => s + r.count, 0);
-  const msg = `قائمة عزومة فرح محب ويوستينا 🤍\n${src.length} عيلة · ${total} فرد\n⛪ الكنيسة فقط: ${church.length} عيلة · ${churchP} فرد\n\n🤍 طرف العروسة (${bp.reduce((s,r)=>s+r.count,0)} فرد):\n${fmt(bp) || "—"}\n\n🤍 طرف العريس (${gp.reduce((s,r)=>s+r.count,0)} فرد):\n${fmt(gp) || "—"}`;
-  location.href = "https://wa.me/?text=" + encodeURIComponent(msg);
+  return `قائمة عزومة فرح محب ويوستينا 🤍\n${src.length} عيلة · ${total} فرد\n⛪ الكنيسة فقط: ${church.length} عيلة · ${churchP} فرد\n\n🤍 طرف العروسة (${bp.reduce((s,r)=>s+r.count,0)} فرد):\n${fmt(bp) || "—"}\n\n🤍 طرف العريس (${gp.reduce((s,r)=>s+r.count,0)} فرد):\n${fmt(gp) || "—"}`;
+}
+function sendSnapshot(){
+  location.href = "https://wa.me/?text=" + encodeURIComponent(snapshotMessage());
 }
 
 $("wName").addEventListener("keydown", e => { if (e.key === "Enter") toStep(2); });
