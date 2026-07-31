@@ -57,7 +57,7 @@ CHURCH_LINK = (
     "?cat=3eff4b55-85f1-4322-8ab6-f1bf8fd8c85c"
     "&g=rsvp-7110440c-c1ca-4577-abac-3cae79bce03c"
 )
-VERSION = "٢٥٫٠ · 25.0"
+VERSION = "٢٦٫٠ · 26.0"
 TEMPLATE_VERSION = "21.0"
 ARABIC = re.compile(r"[؀-ۿ]")
 FAMILIES = [
@@ -110,6 +110,38 @@ FAMILIES = [
     },
 ]
 
+# v26: wedding_events seed — mirrors the live migration verbatim (church universal/uncapped,
+# reception cap_total 400 = 200 bride + derived groom, henna cap_total 75 with a null bride_alloc
+# ⇒ 38/37 50-50 split). Legacy family columns stay authoritative for membership; this table only
+# adds capacity/venue/schedule metadata + capacity math on top.
+EVENTS_SEED = [
+    {
+        "id": "church", "sort": 0, "emoji": "⛪", "name_ar": "الكنيسة", "name_en": "Church",
+        "event_date": "2026-08-22", "time_start": "17:00:00", "time_end": None,
+        "venue_ar": "كنيسة السيدة العذراء بالرحاب", "venue_en": "St. Mary Church – El Rehab",
+        "address_ar": None, "address_en": None, "map_url": None,
+        "cap_total": None, "bride_alloc": None, "universal": True, "core": True, "active": True,
+        "meal_style": None, "meal_options": [], "extras": {},
+    },
+    {
+        "id": "reception", "sort": 1, "emoji": "💍", "name_ar": "حفل الزفاف", "name_en": "Reception",
+        "event_date": "2026-08-22", "time_start": "19:00:00", "time_end": None,
+        "venue_ar": "فندق الماسة – مدينة نصر", "venue_en": "Al Masa Hotel – Nasr City",
+        "address_ar": None, "address_en": None, "map_url": None,
+        "cap_total": 400, "bride_alloc": 200, "universal": False, "core": True, "active": True,
+        "meal_style": None, "meal_options": [], "extras": {},
+    },
+    {
+        "id": "henna", "sort": 2, "emoji": "🌿", "name_ar": "حفلة الحنة", "name_en": "Henna Party",
+        "event_date": "2026-08-14", "time_start": "20:00:00", "time_end": "00:00:00",
+        "venue_ar": "دار الدفاع الجوي – مدينة نصر", "venue_en": "Dar Air Defense – Nasr City",
+        "address_ar": None, "address_en": None, "map_url": None,
+        "cap_total": 75, "bride_alloc": None, "universal": False, "core": True, "active": True,
+        "meal_style": None, "meal_options": [], "extras": {},
+    },
+]
+EVENTS_NOTNULL = {"name_ar", "name_en", "universal", "core", "active", "sort", "meal_options", "extras"}
+
 
 class QuietHandler(SimpleHTTPRequestHandler):
     def log_message(self, *_args):
@@ -155,9 +187,30 @@ def run_browser(browser_type, browser_name, base_url):
 
     deleted = {}
     patched = {}
+    event_mutations = []
+    event_patched = {}
+    event_inserted = []
 
     def mock_supabase(route):
         request = route.request
+        # v26: wedding_events — same live-constraint enforcement pattern as wedding_families below
+        # (400 on null into a NOT NULL column), kept as its own table/mutation log since it's a
+        # separate resource with its own id space (church/reception/henna + ev_xxxxxx customs).
+        if "wedding_events" in request.url and request.method != "GET":
+            event_mutations.append((request.method, request.url, request.post_data))
+            ebody = json.loads(request.post_data or "{}")
+            erows = ebody if isinstance(ebody, list) else [ebody]
+            for row_ in erows:
+                if isinstance(row_, dict) and any(row_.get(c) is None for c in EVENTS_NOTNULL if c in row_):
+                    route.fulfill(status=400, content_type="application/json", body='{"message":"null value violates not-null constraint"}')
+                    return
+            eid = request.url.split("id=eq.")[1].split("&")[0] if "id=eq." in request.url else None
+            if request.method == "PATCH" and eid:
+                event_patched.setdefault(eid, {}).update(ebody if isinstance(ebody, dict) else {})
+            elif request.method == "POST":
+                event_inserted.extend(r for r in erows if isinstance(r, dict))
+            route.fulfill(status=200, content_type="application/json", body=json.dumps(erows))
+            return
         if "wedding_families" in request.url and request.method != "GET":
             family_mutations.append((request.method, request.url, request.post_data))
             pbody = json.loads(request.post_data or "{}")
@@ -195,6 +248,9 @@ def run_browser(browser_type, browser_name, base_url):
                 dict(f, **{k: v for k, v in patched.get(f["id"], {}).items() if k != "deleted_at"}, deleted_at=deleted.get(f["id"]))
                 for f in FAMILIES
             ]
+        elif "wedding_events" in request.url and request.method == "GET":
+            body = [dict(e, **event_patched.get(e["id"], {})) for e in EVENTS_SEED]
+            body += [dict(e, **event_patched.get(e["id"], {})) for e in event_inserted]
         route.fulfill(status=200, content_type="application/json", body=json.dumps(body))
 
     page.route("**/*.supabase.co/**", mock_supabase)
@@ -205,6 +261,13 @@ def run_browser(browser_type, browser_name, base_url):
             assert time.monotonic() < deadline, family_mutations
             page.wait_for_timeout(30)
         return family_mutations[-1]
+
+    def wait_new_event_mutation(n_before, timeout=10):
+        deadline = time.monotonic() + timeout
+        while len(event_mutations) <= n_before:
+            assert time.monotonic() < deadline, event_mutations
+            page.wait_for_timeout(30)
+        return event_mutations[-1]
 
     def sent_patches():
         return [m for m in family_mutations if m[0] == "PATCH" and "invite_sent" in (m[2] or "")]
@@ -1173,7 +1236,8 @@ def run_browser(browser_type, browser_name, base_url):
     page.evaluate("location.hash = '#list'")
     page.wait_for_function("all.length === 3")
 
-    # ── per-role hamburger menu contents (exact rows, no dead Tables/Settings rows for v26/v27)
+    # ── per-role hamburger menu contents (exact rows; v26 adds master-only Settings after Tags;
+    # Tables stays a dead row reserved for v27 seating)
     def menu_labels():
         return page.evaluate(
             "[...document.querySelectorAll('#menuRows .menu-row > span:first-child')]"
@@ -1184,10 +1248,10 @@ def run_browser(browser_type, browser_name, base_url):
     page.wait_for_function("!document.getElementById('menuScrim').hidden")
     master_rows = menu_labels()
     assert master_rows == [
-        "List", "Add", "Fast entry", "Photos", "Waitlist", "Deleted", "Tags",
+        "List", "Add", "Fast entry", "Photos", "Waitlist", "Deleted", "Tags", "Settings",
         "Excel", "Snapshot", "PIN", "بالعربي",
     ], master_rows
-    assert "Tables" not in master_rows and "Settings" not in master_rows
+    assert "Tables" not in master_rows
     page.evaluate("closeMenu()")
 
     page.evaluate("localStorage.setItem('wedOrg', 'bride')")
@@ -1401,13 +1465,184 @@ def run_browser(browser_type, browser_name, base_url):
     assert len(posted) == 1 and posted[0]["name"] == "Brand New Fast Family", posted
     page.wait_for_function("document.getElementById('previewBg').hidden")
 
+    # ══════════════════════════ v26: Event Setup ══════════════════════════
+    # Legacy booleans (church_only/event2/count) stay authoritative for membership on the three
+    # core events; `seats` jsonb is exceptions-only. eff() below is an INDEPENDENT re-derivation
+    # of the app's eventEff() (not a call into it) so the gauge assertions aren't just testing the
+    # implementation against itself.
+    def eff(fam, event_id):
+        if fam.get("deleted_at") or fam.get("waitlist"):
+            return 0
+        if event_id == "henna":
+            invited = bool(fam.get("event2"))
+        elif event_id == "reception":
+            invited = not fam.get("church_only")
+        else:
+            invited = False
+        if not invited:
+            return 0
+        override = (fam.get("seats") or {}).get(event_id)
+        n_ = override if isinstance(override, int) else fam["count"]
+        return min(n_, fam["count"])
+
+    page.evaluate("localStorage.setItem('wedOrg', 'master')")
+    page.evaluate("location.hash = '#list'")
+    page.wait_for_function("!document.getElementById('scrList').hidden")
+    page.evaluate("async () => { await loadEvents(); await refreshSideTotals(); }")
+    page.wait_for_function("EVENTS.length === 3")
+
+    # ── master-only routing: side-role and de-authenticated hits on #settings redirect to #add
+    # (router-level redirect, not just a hidden menu row — a deep link can't reach it either)
+    page.evaluate("localStorage.setItem('wedOrg', 'bride')")
+    page.evaluate("location.hash = '#settings'")
+    page.wait_for_function("location.hash === '#add'")
+    assert not page.locator("#scrAdd").is_hidden()
+    page.evaluate("localStorage.removeItem('wedOrg')")
+    page.evaluate("location.hash = '#settings'")
+    page.wait_for_function("location.hash === '#add'")
+    page.evaluate("localStorage.setItem('wedOrg', 'master')")
+    page.evaluate("location.hash = '#list'")
+    page.wait_for_function("all.length === 3")
+
+    # ── Settings screen reached via the ☰ Settings row; one collapsed card per active event,
+    # church locked "Everyone" with no capacity/split fields at all
+    page.click("#hamburgerBtn")
+    page.wait_for_function("!document.getElementById('menuScrim').hidden")
+    page.locator("#menuRows .menu-row", has_text="Settings").click()
+    page.wait_for_function("!document.getElementById('scrSettings').hidden")
+    assert not page.locator("#scrSettings").is_hidden()
+    page.wait_for_function("document.querySelectorAll('#settingsList .evt-card').length === 3")
+    ev_ids = page.evaluate("[...document.querySelectorAll('#settingsList .evt-card')].map(c => c.dataset.id)")
+    assert ev_ids == ["church", "reception", "henna"], ev_ids
+    assert page.locator('.evt-card[data-id="church"] .evt-badge-everyone').count() == 1
+    assert page.locator("#evt_church_cap").count() == 0  # capacity hidden for the universal event
+
+    # ── henna cap 75 display: seeded cap shows in the field, split defaults to 50/50 (bride_alloc
+    # is null in the seed ⇒ derived 38/37, no per-side number was ever set)
+    page.locator('.evt-card[data-id="henna"] summary').click()
+    page.wait_for_function("document.getElementById('evt_henna_cap').offsetParent !== null")
+    assert page.input_value("#evt_henna_cap") == "75"
+    assert "on" not in (page.get_attribute("#evt_henna_splitNum", "class") or "")
+    assert page.evaluate("document.getElementById('evt_henna_splitFields').hidden") is True
+
+    # ── event field edit round-trips via PATCH
+    page.locator('.evt-card[data-id="reception"] summary').click()
+    page.wait_for_function("document.getElementById('evt_reception_venueEn').offsetParent !== null")
+    page.fill("#evt_reception_venueEn", "Al Masa Hotel — New Ballroom")
+    n_ev = len(event_mutations)
+    page.click("#settingsSaveBtn")
+    mut = wait_new_event_mutation(n_ev)
+    assert mut[0] == "PATCH" and "id=eq.reception" in mut[1], mut
+    ev_body = json.loads(mut[2])
+    assert ev_body["venue_en"] == "Al Masa Hotel — New Ballroom", ev_body
+    page.wait_for_function("EVENTS.find(e => e.id === 'reception').venue_en === 'Al Masa Hotel — New Ballroom'")
+
+    # ── derived groom math: bride/groom split is edited as ONE number (bride); groom is a
+    # read-only line that updates live from cap − bride, never typed — 225 of 400 ⇒ 175 by
+    # arithmetic, asserted literally, with no save required to see it
+    page.wait_for_function("document.getElementById('evt_reception_bride').offsetParent !== null")
+    assert page.input_value("#evt_reception_cap") == "400"
+    assert page.input_value("#evt_reception_bride") == "200"
+    page.fill("#evt_reception_bride", "225")
+    page.wait_for_function("document.getElementById('evt_reception_groomReadout').textContent.trim() === '175'")
+    page.fill("#evt_reception_bride", "200")  # revert — keeps this card a no-op for the save below
+    page.wait_for_function("document.getElementById('evt_reception_groomReadout').textContent.trim() === '200'")
+
+    # ── custom event add: name required, id auto-generated ev_xxxxxx, INSERTs active + non-core
+    n_events_before = page.evaluate("document.querySelectorAll('#settingsList .evt-card').length")
+    page.click("#settingsAddBtn")
+    page.wait_for_function(f"document.querySelectorAll('#settingsList .evt-card').length === {n_events_before + 1}")
+    new_id = page.evaluate("EVENTS.find(e => e._isNew).id")
+    assert new_id.startswith("ev_"), new_id
+    page.fill(f"#evt_{new_id}_nameAr", "حفلة الخطوبة")
+    page.fill(f"#evt_{new_id}_nameEn", "Engagement Party")
+    n_ev = len(event_mutations)
+    page.click("#settingsSaveBtn")
+    mut = wait_new_event_mutation(n_ev)
+    assert mut[0] == "POST", mut
+    posted_ev = json.loads(mut[2])
+    assert posted_ev["id"] == new_id, posted_ev
+    assert posted_ev["active"] is True and posted_ev["core"] is False, posted_ev
+    assert posted_ev["name_en"] == "Engagement Party", posted_ev
+    page.wait_for_function("!EVENTS.find(e => e._isNew)")  # cleared once the insert round-trips
+
+    # ── delete (deactivate, never hard-delete): a non-core event's Delete button PATCHes
+    # active:false and the card disappears; core events (church/reception/henna) never get one
+    assert page.locator('.evt-card[data-id="church"] .evt-delete').count() == 0
+    assert page.locator('.evt-card[data-id="reception"] .evt-delete').count() == 0
+    n_ev = len(event_mutations)
+    page.locator(f'.evt-card[data-id="{new_id}"] .evt-delete').click()
+    mut = wait_new_event_mutation(n_ev)
+    assert mut[0] == "PATCH" and f"id=eq.{new_id}" in mut[1], mut
+    assert json.loads(mut[2]) == {"active": False}, mut
+    page.wait_for_function("document.querySelectorAll('#settingsList .evt-card').length === 3")
+
+    # ── live invited-vs-cap gauges: an additive card per capped active non-universal event beyond
+    # reception (today: henna). Computed independently in Python from a fresh, direct fetch of the
+    # mocked wedding_families table — not from the app's own in-memory state — so this is a real
+    # check against whatever this suite's accumulated mutations left the fixture rows at.
+    raw_families = page.evaluate("async () => (await (await fetch(SUPA + '?select=*')).json())")
+    henna_bride = sum(eff(f, "henna") for f in raw_families if f["side"] == "bride")
+    henna_groom = sum(eff(f, "henna") for f in raw_families if f["side"] == "groom")
+    page.evaluate("location.hash = '#list'")
+    page.wait_for_function("!document.getElementById('scrList').hidden")
+    page.evaluate("async () => { await refreshSideTotals(); }")
+    page.wait_for_function("document.querySelector('#orgCapEvents .cap-card[data-event=\"henna\"]') !== null")
+    henna_gauge_text = page.inner_text('#orgCapEvents .cap-card[data-event="henna"]')
+    # each side's bar reads against ITS OWN derived allocation, not the raw event total — henna's
+    # bride_alloc is null (50/50) so 75 ⇒ ceil(75/2)=38 bride, 75-38=37 groom, matching brideCap()/
+    # groomCap() exactly (odd seat goes to bride, same rounding rule as the settings-screen math)
+    assert "Henna Party" in henna_gauge_text, henna_gauge_text
+    assert f"{henna_bride} / 38" in henna_gauge_text, (henna_gauge_text, henna_bride)
+    assert f"{henna_groom} / 37" in henna_gauge_text, (henna_gauge_text, henna_groom)
+
+    # ── seats-exceptions semantics are untouched: henna's per-family override still lives at
+    # seats.henna and clamps to count (v23 item 8 / this file's earlier henna-stepper assertions
+    # at the top of the suite already exercise the Edit stepper end-to-end; this just confirms the
+    # v26 read path — eventEff()/eventInvited() — agrees with the same live row)
+    henna_fixture = next(f for f in raw_families if f["id"] == "henna-family")
+    assert page.evaluate(
+        "eventEff(all.find(r => r.id === 'henna-family'), eventById('henna'))"
+    ) == eff(henna_fixture, "henna")
+
+    # ── footer version marker
+    assert page.locator(".ver").inner_text() == VERSION
+
+    # ── v26: the mock mirrors live wedding_events column constraints exactly (asserted last —
+    # these direct probes intentionally add to event_mutations, so they run after the counts
+    # above). meal_options/extras/name_ar are NOT NULL with defaults; map_url is nullable.
+    st_meal = page.evaluate(
+        "async () => (await fetch(EVENTS_URL + '?id=eq.reception', {method:'PATCH', headers:H, body: JSON.stringify({meal_options: null})})).status"
+    )
+    assert st_meal == 400, st_meal
+    st_extras = page.evaluate(
+        "async () => (await fetch(EVENTS_URL + '?id=eq.reception', {method:'PATCH', headers:H, body: JSON.stringify({extras: null})})).status"
+    )
+    assert st_extras == 400, st_extras
+    st_name = page.evaluate(
+        "async () => (await fetch(EVENTS_URL + '?id=eq.reception', {method:'PATCH', headers:H, body: JSON.stringify({name_ar: null})})).status"
+    )
+    assert st_name == 400, st_name
+    st_map = page.evaluate(
+        "async () => (await fetch(EVENTS_URL + '?id=eq.reception', {method:'PATCH', headers:H, body: JSON.stringify({map_url: null})})).status"
+    )
+    assert st_map == 200, st_map  # nullable column accepts null
+
     browser.close()
     print(
-        f"PASS {browser_name}: v25 — IA restructure: hash router (#list/#add/#fast/#photos/"
+        f"PASS {browser_name}: v26 — Event Setup: master-only #settings route (router-level "
+        "redirect for every other role, deep links included) reached via the ☰ Settings row; one "
+        "collapsed card per active wedding_events row (church locked Everyone, no capacity/split), "
+        "field edits round-trip via PATCH, bride/groom split is one number with a live-derived "
+        "read-only groom line (225 of 400 ⇒ 175, no save required to see it), custom events "
+        "INSERT active+non-core with an auto-generated ev_xxxxxx id, Delete deactivates (never "
+        "hard-deletes), an additive live gauge card per capped active non-universal event beyond "
+        "reception (henna 75 seeded), mock enforces the same NOT NULL constraints as the live "
+        "wedding_events table. On top of v25 — IA restructure: hash router (#list/#add/#fast/#photos/"
         "#waitlist/#deleted/#tags) with role-gated redirects, deep links surviving reload, "
         "back/forward navigation; ☰ hamburger menu built from one role table (contributor 3 "
         "rows max + conditional Organizers row once a PIN was ever entered on the device, side "
-        "organizer, master with Waitlist/Deleted/Tags and no dead Tables/Settings rows), "
+        "organizer, master with Waitlist/Deleted/Tags/Settings and no dead Tables row), "
         "Excel/Snapshot/PIN/Lang as actions not screens; one-screen Add replacing the 3-step "
         "wizard (master Bride/Groom segment vs. side-locked read-only pill, count stepper, "
         "Church pill dimming Reception with zero explainer text, empty-name disable, empty-phone "

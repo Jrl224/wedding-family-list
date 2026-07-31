@@ -218,6 +218,23 @@
   .cap-card.maxed .cap-left{color:#e08a8a}
   .cap-full-msg{margin-top:7px;font-size:12.5px;color:#e08a8a;font-weight:700;display:none}
   .cap-card.maxed .cap-full-msg{display:block}
+  .evt-card{border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,var(--card2),var(--card));margin-bottom:10px;overflow:hidden;text-align:start}
+  .evt-card>summary{padding:14px 16px;cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px}
+  .evt-card>summary::-webkit-details-marker{display:none}
+  .evt-card>summary b{flex:1;font-size:15px;overflow-wrap:anywhere}
+  .evt-card>summary .evt-meta{color:var(--dim);font-size:11.5px;white-space:nowrap}
+  .evt-body{padding:2px 16px 16px;display:flex;flex-direction:column;gap:10px}
+  .evt-field label{display:block;color:var(--gold-b);font-size:12px;font-weight:700;margin-bottom:4px}
+  .evt-field input,.evt-field textarea{
+    width:100%;padding:11px;border-radius:10px;border:1px solid var(--line);
+    background:rgba(9,18,32,.8);color:var(--ivory);font-family:inherit;font-size:14px;
+  }
+  .evt-field textarea{resize:vertical}
+  .evt-row2{display:flex;gap:8px}
+  .evt-row2>div{flex:1;min-width:0}
+  .evt-badge-everyone{display:inline-block;padding:5px 12px;border-radius:8px;background:rgba(150,130,220,.15);border:1px solid rgba(150,130,220,.4);color:#c3b3f0;font-size:12.5px;font-weight:700}
+  .evt-groom-readout{padding:11px;border-radius:10px;background:rgba(9,18,32,.5);border:1px solid var(--line);color:var(--gold-b);font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600}
+  .evt-delete{width:100%;margin-top:2px;padding:12px;border-radius:10px;background:rgba(201,106,106,.15);border:1px solid rgba(201,106,106,.5);color:#e08a8a;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer}
   .hamburger{
     position:fixed;top:12px;inset-inline-end:12px;z-index:16;width:44px;height:44px;border-radius:14px;cursor:pointer;
     border:1px solid var(--line);background:rgba(18,32,58,.92);color:var(--gold-b);font-size:20px;font-family:inherit;
@@ -437,6 +454,7 @@
       <div class="cap-line"><b id="orgCapGName"></b><span><span id="orgCapGUsed">0</span> / <span id="orgCapGMax">200</span> · <span class="cap-left" id="orgCapGLeft"></span><span class="cap-church" id="orgCapGChurch"></span></span></div>
       <div class="cap-bar"><div class="cap-fill ok" id="orgCapGFill"></div></div>
     </div>
+    <div id="orgCapEvents"></div>
     <div class="fbar" id="filterBar">
       <button type="button" class="fs-trigger" id="filtersBtn" onclick="openFilterSheet()">
         <span id="filtersBtnLbl"></span><span class="fs-badge" id="filtersBadge" hidden></span>
@@ -457,7 +475,14 @@
     </div>
   </div>
 
-  <p class="ver">٢٥٫٠ · 25.0</p>
+  <div class="screen" id="scrSettings" hidden>
+    <h2 class="sec" id="settingsTitle"></h2>
+    <div id="settingsList"></div>
+    <button type="button" class="next save-btn" id="settingsAddBtn" onclick="addCustomEvent()"></button>
+    <button type="button" class="next save-btn" id="settingsSaveBtn" onclick="saveSettings()" style="margin-top:10px"></button>
+  </div>
+
+  <p class="ver">٢٦٫٠ · 26.0</p>
 </div>
 
 <div class="modal-bg" id="filterBg" hidden onmousedown="if(event.target===this) closeFilterSheet()">
@@ -763,6 +788,11 @@ const STR = {
     menuPin:"الرقم السري", menuDeleted:"المحذوفات", menuTags:"الوسوم", menuOrganizers:"المنظمين",
     existsChip:"موجود", detailsLbl:"تفاصيل", nameLbl:"الاسم", countLbl:"العدد", phoneLbl:"التليفون",
     contactsLbl:"جهات الاتصال", capWaitlistChip:"الانتظار", excelLbl:"Excel", sideLinkLbl:"الجهة",
+    menuSettings:"الإعدادات", setEventsTitle:"المناسبات",
+    setName:"الاسم", setDate:"التاريخ", setFrom:"من", setTo:"إلى", setVenue:"المكان", setAddress:"العنوان",
+    setMap:"الخريطة", setCapacity:"السعة", setSplit:"التوزيع", setNumbers:"أرقام", setBride:"العروسة",
+    setGroom:"العريس", setMeal:"الوجبة", setPlated:"وجبات", setBuffet:"بوفيه", setDishes:"الأصناف",
+    setAddEvent:"➕ مناسبة", setEveryone:"الكل", setUnlimited:"بلا حد", setDeleteEvent:"حذف",
   },
   en: {
     kicker:"Guest List", sideQ:"Which side are you from? One minute to add your families.",
@@ -836,6 +866,11 @@ const STR = {
     menuPin:"PIN", menuDeleted:"Deleted", menuTags:"Tags", menuOrganizers:"Organizers",
     existsChip:"Exists", detailsLbl:"Details", nameLbl:"Name", countLbl:"Count", phoneLbl:"Phone",
     contactsLbl:"Contacts", capWaitlistChip:"Waitlist", excelLbl:"Excel", sideLinkLbl:"Side",
+    menuSettings:"Settings", setEventsTitle:"Events",
+    setName:"Name", setDate:"Date", setFrom:"From", setTo:"To", setVenue:"Venue", setAddress:"Address",
+    setMap:"Map", setCapacity:"Capacity", setSplit:"Split", setNumbers:"Numbers", setBride:"Bride",
+    setGroom:"Groom", setMeal:"Meal", setPlated:"Plated", setBuffet:"Buffet", setDishes:"Dishes",
+    setAddEvent:"➕ Event", setEveryone:"Everyone", setUnlimited:"Unlimited", setDeleteEvent:"Delete",
   }
 };
 let L = localStorage.getItem("wedLang") || "ar";
@@ -900,6 +935,48 @@ async function loadCaps(){
     }
   } catch(e) {}
 }
+
+/* ── v26: event setup (wedding_events) ──
+   Legacy columns (church_only/event2/count) stay PERMANENTLY authoritative for membership +
+   family size on the three core events — old open tabs keep writing them forever. `seats` jsonb
+   stores only exceptions (a seat-count override) plus membership for brand-new custom events.
+   Groom is always DERIVED (cap_total − bride_alloc), never stored, so it can't drift. */
+const EVENTS_URL = "https://wydodvbkqhpoyefcwpnf.supabase.co/rest/v1/wedding_events";
+let EVENTS = [];
+let eventTotals = {};
+function eventById(id){ return EVENTS.find(e => e.id === id); }
+function brideCap(e){ return e && e.cap_total != null ? (e.bride_alloc != null ? e.bride_alloc : Math.ceil(e.cap_total / 2)) : null; }
+function groomCap(e){ return e && e.cap_total != null ? e.cap_total - brideCap(e) : null; }
+function eventInvited(f, e){
+  if (!e) return false;
+  if (e.universal) return true;
+  if (e.id === "reception") return !f.church_only;
+  if (e.id === "henna") return !!f.event2;
+  return !!(f.seats && Object.prototype.hasOwnProperty.call(f.seats, e.id));
+}
+function eventEff(f, e){
+  if (!eventInvited(f, e)) return 0;
+  const override = f.seats && f.seats[e.id];
+  const n = Number.isInteger(override) ? override : f.count;
+  return Math.min(n, f.count);
+}
+function syncCapsFromEvents(){
+  const rec = eventById("reception");
+  if (rec && rec.cap_total != null) CAPS = { bride: brideCap(rec), groom: groomCap(rec) };
+  const hn = eventById("henna");
+  if (hn) EV2 = { ar: hn.name_ar || EV2.ar, en: hn.name_en || EV2.en };
+}
+async function loadEvents(){
+  try {
+    const r = await fetch(EVENTS_URL + "?select=*&order=sort.asc", { headers: H });
+    if (r.ok) {
+      EVENTS = await r.json();
+      syncCapsFromEvents();
+      renderCaps();
+      if (!$("scrSettings").hidden) renderSettingsScreen();
+    }
+  } catch(e) {}
+}
 let wEv2 = false, eEv2 = false;
 function setEv2(v){ wEv2 = v; }
 let eHenna = 0;
@@ -924,17 +1001,21 @@ function setChurch(v){ wChurch = v; }
 function setEChurch(v){ eChurch = v; $("eRecChk").checked = !v; }
 async function refreshSideTotals(){
   try {
-    const r = await fetch(SUPA + "?select=side,count,church_only,waitlist,deleted_at", { headers: H });
+    const r = await fetch(SUPA + "?select=side,count,church_only,event2,waitlist,deleted_at,seats", { headers: H });
     if (!r.ok) return;
     const rows = await r.json();
     sideTotals = { bride: 0, groom: 0 };
     churchTotals = { bride: 0, groom: 0 };
+    const et = {};
+    EVENTS.filter(e => e.active && !e.universal).forEach(e => et[e.id] = { bride: 0, groom: 0 });
     rows.forEach(x => {
       if (x.deleted_at || x.waitlist) return;   // waitlisted rows are invisible to cap/headcount math
       if (sideTotals[x.side] === undefined) return;
       if (x.church_only) churchTotals[x.side] += x.count;
       else sideTotals[x.side] += x.count;
+      Object.keys(et).forEach(eid => { et[eid][x.side] += eventEff(x, eventById(eid)); });
     });
+    eventTotals = et;
     renderCaps();
   } catch(e) {}
 }
@@ -965,8 +1046,36 @@ function renderCaps(){
     $("orgCapGName").textContent = t("sideWordG");
     paintCap("orgCapB", "bride");
     paintCap("orgCapG", "groom");
+    renderExtraEventGauges();
   }
   renderAddCapChip();
+}
+/* v26: one extra live gauge card per capped active non-universal event beyond reception (today:
+   henna 75, plus any custom event once it has a capacity) — additive, never touches the existing
+   reception cap-cards above so their IDs/behavior stay byte-identical for older code paths. */
+function gaugeLine(label, used, cap){
+  const pct = cap ? Math.min(100, Math.round(used / cap * 100)) : 0;
+  const cls = pct >= 100 ? "full" : pct >= 90 ? "warn" : "ok";
+  const leftTxt = used > cap ? t("capOver")(used - cap) : t("capLeft")(cap - used);
+  return `<div class="cap-line"><b>${esc(label)}</b><span>${localDigits(used)} / ${localDigits(cap)} · <span class="cap-left">${esc(leftTxt)}</span></span></div>`
+       + `<div class="cap-bar"><div class="cap-fill ${cls}" style="width:${pct}%"></div></div>`;
+}
+function renderExtraEventGauges(){
+  const el = $("orgCapEvents"); if (!el) return;
+  el.innerHTML = "";
+  const role = orgRole() || "master";
+  EVENTS.filter(e => e.active && !e.universal && e.id !== "reception" && e.cap_total != null).forEach(e => {
+    const bCap = brideCap(e), gCap = groomCap(e);
+    const used = eventTotals[e.id] || { bride: 0, groom: 0 };
+    const card = document.createElement("div");
+    card.className = "cap-card";
+    card.dataset.event = e.id;
+    let html = `<div class="cap-line"><b>${esc(L === "ar" ? e.name_ar : e.name_en)}</b></div>`;
+    if (role === "master" || role === "bride") html += gaugeLine(t("sideWordB"), used.bride, bCap);
+    if (role === "master" || role === "groom") html += gaugeLine(t("sideWordG"), used.groom, gCap);
+    card.innerHTML = html;
+    el.appendChild(card);
+  });
 }
 setInterval(() => { if (!document.hidden && mySide) { refreshSideTotals(); loadPhotos(); } }, 15000);
 
@@ -1040,17 +1149,18 @@ function route(){
   if (mySide) {
     if (!addSide) addSide = mySide;
     $("menuHintDot").hidden = !!localStorage.getItem("wedMenuSeen");
-    refreshMine(); loadCaps().then(refreshSideTotals); loadPhotos();
+    refreshMine(); Promise.all([loadCaps(), loadEvents()]).then(refreshSideTotals); loadPhotos();
     screenRoute();
   }
 }
 
-const SCREEN_HASHES = ["list","add","fast","photos","waitlist","deleted","tags"];
+const SCREEN_HASHES = ["list","add","fast","photos","waitlist","deleted","tags","settings"];
 function currentHash(){ const h = (location.hash || "").replace(/^#/, ""); return SCREEN_HASHES.includes(h) ? h : ""; }
 function screenAllowed(scr){
   if (scr === "add" || scr === "fast" || scr === "photos") return true;
   if (scr === "list") return isOrg();
   if (scr === "waitlist" || scr === "deleted" || scr === "tags") return isMasterRole();
+  if (scr === "settings") return isMasterRole();
   return false;
 }
 function openOrgList(){
@@ -1060,14 +1170,15 @@ function openOrgList(){
 }
 function showScreen(scr){
   const wasList = !$("scrList").hidden;
-  ["scrAdd","scrFast","scrPhotos","scrList"].forEach(id => $(id).hidden = true);
-  const domId = scr === "add" ? "scrAdd" : scr === "fast" ? "scrFast" : scr === "photos" ? "scrPhotos" : "scrList";
+  ["scrAdd","scrFast","scrPhotos","scrList","scrSettings"].forEach(id => $(id).hidden = true);
+  const domId = scr === "add" ? "scrAdd" : scr === "fast" ? "scrFast" : scr === "photos" ? "scrPhotos" : scr === "settings" ? "scrSettings" : "scrList";
   $(domId).hidden = false;
   const enteringList = domId === "scrList";
   if (enteringList) { if (!wasList) openOrgList(); }
   else if (wasList && orgTimer) { clearInterval(orgTimer); orgTimer = null; }
   if (domId === "scrAdd") renderAddScreen();
   if (domId === "scrPhotos") loadPhotos();
+  if (domId === "scrSettings") renderSettingsScreen();
   if (scr === "waitlist") { activeFilters.clear(); activeFilters.add("waitlist"); renderAll(); }
   else if (scr === "deleted") { activeFilters.clear(); activeFilters.add("deleted"); renderAll(); }
   else if (scr === "tags") { activeFilters.clear(); tagFilter = null; renderAll(); openFilterSheet(); }
@@ -1105,6 +1216,7 @@ function menuRowsFor(){
     rows.push({ id: "waitlist", label: t("waitlistLabel"), onClick: nav("waitlist") });
     rows.push({ id: "deleted", label: t("menuDeleted"), onClick: nav("deleted") });
     rows.push({ id: "tags", label: t("menuTags"), onClick: nav("tags") });
+    rows.push({ id: "settings", label: t("menuSettings"), onClick: nav("settings") });
   }
   rows.push({ id: "excel", label: t("excelLbl"), onClick: () => { closeMenu(); exportExcel(); } });
   rows.push({ id: "snapshot", label: t("menuSnapshot"), onClick: () => { closeMenu(); sendSnapshot(); } });
@@ -2105,6 +2217,207 @@ function deleteFromEdit(){
   editing = null;
   if (row) removeRow(row);
 }
+
+/* ── v26: Settings — master-only event setup (church/reception/henna + custom events) ── */
+function pickEventFields(e){
+  // time_start/time_end are compared at HH:MM precision — that's all an <input type=time> can
+  // round-trip, and Postgres `time` values load back as HH:MM:SS; slicing here keeps unedited
+  // cards byte-identical to their own DOM so a save doesn't needlessly re-PATCH untouched rows.
+  return {
+    name_ar: e.name_ar || "", name_en: e.name_en || "",
+    event_date: e.event_date || null,
+    time_start: (e.time_start || "").slice(0, 5) || null, time_end: (e.time_end || "").slice(0, 5) || null,
+    venue_ar: e.venue_ar || null, venue_en: e.venue_en || null,
+    address_ar: e.address_ar || null, address_en: e.address_en || null,
+    map_url: e.map_url || null,
+    cap_total: e.cap_total == null ? null : e.cap_total,
+    bride_alloc: e.bride_alloc == null ? null : e.bride_alloc,
+    meal_style: e.meal_style || null, meal_options: e.meal_options || [], extras: e.extras || {},
+  };
+}
+function collectEventCard(e){
+  const g = id => { const el = $(id); return el ? el.value.trim() : ""; };
+  // number inputs' min="0" only affects the spinner/validity styling, not what a typed "-5"
+  // actually commits to .value — clamp + guard NaN here so a stray negative or malformed number
+  // can never reach the network.
+  const num = raw => { const n = Number(raw); return Number.isFinite(n) ? Math.max(0, Math.round(n)) : null; };
+  const universal = !!e.universal;
+  const cap = universal ? null : (g(`evt_${e.id}_cap`) === "" ? null : num(g(`evt_${e.id}_cap`)));
+  const numbersBtn = $(`evt_${e.id}_splitNum`);
+  const numbers = !universal && numbersBtn && numbersBtn.className.includes("on");
+  const bride = (numbers && g(`evt_${e.id}_bride`) !== "") ? num(g(`evt_${e.id}_bride`)) : null;
+  let mealStyle = null, mealOptions = [];
+  if (e.id === "reception") {
+    const plated = $(`evt_${e.id}_mealPlated`), buffet = $(`evt_${e.id}_mealBuffet`);
+    mealStyle = plated && plated.className.includes("on") ? "plated" : (buffet && buffet.className.includes("on") ? "buffet" : null);
+    if (mealStyle === "plated") {
+      const ar = g(`evt_${e.id}_dishesAr`).split("\n").map(s => s.trim()).filter(Boolean);
+      const en = g(`evt_${e.id}_dishesEn`).split("\n").map(s => s.trim()).filter(Boolean);
+      const len = Math.max(ar.length, en.length);
+      for (let i = 0; i < len; i++) mealOptions.push({ ar: ar[i] || "", en: en[i] || "" });
+    }
+  }
+  return {
+    name_ar: g(`evt_${e.id}_nameAr`), name_en: g(`evt_${e.id}_nameEn`),
+    event_date: g(`evt_${e.id}_date`) || null,
+    time_start: g(`evt_${e.id}_from`) || null, time_end: g(`evt_${e.id}_to`) || null,
+    venue_ar: g(`evt_${e.id}_venueAr`) || null, venue_en: g(`evt_${e.id}_venueEn`) || null,
+    address_ar: g(`evt_${e.id}_addrAr`) || null, address_en: g(`evt_${e.id}_addrEn`) || null,
+    map_url: g(`evt_${e.id}_map`) || null,
+    cap_total: cap, bride_alloc: bride,
+    meal_style: mealStyle, meal_options: mealOptions, extras: e.extras || {},
+  };
+}
+function onEventCapInput(id){
+  const readout = $(`evt_${id}_groomReadout`); if (!readout) return;
+  const capEl = $(`evt_${id}_cap`), brideEl = $(`evt_${id}_bride`);
+  const num = raw => { const n = Number(raw); return Number.isFinite(n) ? Math.max(0, n) : null; };
+  const cap = capEl && capEl.value !== "" ? num(capEl.value) : null;
+  const bride = brideEl && brideEl.value !== "" ? num(brideEl.value) : null;
+  readout.textContent = (cap != null && bride != null) ? localDigits(cap - bride) : "";
+}
+function setEventSplitMode(id, numbers){
+  $(`evt_${id}_split50`).className = numbers ? "" : "on";
+  $(`evt_${id}_splitNum`).className = numbers ? "on" : "";
+  $(`evt_${id}_splitFields`).hidden = !numbers;
+  if (!numbers) $(`evt_${id}_bride`).value = "";
+  onEventCapInput(id);
+}
+function setEventMeal(id, style){
+  $(`evt_${id}_mealPlated`).className = style === "plated" ? "on" : "";
+  $(`evt_${id}_mealBuffet`).className = style === "buffet" ? "on" : "";
+  const wrap = $(`evt_${id}_dishesWrap`); if (wrap) wrap.hidden = style !== "plated";
+}
+function renderEventCard(e, openIds){
+  const det = document.createElement("details");
+  det.className = "evt-card";
+  det.dataset.id = e.id;
+  det.open = !!e._isNew || (openIds && openIds.has(e.id));
+  const summary = document.createElement("summary");
+  const gaugeTxt = e.cap_total != null
+    ? `${localDigits(((eventTotals[e.id] && (eventTotals[e.id].bride + eventTotals[e.id].groom)) || 0))} / ${localDigits(e.cap_total)}`
+    : t("setUnlimited");
+  summary.innerHTML = `<span style="font-size:18px">${esc(e.emoji || "🤍")}</span><b>${esc((L === "ar" ? e.name_ar : e.name_en) || "—")}</b><span class="evt-meta">${e.event_date ? esc(e.event_date) + " · " : ""}${gaugeTxt}</span>`;
+  det.appendChild(summary);
+  const body = document.createElement("div");
+  body.className = "evt-body";
+
+  const field = (labelKey, id, value, type) => `<div class="evt-field"><label>${t(labelKey)}</label><input type="${type || "text"}" id="${id}" value="${esc(value == null ? "" : value)}"></div>`;
+  const row2 = (a, b) => `<div class="evt-row2"><div>${a}</div><div>${b}</div></div>`;
+
+  let html = "";
+  html += row2(field("setName", `evt_${e.id}_nameAr`, e.name_ar), field("setName", `evt_${e.id}_nameEn`, e.name_en));
+  html += row2(
+    `<div class="evt-field"><label>${t("setDate")}</label><input type="date" id="evt_${e.id}_date" value="${e.event_date || ""}"></div>`,
+    `<div class="evt-row2"><div class="evt-field"><label>${t("setFrom")}</label><input type="time" id="evt_${e.id}_from" value="${(e.time_start || "").slice(0,5)}"></div><div class="evt-field"><label>${t("setTo")}</label><input type="time" id="evt_${e.id}_to" value="${(e.time_end || "").slice(0,5)}"></div></div>`
+  );
+  html += row2(field("setVenue", `evt_${e.id}_venueAr`, e.venue_ar), field("setVenue", `evt_${e.id}_venueEn`, e.venue_en));
+  html += row2(field("setAddress", `evt_${e.id}_addrAr`, e.address_ar), field("setAddress", `evt_${e.id}_addrEn`, e.address_en));
+  html += `<div class="evt-field"><label>${t("setMap")}</label><input type="text" dir="ltr" id="evt_${e.id}_map" value="${esc(e.map_url || "")}"></div>`;
+
+  if (e.universal) {
+    html += `<span class="evt-badge-everyone">${t("setEveryone")}</span>`;
+  } else {
+    html += `<div class="evt-field"><label>${t("setCapacity")}</label><input type="number" min="0" id="evt_${e.id}_cap" value="${e.cap_total == null ? "" : e.cap_total}" placeholder="${t("setUnlimited")}" oninput="onEventCapInput('${e.id}')"></div>`;
+    const numbersMode = e.bride_alloc != null;
+    html += `<div class="evt-field"><label>${t("setSplit")}</label>
+      <div class="segment" id="evt_${e.id}_splitSeg">
+        <button type="button" id="evt_${e.id}_split50" class="${numbersMode ? "" : "on"}" onclick="setEventSplitMode('${e.id}', false)">50/50</button>
+        <button type="button" id="evt_${e.id}_splitNum" class="${numbersMode ? "on" : ""}" onclick="setEventSplitMode('${e.id}', true)">${t("setNumbers")}</button>
+      </div></div>`;
+    html += `<div class="evt-row2" id="evt_${e.id}_splitFields" ${numbersMode ? "" : "hidden"}>
+      <div class="evt-field"><label>${t("setBride")}</label><input type="number" min="0" id="evt_${e.id}_bride" value="${e.bride_alloc == null ? "" : e.bride_alloc}" oninput="onEventCapInput('${e.id}')"></div>
+      <div class="evt-field"><label>${t("setGroom")}</label><div class="evt-groom-readout" id="evt_${e.id}_groomReadout">${groomCap(e) == null ? "" : localDigits(groomCap(e))}</div></div>
+    </div>`;
+  }
+
+  if (e.id === "reception") {
+    const plated = e.meal_style === "plated";
+    const dishesAr = (e.meal_options || []).map(m => m.ar || "").join("\n");
+    const dishesEn = (e.meal_options || []).map(m => m.en || "").join("\n");
+    html += `<div class="evt-field"><label>${t("setMeal")}</label>
+      <div class="segment">
+        <button type="button" id="evt_${e.id}_mealPlated" class="${plated ? "on" : ""}" onclick="setEventMeal('${e.id}', 'plated')">${t("setPlated")}</button>
+        <button type="button" id="evt_${e.id}_mealBuffet" class="${e.meal_style === "buffet" ? "on" : ""}" onclick="setEventMeal('${e.id}', 'buffet')">${t("setBuffet")}</button>
+      </div></div>`;
+    html += `<div class="evt-field" id="evt_${e.id}_dishesWrap" ${plated ? "" : "hidden"}><label>${t("setDishes")}</label>
+      <div class="evt-row2">
+        <textarea id="evt_${e.id}_dishesAr" rows="3">${esc(dishesAr)}</textarea>
+        <textarea id="evt_${e.id}_dishesEn" rows="3">${esc(dishesEn)}</textarea>
+      </div></div>`;
+  }
+
+  if (!e.core) html += `<button type="button" class="evt-delete" onclick="deleteCustomEvent('${e.id}')">${t("setDeleteEvent")}</button>`;
+
+  body.innerHTML = html;
+  det.appendChild(body);
+  return det;
+}
+function renderSettingsScreen(){
+  $("settingsTitle").textContent = t("setEventsTitle");
+  $("settingsAddBtn").textContent = t("setAddEvent");
+  $("settingsSaveBtn").textContent = t("save");
+  EVENTS.forEach(e => { if (!e._isNew) e._orig = JSON.stringify(pickEventFields(e)); });
+  const el = $("settingsList"); if (!el) return;
+  const openIds = new Set([...el.querySelectorAll(".evt-card[open]")].map(d => d.dataset.id));
+  el.innerHTML = "";
+  EVENTS.filter(e => e.active).forEach(e => el.appendChild(renderEventCard(e, openIds)));
+}
+function addCustomEvent(){
+  const id = "ev_" + Math.random().toString(16).slice(2, 8);
+  const maxSort = EVENTS.reduce((m, e) => Math.max(m, e.sort || 0), 0);
+  EVENTS.push({
+    id, sort: maxSort + 1, emoji: "🤍", name_ar: "", name_en: "",
+    event_date: null, time_start: null, time_end: null,
+    venue_ar: null, venue_en: null, address_ar: null, address_en: null, map_url: null,
+    cap_total: null, bride_alloc: null, universal: false, core: false, active: true,
+    meal_style: null, meal_options: [], extras: {}, _isNew: true,
+  });
+  renderSettingsScreen();
+  const det = document.querySelector(`.evt-card[data-id="${id}"]`);
+  if (det) det.scrollIntoView({ behavior: "smooth" });
+}
+async function deleteCustomEvent(id){
+  const ev = eventById(id); if (!ev) return;
+  if (ev._isNew) { EVENTS = EVENTS.filter(e => e.id !== id); renderSettingsScreen(); return; }
+  try {
+    const r = await fetch(`${EVENTS_URL}?id=eq.${id}`, { method: "PATCH", headers: H, body: JSON.stringify({ active: false }) });
+    if (r.ok) { EVENTS = EVENTS.filter(e => e.id !== id); renderSettingsScreen(); refreshSideTotals(); toast(t("edited")); }
+    else toast(t("netErr"), true);
+  } catch(e) { toast(t("netErr"), true); }
+}
+async function saveSettings(){
+  const cards = EVENTS.filter(e => e.active);
+  let ok = true, sawInvalid = false;
+  for (const e of cards) {
+    const body = collectEventCard(e);
+    if (!body.name_ar || !body.name_en) { sawInvalid = true; continue; }
+    const changed = e._isNew || JSON.stringify(body) !== e._orig;
+    if (!changed) continue;
+    try {
+      if (e._isNew) {
+        const insertBody = { id: e.id, sort: e.sort, emoji: e.emoji || "🤍", universal: false, core: false, active: true, ...body };
+        const r = await fetch(EVENTS_URL, { method: "POST", headers: H, body: JSON.stringify(insertBody) });
+        if (!r.ok) { ok = false; continue; }
+        e._isNew = false; Object.assign(e, insertBody);
+      } else {
+        const r = await fetch(`${EVENTS_URL}?id=eq.${e.id}`, { method: "PATCH", headers: H, body: JSON.stringify(body) });
+        if (!r.ok) { ok = false; continue; }
+        Object.assign(e, body);
+      }
+    } catch(err) { ok = false; }
+  }
+  if (ok && !sawInvalid) {
+    syncCapsFromEvents();
+    renderCaps();
+    renderSettingsScreen();
+    refreshSideTotals();
+    toast(t("edited"));
+  } else {
+    toast(t("netErr"), true);
+  }
+}
+
 function renderMine(){
   const live = mine.filter(r => !r.deleted_at);
   const el = $("mineList");
