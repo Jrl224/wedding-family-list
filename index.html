@@ -97,6 +97,11 @@
   .fam .card-chip.crumb.trashed{opacity:.5}
   .fam .card-chip.rollup{border-color:rgba(150,130,220,.5);background:rgba(150,130,220,.13);color:#c3b3f0;cursor:pointer;position:relative}
   .fam .card-chip.crumb::before,.fam .card-chip.rollup::before{content:"";position:absolute;inset:-12px}
+  .fam .card-chip.group{border-color:rgba(201,162,39,.4);background:rgba(201,162,39,.09);color:var(--gold-b)}
+  .group-header{color:var(--gold-b);font-size:12.5px;font-weight:700;text-align:start;margin:16px 0 7px;padding-bottom:5px;border-bottom:1px solid var(--line)}
+  .group-header:first-child{margin-top:0}
+  .fs-row .fs-grp-rename{flex:0 0 auto;background:none;border:0;font-size:14px;line-height:1;padding:4px 6px;cursor:pointer;opacity:.7}
+  .fs-row .fs-grp-rename:hover{opacity:1}
   .fam.flash{animation:famflash .6s ease}
   @keyframes famflash{0%,100%{background:linear-gradient(180deg,var(--card2),var(--card))}50%{background:rgba(201,162,39,.22)}}
   .fam .nophone-badge{font-size:11px;margin-inline-start:5px;padding:1px 6px;border-radius:6px;background:rgba(201,106,106,.18);border:1px solid rgba(201,106,106,.5);color:#e6a3a3;vertical-align:middle}
@@ -408,6 +413,11 @@
     </div>
     <p class="add-chip waitlist" id="addWaitlistChip" hidden></p>
 
+    <div class="fs-section" id="addGroupSec">
+      <p class="fs-label" id="addGroupLabel"></p>
+      <div class="tag-pills" id="addGroupChips"></div>
+    </div>
+
     <button class="next save-btn" id="addSaveBtn" onclick="saveFamilyOneScreen()"></button>
 
     <details class="more-opts" id="addMore" hidden>
@@ -471,6 +481,7 @@
       <button id="sortNoPhone" class="on" onclick="setSort('nophone')"></button>
       <button id="sortAZ" onclick="setSort('az')"></button>
       <button id="sortLast" onclick="setSort('last')"></button>
+      <button id="sortGroup" onclick="setSort('group')" hidden></button>
       <button id="sortTree" onclick="toggleTreeView()" hidden></button>
     </div>
     <input class="search" id="search" oninput="renderAll()">
@@ -488,7 +499,7 @@
     <button type="button" class="next save-btn" id="settingsSaveBtn" onclick="saveSettings()" style="margin-top:10px"></button>
   </div>
 
-  <p class="ver">٢٦٫١ · 26.1</p>
+  <p class="ver">٢٦٫٢ · 26.2</p>
 </div>
 
 <div class="modal-bg" id="filterBg" hidden onmousedown="if(event.target===this) closeFilterSheet()">
@@ -525,6 +536,10 @@
         <p class="fs-label" id="fsIssuesLbl"></p>
         <label class="fs-row" id="rowFNoPhone"><input type="checkbox" id="cbFNoPhone" onchange="toggleFilterCb('nophone',this.checked)"><span id="rowFNoPhoneLbl"></span><span class="fs-count" id="cntFNoPhone"></span></label>
         <label class="fs-row" id="rowFWrong"><input type="checkbox" id="cbFWrong" onchange="toggleFilterCb('wrong',this.checked)"><span id="rowFWrongLbl"></span><span class="fs-count" id="cntFWrong"></span></label>
+      </div>
+      <div class="fs-section" id="fsGroupSec" hidden>
+        <p class="fs-label" id="fsGroupLbl"></p>
+        <div id="fsGroupRows"></div>
       </div>
       <div class="fs-section" id="fsTagsSec" hidden>
         <p class="fs-label" id="fsTagsLbl"></p>
@@ -592,6 +607,10 @@
     <label class="check-row"><input type="checkbox" id="eRecChk" onchange="setEChurch(!this.checked)"><span id="eChurchLabel"></span></label>
     <div class="check-row-seats"><label class="check-row"><input type="checkbox" id="eEv2Chk" onchange="setEEv2(this.checked)"><span id="eEv2Label"></span></label><span class="seat-step" id="eHennaSeatsRow" hidden><button type="button" onclick="hennaBump(-1)">−</button><span id="eHennaSeats"></span><button type="button" onclick="hennaBump(1)">+</button></span></div>
     <label class="check-row"><input type="checkbox" id="eConfirmedChk"><span id="eConfirmedLabel"></span></label>
+    <div class="fs-section" id="eGroupSec">
+      <p class="fs-label" id="eGroupLabel"></p>
+      <div class="tag-pills" id="eGroupChips"></div>
+    </div>
     <div class="fs-section" id="eTagsSec" hidden>
       <p class="fs-label" id="eTagsLabel"></p>
       <div class="tag-pills" id="eTagPills"></div>
@@ -789,6 +808,7 @@ const STR = {
     rowSent:d=>`✓ اتبعتت${d ? " · " + d : ""}`, fSent:"✓ اتبعتت", fUnsent:"◻︎ لسه",
     tagsLabel:"تصنيفات", addTag:"+ تصنيف", waitlistLabel:"قائمة الانتظار", waitNo:"لا", waitYes:"نعم",
     chipWaitlist:"انتظار", issueWaitlist:"⏳ انتظار",
+    groupLbl:"المجموعة", groupAddChip:"+", sortGroup:"👥 مجموعة", groupRenameTitle:"اسم المجموعة", groupRenameAria:"تعديل", groupRenameConfirm:(n,name)=>`تغيير ${n} عيلة إلى «${name}»؟`, groupRenamed:n=>`اتغيّرت ${n} عيلة ✅`,
     evReception:"الفرح", evHenna:"الحنة", evChurch:"الكنيسة",
     addedToast:"تمت الإضافة", fastEntryLbl:"إدخال سريع",
     menuPhotos:"الصور", menuHeading:"القائمة", listLbl:"القائمة", menuAdd:"إضافة", menuSnapshot:"لقطة",
@@ -868,6 +888,7 @@ const STR = {
     rowSent:d=>`✓ Sent${d ? " · " + d : ""}`, fSent:"✓ Sent", fUnsent:"◻︎ Not sent",
     tagsLabel:"Tags", addTag:"+ Tag", waitlistLabel:"Waitlist", waitNo:"No", waitYes:"Yes",
     chipWaitlist:"Waitlist", issueWaitlist:"⏳ Waitlist",
+    groupLbl:"Group", groupAddChip:"+", sortGroup:"👥 By group", groupRenameTitle:"Group name", groupRenameAria:"Rename", groupRenameConfirm:(n,name)=>`Rename ${n} families to “${name}”?`, groupRenamed:n=>`Renamed ${n} families ✅`,
     evReception:"Reception", evHenna:"Henna", evChurch:"Church",
     addedToast:"Added", fastEntryLbl:"Fast entry",
     menuPhotos:"Photos", menuHeading:"Menu", listLbl:"List", menuAdd:"Add", menuSnapshot:"Snapshot",
@@ -883,6 +904,23 @@ const STR = {
 };
 let L = localStorage.getItem("wedLang") || "ar";
 const t = k => STR[L][k];
+/* ── v26.2 relationship groups: one optional canonical group per family (wedding_families.
+   relationship_group). The Arabic canonical is what the DB stores regardless of UI language;
+   GROUP_EN maps each canonical → its English display label. Suggestions are side-aware; the
+   person-specific "friends" suggestion differs by side (Youstina vs Moheb). ── */
+const GROUP_SUGGESTIONS = {
+  bride: ["عيلة ماما", "عيلة بابا", "أصحاب ماما", "أصحاب بابا", "أصحاب يوستينا", "شغل"],
+  groom: ["عيلة ماما", "عيلة بابا", "أصحاب ماما", "أصحاب بابا", "أصحاب محب", "شغل"],
+};
+const GROUP_EN = {
+  "عيلة ماما": "Mom's family",
+  "عيلة بابا": "Dad's family",
+  "أصحاب ماما": "Mom's friends",
+  "أصحاب بابا": "Dad's friends",
+  "أصحاب يوستينا": "Youstina's friends",
+  "أصحاب محب": "Moheb's friends",
+  "شغل": "Work",
+};
 function toggleLang(){ L = L === "ar" ? "en" : "ar"; localStorage.setItem("wedLang", L); applyLang(); }
 function applyLang(){
   document.documentElement.lang = L;
@@ -896,7 +934,7 @@ function applyLang(){
   set("sortBtn","sort"); set("pickBtn","pick"); set("fileBtn","fileB");
   set("orgTitle","orgTitle");
   set("lB","lB"); set("lG","lG"); set("lA","lA");
-  set("sortNoPhone","sortNoPhone"); set("sortAZ","sortAZ"); set("sortLast","sortLast"); set("sortTree","tree"); $("search").placeholder = t("searchPh");
+  set("sortNoPhone","sortNoPhone"); set("sortAZ","sortAZ"); set("sortLast","sortLast"); set("sortGroup","sortGroup"); set("sortTree","tree"); $("search").placeholder = t("searchPh");
   set("photosTitle","photosTitle"); set("photosUploadBtn","menuPhotos");
   set("prevTitle","prevTitle"); set("prevSub","prevSub"); set("prevCancel","cancel");
   set("dupTitle","dupTitle"); set("dupSub","dupSub"); set("dupGo","dupGo"); set("dupCancel","dupCancel");
@@ -906,6 +944,7 @@ function applyLang(){
   set("eParentLabel","eParentLabel");
   set("eConfirmedLabel","confirmedLabel");
   set("eTagsLabel","tagsLabel"); set("fsTagsLbl","tagsLabel");
+  set("addGroupLabel","groupLbl"); set("eGroupLabel","groupLbl"); set("fsGroupLbl","groupLbl");
   set("eWaitlistLabel","waitlistLabel"); set("eWaitNo","waitNo"); set("eWaitYes","waitYes");
   set("rowFWaitlistLbl","issueWaitlist");
   set("filtersBtnLbl","filtersLbl"); set("filterSheetTitle","filtersLbl");
@@ -925,7 +964,7 @@ function applyLang(){
   renderAddScreenLabels();
   if (typeof inviteRow !== "undefined" && inviteRow && !$("inviteBg").hidden) renderInviteModal();
   updateRoleChip();
-  if (typeof editing !== "undefined" && editing && !$("editBg").hidden) renderETagPills();
+  if (typeof editing !== "undefined" && editing && !$("editBg").hidden) { renderETagPills(); renderEGroupChips(); }
   renderMine(); renderAll(); renderCaps(); renderMenu();
 }
 
@@ -1094,7 +1133,7 @@ let device = localStorage.getItem("wedDevice");
 if (!device) { device = "d" + Math.random().toString(36).slice(2, 10); localStorage.setItem("wedDevice", device); }
 let mySide = localStorage.getItem("wedSide") || "";
 let cc = localStorage.getItem("wedCC") || "+20";
-let mine = [], all = [], activeFilters = new Set(), sortMode = "nophone", treeView = false, n = 2, orgTimer = null, pending = [], step = 1, photoTick = 0, tagFilter = null;
+let mine = [], all = [], activeFilters = new Set(), groupFilter = new Set(), sortMode = "nophone", treeView = false, n = 2, orgTimer = null, pending = [], step = 1, photoTick = 0, tagFilter = null;
 let collapsed = new Set(JSON.parse(localStorage.getItem("wedCollapsed") || "[]"));
 
 const $ = id => document.getElementById(id);
@@ -1143,6 +1182,7 @@ function collectMembers(containerId){
 /* ── routing (v25: hash router replaces the 3-step wizard) ── */
 let addSide = "";           // master's chosen target side on #add; side-locked roles ignore this
 let addTags = [];
+let addGroup = "";          // v26.2: contributor-chosen relationship group (canonical Arabic) on the Add screen
 let addDupConfirmed = false;
 let photoCount = 0;
 
@@ -1283,6 +1323,7 @@ function setAddSide(s){
   renderAddSideUI();
   renderCaps();
   resetAddDupState();
+  renderAddGroupChips();
 }
 function renderAddSideUI(){
   const master = isMasterRole();
@@ -1353,13 +1394,14 @@ async function saveFamilyOneScreen(){
   const org = isOrg();
   const nameEn = (org && $("addNameEn").value.trim()) || "";
   const tags = (isMasterRole() && addTags.length) ? addTags.slice() : null;
-  const item = { name, name_en: nameEn, count: n, phone, event2: wEv2, church_only: wChurch, waitlist: atCap, side, tags };
+  const item = { name, name_en: nameEn, count: n, phone, event2: wEv2, church_only: wChurch, waitlist: atCap, side, tags, relationship_group: addGroup || null };
   const ok = await insertRows([item], { bypassDupModal: true });
   btn.disabled = false;
   if (ok) {
     toast(t("addedToast"));
     nameEl.value = ""; $("addPhone").value = ""; $("addNameEn").value = "";
     addTags = []; if (isMasterRole()) renderAddTagPills();
+    addGroup = ""; renderAddGroupChips();
     setEv2(false); setChurch(false); renderAddEventPills();
     n = 2; $("addCount").textContent = localDigits(n);
     resetAddDupState();
@@ -1449,6 +1491,7 @@ function renderAddScreenLabels(){
   renderAddSideUI();
   renderAddEventPills();
   renderAddCapChip();
+  renderAddGroupChips();
 }
 function renderAddScreen(){
   const org = isOrg(), master = isMasterRole();
@@ -1674,6 +1717,7 @@ async function insertRows(items, opts){
     if (i.name_en) row.name_en = i.name_en;
     if (i.waitlist) row.waitlist = true;
     if (i.tags) row.tags = i.tags;
+    if (i.relationship_group) row.relationship_group = i.relationship_group;
     return row;
   });
   try {
@@ -1827,6 +1871,208 @@ function renderETagPills(){
   add.type = "button"; add.className = "tag-pill add-tag"; add.textContent = t("addTag");
   add.onclick = openTagInput;
   el.appendChild(add);
+}
+
+/* ── v26.2 relationship groups: one canonical Arabic group per family, set by the contributor at
+   add time and editable by organizers. Freeform folds into existing canonicals/vocabulary via the
+   same Arabic-fold matchKey as tags (typo/hamza variants reuse the existing group, never a dup). ── */
+let editingGroup = "";
+// suggestion set: side-locked roles see their side's; master sees the deduped union of both sides
+function groupSuggestions(role, side){
+  if (role === "master") {
+    const seen = new Set(), out = [];
+    [...GROUP_SUGGESTIONS.bride, ...GROUP_SUGGESTIONS.groom].forEach(g => { if (!seen.has(g)) { seen.add(g); out.push(g); } });
+    return out;
+  }
+  return (GROUP_SUGGESTIONS[side] || GROUP_SUGGESTIONS.bride).slice();
+}
+// EN UI shows the mapped English label for a known canonical; freeform values show as stored
+function groupLabel(canon){
+  const c = normalizeTag(canon);
+  return (L === "en" && GROUP_EN[c]) ? GROUP_EN[c] : c;
+}
+// groups actually in use across live rows, most-used first (drives the filter + rename surfaces)
+function groupVocabulary(){
+  const counts = {}, names = {};
+  all.forEach(r => {
+    if (r.deleted_at) return;
+    const g = normalizeTag(r.relationship_group);
+    const mk = tagMatchKey(g);
+    if (!mk) return;
+    counts[mk] = (counts[mk] || 0) + 1;
+    if (!names[mk]) names[mk] = g;
+  });
+  return Object.keys(counts).map(mk => ({ mk, name: names[mk], count: counts[mk] })).sort((a, b) => b.count - a.count);
+}
+// fold a raw entry to a canonical value: a matching suggestion wins, then an existing used group,
+// then the normalized freeform text itself. `side` biases the suggestion match toward that side.
+function resolveGroupValue(raw, side){
+  const val = normalizeTag(raw);
+  if (!val) return "";
+  const mk = tagMatchKey(val);
+  const sideSet = side ? (GROUP_SUGGESTIONS[side] || []) : [];
+  const allCanon = [...GROUP_SUGGESTIONS.bride, ...GROUP_SUGGESTIONS.groom];
+  const canonHit = sideSet.find(c => tagMatchKey(c) === mk) || allCanon.find(c => tagMatchKey(c) === mk);
+  if (canonHit) return canonHit;
+  const vocabHit = groupVocabulary().find(v => v.mk === mk);
+  if (vocabHit) return vocabHit.name;
+  return val;
+}
+
+/* single-select chip row shared by Add (contributor) and Edit (organizer). `pillsId` renders into
+   that container; `getSel`/`setSel` read/write the caller's selection; `side`/`role` pick the set. */
+function renderGroupChips(pillsId, side, role, getSel, setSel, openInput){
+  const el = $(pillsId); if (!el) return;
+  el.innerHTML = "";
+  const sel = getSel();
+  const selMk = sel ? tagMatchKey(sel) : "";
+  const seen = new Set();
+  const addPill = (canon, on) => {
+    const mk = tagMatchKey(canon);
+    if (seen.has(mk)) return;
+    seen.add(mk);
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "tag-pill" + (on ? " on" : "");
+    btn.textContent = groupLabel(canon);
+    btn.onclick = () => { setSel(on ? "" : canon); };   // one tap selects; tapping the selected chip clears it
+    el.appendChild(btn);
+  };
+  groupSuggestions(role, side).forEach(canon => addPill(canon, tagMatchKey(canon) === selMk));
+  // Edit surface additionally offers already-used groups so any existing value is one tap away
+  if (role !== "add") groupVocabulary().forEach(v => addPill(v.name, v.mk === selMk));
+  if (sel && !seen.has(selMk)) addPill(sel, true);      // a freeform selection not in any set stays visible
+  const add = document.createElement("button");
+  add.type = "button"; add.className = "tag-pill grp-add"; add.textContent = t("groupAddChip");
+  add.onclick = openInput;
+  el.appendChild(add);
+}
+// reusable freeform "+" input (mirrors the tag input): commits through the caller's fold+select
+function openGroupInput(pillsId, commit){
+  const el = $(pillsId); if (!el) return;
+  const old = el.querySelector(".grp-add"); if (!old) return;
+  const wrap = document.createElement("span");
+  wrap.className = "tag-pill add-tag-input";
+  const inp = document.createElement("input");
+  inp.type = "text"; inp.autocomplete = "off"; inp.dir = "auto";
+  wrap.appendChild(inp);
+  el.replaceChild(wrap, old);
+  inp.focus();
+  let done = false;
+  const fire = () => { if (done) return; done = true; commit(inp.value); };
+  inp.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); fire(); } });
+  inp.addEventListener("blur", fire);
+}
+
+/* Add screen (contributor-facing, never gated behind organizer-only surfaces) */
+function addGroupSide(){ return isMasterRole() ? "master" : targetSide(); }
+function renderAddGroupChips(){
+  if (!$("addGroupChips")) return;
+  const role = isMasterRole() ? "master" : "add";
+  renderGroupChips("addGroupChips", targetSide(), role, () => addGroup, v => { addGroup = v; renderAddGroupChips(); }, openAddGroupInput);
+}
+function openAddGroupInput(){
+  openGroupInput("addGroupChips", raw => {
+    const v = normalizeTag(raw);
+    addGroup = v ? resolveGroupValue(v, targetSide()) : addGroup;
+    renderAddGroupChips();
+  });
+}
+
+/* Edit modal (all org roles + contributors editing their own row); prefilled from the row */
+function renderEGroupChips(){
+  if (!$("eGroupChips")) return;
+  const role = isMasterRole() ? "master" : "add";
+  const side = editing ? editing.side : (mySide || "bride");
+  renderGroupChips("eGroupChips", side, role, () => editingGroup, v => { editingGroup = v; renderEGroupChips(); }, openEGroupInput);
+}
+function openEGroupInput(){
+  openGroupInput("eGroupChips", raw => {
+    const v = normalizeTag(raw);
+    const side = editing ? editing.side : (mySide || "bride");
+    editingGroup = v ? resolveGroupValue(v, side) : editingGroup;
+    renderEGroupChips();
+  });
+}
+
+/* filter sheet: multi-select group facet — ORs within itself, ANDs with every other filter, counts
+   computed over the same soft-delete/waitlist-excluded base the other rows use, hidden when empty */
+function renderGroupFilterSection(countBase){
+  const sec = $("fsGroupSec"); if (!sec) return;
+  const exclusive = activeFilters.has("deleted") || activeFilters.has("waitlist");
+  const preds = [...activeFilters].filter(k => FILTER_PREDS[k]).map(k => FILTER_PREDS[k]);
+  const filtered = countBase.filter(r => preds.every(p => p(r)));
+  const counts = {}, names = {};
+  filtered.forEach(r => {
+    const g = normalizeTag(r.relationship_group);
+    const mk = tagMatchKey(g);
+    if (!mk) return;
+    counts[mk] = (counts[mk] || 0) + 1;
+    if (!names[mk]) names[mk] = g;
+  });
+  const keys = Object.keys(counts).sort((a, b) => groupLabel(names[a]).localeCompare(groupLabel(names[b]), L === "ar" ? "ar" : "en"));
+  sec.hidden = keys.length === 0;
+  const rows = $("fsGroupRows"); rows.innerHTML = "";
+  if (sec.hidden) return;
+  const master = isMasterRole();
+  keys.forEach(mk => {
+    const label = document.createElement("label");
+    label.className = "fs-row" + (exclusive ? " fs-disabled" : "");
+    const cb = document.createElement("input");
+    cb.type = "checkbox"; cb.checked = groupFilter.has(mk); cb.disabled = exclusive;
+    cb.onchange = () => toggleGroupFilter(mk, cb.checked);
+    const span = document.createElement("span"); span.textContent = groupLabel(names[mk]);
+    const cnt = document.createElement("span"); cnt.className = "fs-count"; cnt.textContent = localDigits(counts[mk]);
+    if (master) {
+      // master-only explicit rename affordance; non-master roles never render it at all
+      const ren = document.createElement("button");
+      ren.type = "button"; ren.className = "fs-grp-rename"; ren.textContent = "✏️";
+      ren.setAttribute("aria-label", t("groupRenameAria")); ren.title = t("groupRenameAria");
+      ren.onclick = e => { e.preventDefault(); e.stopPropagation(); promptRenameGroup(names[mk]); };
+      label.append(cb, span, cnt, ren);
+    } else {
+      label.append(cb, span, cnt);
+    }
+    rows.appendChild(label);
+  });
+}
+function toggleGroupFilter(mk, on){
+  activeFilters.delete("deleted"); activeFilters.delete("waitlist");
+  if (on) groupFilter.add(mk); else groupFilter.delete(mk);
+  renderAll();
+}
+
+/* master-only global rename: one PATCH per affected row touching ONLY relationship_group */
+function promptRenameGroup(oldCanon){
+  const raw = window.prompt(t("groupRenameTitle"), oldCanon);
+  if (raw == null) return;
+  const newCanon = resolveGroupValue(String(raw), null);
+  if (!newCanon || tagMatchKey(newCanon) === tagMatchKey(oldCanon)) return;
+  const affected = all.filter(r => !r.deleted_at && r.relationship_group && tagMatchKey(r.relationship_group) === tagMatchKey(oldCanon));
+  if (!affected.length) return;
+  if (!window.confirm(t("groupRenameConfirm")(affected.length, groupLabel(newCanon)))) return;
+  renameGroup(oldCanon, newCanon);
+}
+async function renameGroup(oldCanon, newRaw){
+  const newCanon = resolveGroupValue(String(newRaw), null);
+  if (!newCanon) return 0;
+  const oldMk = tagMatchKey(String(oldCanon));
+  if (!oldMk || tagMatchKey(newCanon) === oldMk) return 0;
+  const affected = all.filter(r => !r.deleted_at && r.relationship_group && tagMatchKey(r.relationship_group) === oldMk);
+  if (!affected.length) return 0;
+  affected.forEach(r => { r.relationship_group = newCanon; });
+  if (groupFilter.delete(oldMk)) groupFilter.add(tagMatchKey(newCanon));
+  renderAll(); renderMine();
+  let ok = 0;
+  for (const r of affected) {
+    try {
+      const res = await fetch(`${SUPA}?id=eq.${r.id}`, { method: "PATCH", headers: H, body: JSON.stringify({ relationship_group: newCanon }) });
+      if (res.ok) ok++;
+    } catch(e) { /* best effort — local state already reflects the rename */ }
+  }
+  toast(t("groupRenamed")(ok));
+  refreshMine(); if (isOrg()) refreshAll();
+  return ok;
 }
 
 /* ── Edit modal: waitlist segment (master-only) ── */
@@ -2120,6 +2366,7 @@ function famRow(r, canDelete, navIds){
     + (!r.church_only ? chip("reception", "🏛", "chipReception") : "")
     + (r.event2 ? chip("henna", "🌿" + (hennaOverridden(r) ? " " + localDigits(r.seats.henna) : ""), "chipHenna") : "")
     + (r.confirmed ? chip("confirmed", "✅", "chipConfirmed") : "")
+    + (r.relationship_group ? `<span class="card-chip group">${esc(groupLabel(r.relationship_group))}</span>` : "")
     + tagList.slice(0, 2).map(tg => `<span class="card-chip tag">${esc(tg)}</span>`).join("")
     + (tagList.length > 2 ? `<span class="card-chip tag">+${localDigits(tagList.length - 2)}</span>` : "")
     + (orgCtx && liveParent(r)
@@ -2183,6 +2430,8 @@ function openEdit(r){
   setEEv2(!!r.event2); setEChurch(!!r.church_only);
   $("eName").value = r.name; $("eNameEn").value = r.name_en || ""; $("ePhone").value = r.phone || ""; $("eCount").textContent = eCount;
   $("eConfirmedChk").checked = !!r.confirmed;
+  editingGroup = r.relationship_group ? normalizeTag(r.relationship_group) : "";
+  renderEGroupChips();
   fillParentOptions(r);
   // v23.2 acceptance #9: contributor PIN edits (mineWrap re-uses this same modal) never show the
   // parent picker — relationships stay an organizer-only affordance, keeping mom's flow simplest.
@@ -2218,10 +2467,10 @@ async function saveEdit(){
   if (eEv2 && eHenna > 0 && eHenna < eCount) seats.henna = eHenna; else delete seats.henna;
   const seatsVal = Object.keys(seats).length ? seats : null;
   const masterFields = isMasterRole();
-  const body = { name, name_en: name_en || null, count: eCount, phone, event2: eEv2, church_only: eChurch, confirmed, seats: seatsVal, parent_id, members };
+  const body = { name, name_en: name_en || null, count: eCount, phone, event2: eEv2, church_only: eChurch, confirmed, seats: seatsVal, parent_id, members, relationship_group: editingGroup || null };
   if (masterFields) { body.tags = editingTags.length ? editingTags : null; body.waitlist = eWaitlistVal; }
   $("editBg").hidden = true;
-  editing.name = name; editing.name_en = name_en || null; editing.count = eCount; editing.phone = phone; editing.event2 = eEv2; editing.church_only = eChurch; editing.confirmed = confirmed; editing.seats = seatsVal; editing.parent_id = parent_id; editing.members = members;
+  editing.name = name; editing.name_en = name_en || null; editing.count = eCount; editing.phone = phone; editing.event2 = eEv2; editing.church_only = eChurch; editing.confirmed = confirmed; editing.seats = seatsVal; editing.parent_id = parent_id; editing.members = members; editing.relationship_group = editingGroup || null;
   if (masterFields) { editing.tags = body.tags; editing.waitlist = body.waitlist; }
   renderMine(); renderAll();
   try {
@@ -2479,6 +2728,7 @@ function currentShow(role){
   const nm = s => (s || "").toLowerCase().replace(/\s+/g, " ").trim();
   return base.filter(r => preds.every(p => p(r))
     && (!tagFilter || (Array.isArray(r.tags) && r.tags.includes(tagFilter)))
+    && (!groupFilter.size || (r.relationship_group && groupFilter.has(tagMatchKey(r.relationship_group))))
     && (!q || nm(r.name).includes(q) || nm(r.name_en).includes(q) || (r.phone || "").includes(q) || nm(breadcrumb(r).join(" ")).includes(q)));
 }
 function renderAll(){
@@ -2488,6 +2738,9 @@ function renderAll(){
   const anyTree = live.some(r => r.parent_id);
   $("sortTree").hidden = !anyTree;
   if (!anyTree) treeView = false;
+  const anyGroup = live.some(r => r.relationship_group);
+  $("sortGroup").hidden = !anyGroup;
+  if (!anyGroup && sortMode === "group") { sortMode = "nophone"; $("sortNoPhone").className = "on"; $("sortGroup").className = ""; }
   // header totals + filter-sheet counts always read the waitlist-excluded set, even while the
   // exclusive ⏳ filter is showing only waitlisted rows below
   const bp = countBase.filter(r => r.side === "bride").reduce((s, r) => s + r.count, 0);
@@ -2502,6 +2755,7 @@ function renderAll(){
   const waitlistCount = all.filter(r => !r.deleted_at && r.waitlist && (role === "master" || r.side === role)).length;
   renderFilterSheet(role, c, delRows.length, waitlistCount);
   renderTagFilterRow(countBase);
+  renderGroupFilterSection(countBase);
   const nameBuckets = {}, phoneBuckets = {};
   countBase.forEach(r => {
     const nk = normName(r.name); if (nk) (nameBuckets[nk] = nameBuckets[nk] || []).push(r);
@@ -2523,6 +2777,11 @@ function renderAll(){
   if (!show.length) { el.innerHTML = `<p class="empty">${t("listEmpty")}</p>`; return; }
   const ordered = sortRows(show);
   const showIds = ordered.map(r => r.id);
+  if (sortMode === "group") {
+    renderGroupClusters(el, show);
+    renderCaps();
+    return;
+  }
   if (treeView && anyTree && !activeFilters.has("deleted")) {
     const shown = new Set(ordered.map(r => r.id));
     const childrenOf = pid => ordered.filter(r => (r.parent_id || null) === pid).sort((a, b) => displayName(a).localeCompare(displayName(b), L === "ar" ? "ar" : "en"));
@@ -2542,6 +2801,32 @@ function renderAll(){
     ordered.forEach(r => el.appendChild(famRow(r, true, showIds)));
   }
   renderCaps();
+}
+// v26.2 By-group sort: cluster families under group headers (groups A–Z Arabic collation, ungrouped
+// last with no header). A separate sort mode from Tree — the two never render together.
+function renderGroupClusters(el, show){
+  const lc = L === "ar" ? "ar" : "en";
+  const groups = {}, names = {}, ungrouped = [];
+  show.forEach(r => {
+    const mk = tagMatchKey(normalizeTag(r.relationship_group));
+    if (!mk) { ungrouped.push(r); return; }
+    (groups[mk] = groups[mk] || []).push(r);
+    if (!names[mk]) names[mk] = normalizeTag(r.relationship_group);
+  });
+  const byName = (a, b) => displayName(a).localeCompare(displayName(b), lc);
+  const order = Object.keys(groups).sort((a, b) => groupLabel(names[a]).localeCompare(groupLabel(names[b]), lc));
+  const flat = [];
+  order.forEach(mk => groups[mk].slice().sort(byName).forEach(r => flat.push(r)));
+  ungrouped.slice().sort(byName).forEach(r => flat.push(r));
+  const gIds = flat.map(r => r.id);
+  order.forEach(mk => {
+    const hd = document.createElement("div");
+    hd.className = "group-header";
+    hd.textContent = groupLabel(names[mk]);
+    el.appendChild(hd);
+    groups[mk].slice().sort(byName).forEach(r => el.appendChild(famRow(r, true, gIds)));
+  });
+  ungrouped.slice().sort(byName).forEach(r => el.appendChild(famRow(r, true, gIds)));
 }
 const FILTER_PREDS = {
   bride: r => r.side === "bride",
@@ -2580,7 +2865,7 @@ function toggleWaitlistFilter(on){
   else activeFilters.delete("waitlist");
   renderAll();
 }
-function clearAllFilters(){ activeFilters.clear(); tagFilter = null; renderAll(); }
+function clearAllFilters(){ activeFilters.clear(); tagFilter = null; groupFilter.clear(); renderAll(); }
 function removeActiveFilter(k){ activeFilters.delete(k); renderAll(); }
 function setTagFilter(name){ tagFilter = (tagFilter === name) ? null : name; renderAll(); }
 function openFilterSheet(){ $("filterBg").hidden = false; }
@@ -2650,7 +2935,7 @@ function renderFilterSheet(role, c, trashCount, waitlistCount){
   $("cbFWaitlist").disabled = trashOn;
   $("rowFWaitlist").classList.toggle("fs-disabled", trashOn);
   $("cntFWaitlist").textContent = localDigits(waitlistCount);
-  const activeCount = activeFilters.size + (tagFilter ? 1 : 0);
+  const activeCount = activeFilters.size + (tagFilter ? 1 : 0) + groupFilter.size;
   $("filtersBadge").hidden = activeCount === 0;
   if (activeCount) $("filtersBadge").textContent = "· " + localDigits(activeCount);
   $("filtersBtn").className = "fs-trigger" + (activeCount ? " on" : "");
@@ -2670,15 +2955,36 @@ function renderFilterSheet(role, c, trashCount, waitlistCount){
     b.onclick = () => setTagFilter(tagFilter);
     echoEl.appendChild(b);
   }
+  if (groupFilter.size) {
+    const vocab = groupVocabulary();
+    [...groupFilter].forEach(mk => {
+      const v = vocab.find(x => x.mk === mk);
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "echo-chip";
+      b.textContent = (v ? groupLabel(v.name) : mk) + " ✕";
+      b.onclick = () => toggleGroupFilter(mk, false);
+      echoEl.appendChild(b);
+    });
+  }
 }
 function setSort(m){
   sortMode = m;
+  if (m === "group") { treeView = false; $("sortTree").className = ""; }   // By-group and Tree are separate sort modes
   $("sortNoPhone").className = m === "nophone" ? "on" : "";
   $("sortAZ").className = m === "az" ? "on" : "";
   $("sortLast").className = m === "last" ? "on" : "";
+  $("sortGroup").className = m === "group" ? "on" : "";
   renderAll();
 }
-function toggleTreeView(){ treeView = !treeView; $("sortTree").className = treeView ? "on" : ""; renderAll(); }
+function toggleTreeView(){
+  treeView = !treeView;
+  if (treeView && sortMode === "group") {   // leaving By-group for Tree: reset the sort mode + its button
+    sortMode = "nophone";
+    $("sortNoPhone").className = "on"; $("sortAZ").className = ""; $("sortLast").className = ""; $("sortGroup").className = "";
+  }
+  $("sortTree").className = treeView ? "on" : "";
+  renderAll();
+}
 
 /* ── organizer ── */
 function switchPin(){
@@ -2854,13 +3160,13 @@ async function handleFiles(files){
 
 /* ── exports ── */
 function exportExcel(){
-  const head = ["Name (الاسم)", "Name (English)", "Side (الطرف)", "People (الأفراد)", "WhatsApp", ev2Name(), "Church Only (الكنيسة فقط)", "Tags (تصنيفات)", "Waitlist (انتظار)", "Confirmed (مؤكد)", "Family (العائلة)", "Members (الأفراد بالاسم)", "Invite Sent (اتبعتت)", "Sent On (تاريخ الإرسال)", "Added"];
+  const head = ["Name (الاسم)", "Name (English)", "Side (الطرف)", "People (الأفراد)", "WhatsApp", ev2Name(), "Church Only (الكنيسة فقط)", "Tags (تصنيفات)", "Waitlist (انتظار)", "Confirmed (مؤكد)", "Group (المجموعة)", "Family (العائلة)", "Members (الأفراد بالاسم)", "Invite Sent (اتبعتت)", "Sent On (تاريخ الإرسال)", "Added"];
   const xrole = orgRole() || "master";
   const xrows = (xrole === "master" ? all : all.filter(r => r.side === xrole)).filter(r => !r.deleted_at);
   const rows_ = xrows.map(r => {
     const entry = sentEntry(r);
     const sentAt = entry && entry.at ? entry.at : "";
-    return [r.name, r.name_en || "", r.side === "bride" ? "Bride عروسة" : "Groom عريس", r.count, r.phone || "", r.event2 ? (hennaOverridden(r) ? "YES (" + r.seats.henna + ")" : "YES") : "", r.church_only ? "YES" : "", (Array.isArray(r.tags) && r.tags.length ? r.tags.join("، ") : ""), r.waitlist ? "YES" : "", r.confirmed ? "YES" : "", [...breadcrumb(r), displayName(r)].join(" › "), (Array.isArray(r.members) ? r.members.filter(v => v && memNorm(v) !== memNorm(r.name) && memNorm(v) !== memNorm(r.name_en)).join(", ") : ""),
+    return [r.name, r.name_en || "", r.side === "bride" ? "Bride عروسة" : "Groom عريس", r.count, r.phone || "", r.event2 ? (hennaOverridden(r) ? "YES (" + r.seats.henna + ")" : "YES") : "", r.church_only ? "YES" : "", (Array.isArray(r.tags) && r.tags.length ? r.tags.join("، ") : ""), r.waitlist ? "YES" : "", r.confirmed ? "YES" : "", r.relationship_group || "", [...breadcrumb(r), displayName(r)].join(" › "), (Array.isArray(r.members) ? r.members.filter(v => v && memNorm(v) !== memNorm(r.name) && memNorm(v) !== memNorm(r.name_en)).join(", ") : ""),
       entry ? "YES" : "", sentAt.slice(0, 10), (r.created_at || "").slice(0, 10)];
   });
   const csv = "﻿" + [head, ...rows_].map(row => row.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\r\n");
@@ -2880,13 +3186,29 @@ function snapshotRows(){
 }
 function snapshotMessage(){
   const src = snapshotRows();
-  const part = side => src.filter(r => r.side === side);
   const fmt = list => list.map((r, i) => `${i+1}. ${displayName(r)} — ${r.count} أفراد${r.phone ? " — " + r.phone : ""}`).join("\n");
-  const bp = part("bride"), gp = part("groom");
   const total = src.reduce((s, r) => s + r.count, 0);
   const church = src.filter(r => r.church_only);
   const churchP = church.reduce((s, r) => s + r.count, 0);
-  return `قائمة عزومة فرح محب ويوستينا 🤍\n${src.length} عيلة · ${total} فرد\n⛪ الكنيسة فقط: ${church.length} عيلة · ${churchP} فرد\n\n🤍 طرف العروسة (${bp.reduce((s,r)=>s+r.count,0)} فرد):\n${fmt(bp) || "—"}\n\n🤍 طرف العريس (${gp.reduce((s,r)=>s+r.count,0)} فرد):\n${fmt(gp) || "—"}`;
+  const header = `قائمة عزومة فرح محب ويوستينا 🤍\n${src.length} عيلة · ${total} فرد\n⛪ الكنيسة فقط: ${church.length} عيلة · ${churchP} فرد`;
+  // v26.2: when any shown family carries a group, cluster the snapshot by group (values as stored,
+  // ungrouped last) instead of by side; with no groups anywhere it falls back to the side split.
+  if (src.some(r => r.relationship_group)) {
+    const groups = {}, names = {}, ungrouped = [];
+    src.forEach(r => {
+      const mk = tagMatchKey(normalizeTag(r.relationship_group));
+      if (!mk) { ungrouped.push(r); return; }
+      (groups[mk] = groups[mk] || []).push(r);
+      if (!names[mk]) names[mk] = normalizeTag(r.relationship_group);
+    });
+    const order = Object.keys(groups).sort((a, b) => names[a].localeCompare(names[b], "ar"));
+    const sections = order.map(mk => `🤍 ${names[mk]} (${groups[mk].reduce((s, r) => s + r.count, 0)} فرد):\n${fmt(groups[mk])}`);
+    if (ungrouped.length) sections.push(`🤍 —— (${ungrouped.reduce((s, r) => s + r.count, 0)} فرد):\n${fmt(ungrouped)}`);
+    return `${header}\n\n${sections.join("\n\n")}`;
+  }
+  const part = side => src.filter(r => r.side === side);
+  const bp = part("bride"), gp = part("groom");
+  return `${header}\n\n🤍 طرف العروسة (${bp.reduce((s,r)=>s+r.count,0)} فرد):\n${fmt(bp) || "—"}\n\n🤍 طرف العريس (${gp.reduce((s,r)=>s+r.count,0)} فرد):\n${fmt(gp) || "—"}`;
 }
 function sendSnapshot(){
   location.href = "https://wa.me/?text=" + encodeURIComponent(snapshotMessage());
