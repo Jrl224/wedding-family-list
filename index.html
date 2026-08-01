@@ -241,6 +241,11 @@
     box-shadow:0 4px 18px rgba(0,0,0,.35);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;
   }
   .hamburger .hint-dot{position:absolute;top:6px;inset-inline-end:6px;width:9px;height:9px;border-radius:50%;background:var(--gold-b);animation:pp 1.6s infinite}
+  .role-chip{
+    position:fixed;top:12px;inset-inline-start:12px;z-index:15;display:inline-flex;align-items:center;gap:5px;
+    min-height:30px;padding:5px 12px;border-radius:999px;border:1px solid var(--gold);background:rgba(201,162,39,.14);
+    color:var(--gold-b);font-size:12.5px;font-weight:700;font-family:inherit;line-height:1;cursor:pointer;white-space:nowrap;
+  }
   .menu-scrim{position:fixed;inset:0;background:rgba(4,9,17,.7);z-index:17;backdrop-filter:blur(2px)}
   .menu-sheet{
     position:fixed;top:0;bottom:0;inset-inline-end:0;width:280px;max-width:86vw;background:var(--bg);border-inline-start:1px solid var(--line);
@@ -343,6 +348,7 @@
 <body>
 
 <button class="hamburger" id="hamburgerBtn" onclick="openMenu()" hidden aria-label="Menu">☰<i class="hint-dot" id="menuHintDot" hidden></i></button>
+<button class="role-chip" id="roleChip" hidden onclick="switchPin()" aria-label="Role"></button>
 <div class="menu-scrim" id="menuScrim" hidden onmousedown="if(event.target===this) closeMenu()">
   <nav class="menu-sheet" id="menuSheet">
     <p class="menu-hd" id="menuHd"></p>
@@ -482,7 +488,7 @@
     <button type="button" class="next save-btn" id="settingsSaveBtn" onclick="saveSettings()" style="margin-top:10px"></button>
   </div>
 
-  <p class="ver">٢٦٫٠ · 26.0</p>
+  <p class="ver">٢٦٫١ · 26.1</p>
 </div>
 
 <div class="modal-bg" id="filterBg" hidden onmousedown="if(event.target===this) closeFilterSheet()">
@@ -745,6 +751,7 @@ const STR = {
     fbTitle:"📷 الصورة اتحفظت لجوزيف ✅", fbSub:"القراءة الآلية مش متاحة دلوقتي — بس الصورة وصلت وجوزيف هيسجل اللي فيها. تحبوا تبعتوهاله كمان على واتساب؟",
     fbShare:"📤 ابعتوها على واتساب", fbBack:"تمام",
     pinTitle:"🔒 للمنظمين بس", pinSub:"ادخلوا الرقم السري", pinOpen:"افتحوا", pinBack:"رجوع", pinErr:"الرقم مش صح",
+    roleChipMaster:"🔑 ماستر", roleChipBride:"👰 عروسة", roleChipGroom:"🤵 عريس",
     sideWordB:"طرف العروسة", sideWordG:"طرف العريس", noPhone:"بدون رقم",
     removed:n=>`اتشالت "${n}"`, undo:"تراجع ↩", restored:"رجعناها ✅", netErr:"النت قطع — حاولوا تاني",
     addedOk:"اتضافت ✅ شكرًا 🤍", addedN:n=>`اتسجل ${n} عيلة ✅ 🤍`, allDup:"تمام — كله كان متسجل خلاص ✅",
@@ -823,6 +830,7 @@ const STR = {
     fbTitle:"📷 Photo saved for Joseph ✅", fbSub:"Auto-reading is offline right now — but the photo went through and Joseph will add what's on it. Want to also send it to him on WhatsApp?",
     fbShare:"📤 Send on WhatsApp", fbBack:"OK",
     pinTitle:"🔒 Organizers only", pinSub:"Enter the PIN", pinOpen:"Open", pinBack:"Back", pinErr:"Wrong PIN",
+    roleChipMaster:"🔑 Master", roleChipBride:"👰 Bride", roleChipGroom:"🤵 Groom",
     sideWordB:"Bride side", sideWordG:"Groom side", noPhone:"no number",
     removed:n=>`Removed "${n}"`, undo:"Undo ↩", restored:"Restored ✅", netErr:"Connection lost — try again",
     addedOk:"Added ✅ thank you 🤍", addedN:n=>`Saved ${n} families ✅ 🤍`, allDup:"All of them were already registered ✅",
@@ -916,6 +924,7 @@ function applyLang(){
   $("platformTip").innerHTML = /iPhone|iPad|iPod/.test(navigator.userAgent) ? t("tipIOS") : t("tipAnd");
   renderAddScreenLabels();
   if (typeof inviteRow !== "undefined" && inviteRow && !$("inviteBg").hidden) renderInviteModal();
+  updateRoleChip();
   if (typeof editing !== "undefined" && editing && !$("editBg").hidden) renderETagPills();
   renderMine(); renderAll(); renderCaps(); renderMenu();
 }
@@ -1001,7 +1010,9 @@ function setChurch(v){ wChurch = v; }
 function setEChurch(v){ eChurch = v; $("eRecChk").checked = !v; }
 async function refreshSideTotals(){
   try {
-    const r = await fetch(SUPA + "?select=side,count,church_only,event2,waitlist,deleted_at,seats", { headers: H });
+    const role = orgRole();
+    const sideQ = (role === "bride" || role === "groom") ? `&side=eq.${role}` : "";
+    const r = await fetch(SUPA + "?select=side,count,church_only,event2,waitlist,deleted_at,seats" + sideQ, { headers: H });
     if (!r.ok) return;
     const rows = await r.json();
     sideTotals = { bride: 0, groom: 0 };
@@ -1192,8 +1203,15 @@ function screenRoute(){
   }
   showScreen(scr);
   renderMenu();
+  updateRoleChip();
 }
 window.addEventListener("hashchange", screenRoute);
+function updateRoleChip(){
+  const chip = $("roleChip"); if (!chip) return;
+  const role = orgRole();
+  chip.hidden = !(mySide && role);
+  if (role) chip.textContent = t(role === "master" ? "roleChipMaster" : role === "bride" ? "roleChipBride" : "roleChipGroom");
+}
 
 /* ── hamburger menu ── */
 function everPinFlag(){ return localStorage.getItem("wedEverPin") === "1"; }
@@ -1674,7 +1692,9 @@ async function refreshMine(){
 }
 async function refreshAll(){
   try {
-    const r = await fetch(SUPA + "?select=*&order=created_at.desc", { headers: H });
+    const role = orgRole();
+    const sideQ = (role === "bride" || role === "groom") ? `&side=eq.${role}` : "";
+    const r = await fetch(SUPA + "?select=*&order=created_at.desc" + sideQ, { headers: H });
     if (r.ok) { all = await r.json(); renderAll(); }
   } catch(e) {}
   if (photoTick++ % 3 === 0) loadPhotos();
@@ -2731,10 +2751,15 @@ async function loadPhotos(){
     });
     if (!r.ok) return;
     let objs = (await r.json()).filter(o => o.name && o.name.endsWith(".jpg") && !o.name.startsWith("deleted/"));
-    // v25: #photos is visible to every side-locked role, not just organizers — scope by org
-    // role when authenticated, else by the door-picked side (mom sees her own side's photos)
-    const scopeRole = isOrg() ? orgRole() : mySide;
-    if (scopeRole && scopeRole !== "master") objs = objs.filter(o => o.name.startsWith(scopeRole));
+    // v23.3: the shared gallery is organizer-only. Authenticated org roles see their side's
+    // photos (master sees all); anonymous contributors keep an upload path but only ever see
+    // photos this device uploaded (name = `${side}-${device}-${ts}-${idx}.jpg`), never anyone else's.
+    if (isOrg()) {
+      const scopeRole = orgRole();
+      if (scopeRole && scopeRole !== "master") objs = objs.filter(o => o.name.startsWith(scopeRole));
+    } else {
+      objs = objs.filter(o => o.name.split("-")[1] === device);
+    }
     photoCount = objs.length;
     if (!$("menuScrim").hidden) renderMenu();
     const el = $("photoGrid");

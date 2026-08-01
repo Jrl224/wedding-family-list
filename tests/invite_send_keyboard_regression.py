@@ -190,6 +190,7 @@ def run_browser(browser_type, browser_name, base_url):
     event_mutations = []
     event_patched = {}
     event_inserted = []
+    family_gets = []
 
     def mock_supabase(route):
         request = route.request
@@ -244,9 +245,12 @@ def run_browser(browser_type, browser_name, base_url):
                 }
             ]
         elif "wedding_families" in request.url and request.method == "GET":
+            family_gets.append(request.url)
+            side_m = re.search(r"side=eq\.(\w+)", request.url)
+            src = [f for f in FAMILIES if not side_m or f["side"] == side_m.group(1)]
             body = [
                 dict(f, **{k: v for k, v in patched.get(f["id"], {}).items() if k != "deleted_at"}, deleted_at=deleted.get(f["id"]))
-                for f in FAMILIES
+                for f in src
             ]
         elif "wedding_events" in request.url and request.method == "GET":
             body = [dict(e, **event_patched.get(e["id"], {})) for e in EVENTS_SEED]
@@ -271,6 +275,13 @@ def run_browser(browser_type, browser_name, base_url):
 
     def sent_patches():
         return [m for m in family_mutations if m[0] == "PATCH" and "invite_sent" in (m[2] or "")]
+
+    def wait_new_family_get(n_before, timeout=10):
+        deadline = time.monotonic() + timeout
+        while len(family_gets) <= n_before:
+            assert time.monotonic() < deadline, family_gets
+            page.wait_for_timeout(30)
+        return family_gets[-1]
 
     page.goto(base_url, wait_until="domcontentloaded")
     # v25: #add is the default landing screen for every role; the organizer #list screen
@@ -1627,6 +1638,106 @@ def run_browser(browser_type, browser_name, base_url):
         "async () => (await fetch(EVENTS_URL + '?id=eq.reception', {method:'PATCH', headers:H, body: JSON.stringify({map_url: null})})).status"
     )
     assert st_map == 200, st_map  # nullable column accepts null
+
+    # ══════════════════════════ v23.3: PIN role-gating + side-scoped fetch ══════════════════════════
+    err_before = len(page_errors)
+
+    # (a) fresh contributor (anon): the organizer #list is a gated route — a deep link bounces to
+    #     #add; the shared photo gallery renders nobody else's photos, but the upload control stays.
+    page.evaluate("localStorage.removeItem('wedOrg'); location.hash = '#add'")
+    page.wait_for_function("location.hash === '#add'")
+    page.evaluate("location.hash = '#list'")
+    page.wait_for_function("location.hash === '#add'")
+    assert page.locator("#scrList").is_hidden()
+    assert not page.locator("#scrAdd").is_hidden()
+    assert page.evaluate("localStorage.getItem('wedOrg')") is None
+    assert page.locator("#roleChip").is_hidden()  # no role ⇒ no chip
+
+    def mock_photo_gate(route):
+        route.fulfill(
+            status=200, content_type="application/json",
+            body=json.dumps([{"name": "bride-fixture-1.jpg"}, {"name": "groom-fixture-1.jpg"}]),
+        )
+
+    page.route("**/storage/v1/object/list/guest-photos", mock_photo_gate)
+    page.evaluate("location.hash = '#photos'")
+    page.wait_for_function("!document.getElementById('scrPhotos').hidden")
+    page.evaluate("loadPhotos()")
+    page.wait_for_timeout(150)
+    assert page.locator("#photoGrid a").count() == 0       # gallery gated: no other-device photos
+    assert page.locator("#photosUploadBtn").count() == 1    # contributor upload path preserved
+    page.unroute("**/storage/v1/object/list/guest-photos", mock_photo_gate)
+    page.evaluate("location.hash = '#add'")
+    page.wait_for_function("location.hash === '#add'")
+
+    # (b) PIN 1994 → master: sees every row, families fetch carries NO side filter, chip reads master
+    page.evaluate("askPin()")
+    page.wait_for_function("!document.getElementById('pinBg').hidden")
+    page.fill("#pinIn", "1994")
+    n_gets = len(family_gets)
+    page.click("#pinOpen")
+    page.wait_for_function("location.hash === '#list'")
+    last_get = wait_new_family_get(n_gets)
+    assert "side=eq." not in last_get, last_get
+    assert page.evaluate("localStorage.getItem('wedOrg')") == "master"
+    page.wait_for_function("all.length === 3")
+    assert not page.locator(".tot.a").is_hidden()           # both-side 'All' total visible for master
+    assert page.locator("#roleChip").inner_text().strip() == page.evaluate("t('roleChipMaster')")
+
+    # (b) PIN 3882 → bride: bride rows only, fetch carries side=eq.bride
+    page.evaluate("switchPin()")
+    page.wait_for_function("!document.getElementById('pinBg').hidden")
+    page.fill("#pinIn", "3882")
+    n_gets = len(family_gets)
+    page.click("#pinOpen")
+    page.wait_for_function("location.hash === '#list'")
+    last_get = wait_new_family_get(n_gets)
+    assert "side=eq.bride" in last_get, last_get
+    assert page.evaluate("localStorage.getItem('wedOrg')") == "bride"
+    page.wait_for_function("all.length > 0 && all.every(r => r.side === 'bride')")
+    assert page.locator("#roleChip").inner_text().strip() == page.evaluate("t('roleChipBride')")
+
+    # (b) PIN 1360 → groom: none of the bride-only fixtures reach the client, fetch carries side=eq.groom
+    page.evaluate("switchPin()")
+    page.wait_for_function("!document.getElementById('pinBg').hidden")
+    page.fill("#pinIn", "1360")
+    n_gets = len(family_gets)
+    page.click("#pinOpen")
+    page.wait_for_function("location.hash === '#list'")
+    last_get = wait_new_family_get(n_gets)
+    assert "side=eq.groom" in last_get, last_get
+    assert page.evaluate("localStorage.getItem('wedOrg')") == "groom"
+    page.wait_for_function("all.length === 0")              # bride fixtures never delivered to groom
+    assert page.locator("#roleChip").inner_text().strip() == page.evaluate("t('roleChipGroom')")
+
+    # (c) wrong PIN 0000 rejected: error shown, role unchanged, modal stays open
+    page.evaluate("switchPin()")
+    page.wait_for_function("!document.getElementById('pinBg').hidden")
+    assert page.evaluate("localStorage.getItem('wedOrg')") is None
+    page.fill("#pinIn", "0000")
+    page.click("#pinOpen")
+    page.wait_for_function("document.getElementById('pinErr').style.display === 'block'")
+    assert page.evaluate("localStorage.getItem('wedOrg')") is None
+    assert not page.locator("#pinBg").is_hidden()
+
+    # (d) switchPin exit → back to contributor on #add, role cleared, chip gone
+    page.click("#pinBack")
+    page.wait_for_function("document.getElementById('pinBg').hidden")
+    assert page.evaluate("localStorage.getItem('wedOrg')") is None
+    assert page.evaluate("location.hash") == "#add"
+    assert not page.locator("#scrAdd").is_hidden()
+    assert page.locator("#roleChip").is_hidden()
+
+    # (e) reload with a persisted role → role retained, #list reachable, no PIN re-prompt
+    page.evaluate("localStorage.setItem('wedOrg', 'master'); location.hash = '#list'")
+    page.wait_for_function("location.hash === '#list'")
+    page.reload(wait_until="domcontentloaded")
+    page.wait_for_function("!document.getElementById('scrList').hidden")
+    assert page.evaluate("localStorage.getItem('wedOrg')") == "master"
+    assert page.locator("#pinBg").is_hidden()
+    assert page.evaluate("location.hash") == "#list"
+
+    assert len(page_errors) == err_before, page_errors[err_before:]
 
     browser.close()
     print(
