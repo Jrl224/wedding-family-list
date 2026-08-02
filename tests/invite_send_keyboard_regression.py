@@ -58,7 +58,7 @@ CHURCH_LINK = (
     "?cat=3eff4b55-85f1-4322-8ab6-f1bf8fd8c85c"
     "&g=rsvp-7110440c-c1ca-4577-abac-3cae79bce03c"
 )
-VERSION = "٢٧٫٠ · 27.0"
+VERSION = "٢٧٫١ · 27.1"
 TEMPLATE_VERSION = "21.0"
 ARABIC = re.compile(r"[؀-ۿ]")
 FAMILIES = [
@@ -77,7 +77,6 @@ FAMILIES = [
         "invite_sent": {},
         "tags": None,
         "waitlist": False,
-        "relationship_group": None,
     },
     {
         "id": "church-family",
@@ -94,7 +93,6 @@ FAMILIES = [
         "invite_sent": {},
         "tags": None,
         "waitlist": False,
-        "relationship_group": None,
     },
     {
         "id": "no-phone-family",
@@ -110,7 +108,6 @@ FAMILIES = [
         "invite_sent": {},
         "tags": None,
         "waitlist": False,
-        "relationship_group": None,
     },
 ]
 
@@ -384,10 +381,9 @@ def run_browser(browser_type, browser_name, base_url):
             if request.method == "PATCH" and isinstance(pbody, dict) and "deleted_at" in pbody:
                 deleted[rid] = pbody["deleted_at"]
             # v23.1: mirror live NOT NULL constraints — a null here rejected the whole payload in prod
-            # (waitlist is NOT NULL DEFAULT false, migrated for v24; confirmed likewise). v26.2:
-            # relationship_group is a NULLABLE text column, so it is deliberately absent here — a
-            # PATCH of {"relationship_group": null} clears the group and must be accepted, and any
-            # accepted relationship_group value is persisted through the generic patched[] path below.
+            # (waitlist is NOT NULL DEFAULT false, migrated for v24; confirmed likewise). Nullable
+            # fields such as seats/members/tags are accepted and persisted through the generic
+            # patched[] path below.
             notnull = {"name", "count", "side", "event2", "church_only", "confirmed", "waitlist"}
             for row_ in (pbody if isinstance(pbody, list) else [pbody]):
                 if isinstance(row_, dict) and any(row_.get(c) is None for c in notnull if c in row_):
@@ -1104,7 +1100,7 @@ def run_browser(browser_type, browser_name, base_url):
     assert st_wait == 400, st_wait   # waitlist NOT NULL → rejected
     st_conf = page.evaluate("async () => (await fetch(SUPA + '?id=eq.henna-family', {method:'PATCH', headers:H, body: JSON.stringify({confirmed: null})})).status")
     assert st_conf == 400, st_conf   # confirmed NOT NULL → rejected
-    st_null = page.evaluate("async () => (await fetch(SUPA + '?id=eq.henna-family', {method:'PATCH', headers:H, body: JSON.stringify({seats:null, members:null, tags:null, group_name:null, name_en:null, parent_id:null})})).status")
+    st_null = page.evaluate("async () => (await fetch(SUPA + '?id=eq.henna-family', {method:'PATCH', headers:H, body: JSON.stringify({seats:null, members:null, tags:null, name_en:null, parent_id:null})})).status")
     assert st_null == 200, st_null   # nullable columns accept null both ways
 
     # ══════════════════════════ v24: Tags + Waitlist ══════════════════════════
@@ -1136,12 +1132,12 @@ def run_browser(browser_type, browser_name, base_url):
     page.evaluate("location.hash = '#list'")
     page.wait_for_function("!document.getElementById('scrList').hidden")
 
-    # ── acceptance #1 (cont'd): master-only — hidden for the guest/contributor context and for
-    # side-role orgs; mom's flows and side-org Edit are otherwise byte-identical
+    # ── acceptance #1 (cont'd): the unified label row is contributor-facing everywhere; waitlist
+    # remains organizer-only and the group filter facet uses the unified section id
     page.evaluate("localStorage.removeItem('wedOrg')")
     page.evaluate("openEdit(all.find(r => r.id === 'church-family'))")
     page.wait_for_function("!document.getElementById('editBg').hidden")
-    assert page.locator("#eTagsSec").is_hidden()
+    assert not page.locator("#eGroupSec").is_hidden()
     assert page.locator("#eWaitlistSec").is_hidden()
     page.locator("#editCancel").click()
     page.wait_for_function("document.getElementById('editBg').hidden")
@@ -1149,11 +1145,11 @@ def run_browser(browser_type, browser_name, base_url):
     page.evaluate("localStorage.setItem('wedOrg', 'bride')")
     page.evaluate("refreshAll()")
     page.wait_for_function("all.length >= 3")
-    assert page.locator("#fsTagsSec").is_hidden()
+    assert page.locator("#fsGroupSec").count() == 1
     assert page.locator("#rowFWaitlist").is_hidden()
     page.evaluate("openEdit(all.find(r => r.id === 'church-family'))")
     page.wait_for_function("!document.getElementById('editBg').hidden")
-    assert page.locator("#eTagsSec").is_hidden()
+    assert not page.locator("#eGroupSec").is_hidden()
     assert page.locator("#eWaitlistSec").is_hidden()
     page.locator("#editCancel").click()
     page.wait_for_function("document.getElementById('editBg').hidden")
@@ -1161,57 +1157,87 @@ def run_browser(browser_type, browser_name, base_url):
     page.evaluate("refreshAll()")
     page.wait_for_function("document.querySelectorAll('#fullList .fam').length === 3")
 
-    # ── acceptance #2: tags CRUD via Edit; normalize-on-commit is NFC → trim → collapse whitespace
+    # ── acceptance #2: labels CRUD via the unified Edit picker; normalize-on-commit is NFC → trim → collapse whitespace
     page.evaluate("openEdit(all.find(r => r.id === 'no-phone-family'))")
     page.wait_for_function("!document.getElementById('editBg').hidden")
-    assert not page.locator("#eTagsSec").is_hidden()
+    assert not page.locator("#eGroupSec").is_hidden()
     assert not page.locator("#eWaitlistSec").is_hidden()
-    assert page.locator("#eTagPills .add-tag").inner_text().strip() == "+ Tag"
-    # openEdit's own delayed focus() on #eName (pre-existing, unrelated to tags) can steal focus
-    # from a tag input opened too soon after — let that settle first
+    assert page.locator("#eGroupChips .grp-add").inner_text().strip() == "+"
+    # openEdit's own delayed focus() on #eName (pre-existing) can steal focus from a picker input opened
+    # too soon after — let that settle first
     page.wait_for_timeout(120)
-    page.locator("#eTagPills .add-tag").click()
-    page.locator("#eTagPills input").fill("  أصحاب بابا  ")
-    page.locator("#eTagPills input").press("Enter")
-    assert page.evaluate("editingTags") == ["أصحاب بابا"]
-    assert page.locator("#eTagPills .tag-pill.on").inner_text().strip() == "أصحاب بابا"
+    page.locator("#eGroupChips .grp-add").click()
+    page.locator("#eGroupChips input").fill("  أصدقاء الجامعة  ")
+    page.locator("#eGroupChips input").press("Enter")
+    assert page.evaluate("editingTags") == ["أصدقاء الجامعة"]
+    assert page.locator("#eGroupChips .tag-pill.on").inner_text().strip() == "أصدقاء الجامعة"
     n = len(family_mutations)
     page.locator("#editSave").click()
     mut = wait_new_mutation(n)
     edit_body = json.loads(mut[2])
-    assert edit_body.get("tags") == ["أصحاب بابا"], edit_body
+    assert edit_body.get("tags") == ["أصدقاء الجامعة"], edit_body
+    assert "relationship_group" not in edit_body, edit_body
     page.wait_for_function("document.getElementById('editBg').hidden")
-    page.wait_for_function("JSON.stringify(all.find(r => r.id === 'no-phone-family').tags) === JSON.stringify(['أصحاب بابا'])")
+    page.wait_for_function("JSON.stringify(all.find(r => r.id === 'no-phone-family').tags) === JSON.stringify(['أصدقاء الجامعة'])")
     page.wait_for_timeout(200)   # let saveEdit's own refreshAll() settle before the next direct mutation
 
-    # ── acceptance #2 (cont'd): matchKey dedupe — a typo'd/hamza'd/re-cased variant of an
-    # existing tag toggles the SAME tag (keeping its original spelling), never a duplicate
+    # ── acceptance #2 (cont'd): multi-label edit keeps both tags, PATCH round-trips both, and the
+    # card shows two raw tag chips from r.tags
+    page.evaluate("openEdit(all.find(r => r.id === 'no-phone-family'))")
+    page.wait_for_function("!document.getElementById('editBg').hidden")
+    page.wait_for_timeout(120)
+    page.evaluate("[...document.querySelectorAll('#eGroupChips .tag-pill')].find(b => b.textContent === \"Mom's family\").click()")
+    page.evaluate("[...document.querySelectorAll('#eGroupChips .tag-pill')].find(b => b.textContent === \"Work\").click()")
+    assert page.evaluate("editingTags") == ["أصدقاء الجامعة", "عيلة ماما", "شغل"]
+    assert page.locator("#eGroupChips .tag-pill.on").count() == 3
+    page.evaluate("[...document.querySelectorAll('#eGroupChips .tag-pill.on')].find(b => b.textContent.trim() === 'أصدقاء الجامعة').click()")
+    assert page.evaluate("editingTags") == ["عيلة ماما", "شغل"]
+    n = len(family_mutations)
+    page.locator("#editSave").click()
+    mut = wait_new_mutation(n)
+    multi_body = json.loads(mut[2])
+    assert multi_body.get("tags") == ["عيلة ماما", "شغل"], multi_body
+    page.wait_for_function("document.getElementById('editBg').hidden")
+    page.wait_for_function("JSON.stringify(all.find(r => r.id === 'no-phone-family').tags) === JSON.stringify(['عيلة ماما','شغل'])")
+    multi_chip_texts = page.evaluate(
+        "[...document.querySelectorAll(\"#fullList .fam[data-id='no-phone-family'] .card-chip.tag\")]"
+        ".map(el => el.textContent.trim())"
+    )
+    assert multi_chip_texts == ["Mom's family", "Work"], multi_chip_texts
+    page.wait_for_timeout(200)
+
+    # ── acceptance #2 (cont'd): matchKey dedupe — a hamza/ta-marbuta variant of an existing label
+    # toggles the SAME label (keeping its original spelling), never a duplicate. Seed the canonical
+    # back into vocabulary (the multi-label edit above dropped it from no-phone-family) so the typed
+    # variant has a fold target; acceptance #3 clears it again.
+    page.evaluate("all.find(r => r.id === 'no-phone-family').tags = ['عيلة ماما','شغل','أصدقاء الجامعة']; renderAll()")
     page.evaluate("openEdit(all.find(r => r.id === 'church-family'))")
     page.wait_for_function("!document.getElementById('editBg').hidden")
     page.wait_for_timeout(120)   # let openEdit's delayed #eName focus() settle first
     vocab_before = page.evaluate("tagVocabulary().length")
-    page.locator("#eTagPills .add-tag").click()
-    page.locator("#eTagPills input").fill("اصحاب بابا")   # bare alef instead of أ, no padding whitespace
-    page.locator("#eTagPills input").press("Enter")
-    assert page.evaluate("tagVocabulary().length") == vocab_before   # no new vocabulary entry
-    assert page.locator("#eTagPills .tag-pill.on").count() == 1
-    assert page.locator("#eTagPills .tag-pill.on").inner_text().strip() == "أصحاب بابا"   # original spelling kept
+    page.locator("#eGroupChips .grp-add").click()
+    page.locator("#eGroupChips input").fill("اصدقاء الجامعه")   # bare alef + ta-marbuta→ha variant of أصدقاء الجامعة
+    page.locator("#eGroupChips input").press("Enter")
+    page.wait_for_function("JSON.stringify(editingTags) === JSON.stringify(['أصدقاء الجامعة'])")
+    assert page.evaluate("tagVocabulary().length") == vocab_before   # folded — no new vocabulary entry
+    assert page.locator("#eGroupChips .tag-pill.on").count() == 1
+    assert page.locator("#eGroupChips .tag-pill.on").inner_text().strip() == "أصدقاء الجامعة"   # original spelling kept
     n = len(family_mutations)
     page.locator("#editSave").click()
     mut = wait_new_mutation(n)
-    assert json.loads(mut[2]).get("tags") == ["أصحاب بابا"], mut
+    assert json.loads(mut[2]).get("tags") == ["أصدقاء الجامعة"], mut
     page.wait_for_function("document.getElementById('editBg').hidden")
-    page.wait_for_function("JSON.stringify(all.find(r => r.id === 'church-family').tags) === JSON.stringify(['أصحاب بابا'])")
+    page.wait_for_function("JSON.stringify(all.find(r => r.id === 'church-family').tags) === JSON.stringify(['أصدقاء الجامعة'])")
     page.wait_for_timeout(200)
 
-    # ── acceptance #3: removing a tag from its last family removes it from the Edit picker (the
-    # picker's vocabulary is computed from live `all` rows, not the local edit buffer)
+    # ── acceptance #3: removing a label from its last family removes it from the Edit picker vocabulary
+    # (suggestions always remain; only in-use custom labels are vocabulary-derived)
     page.evaluate("all.find(r => r.id === 'no-phone-family').tags = null; all.find(r => r.id === 'church-family').tags = null; renderAll()")
-    assert page.evaluate("tagVocabulary().some(v => v.name === 'أصحاب بابا')") is False
+    assert page.evaluate("tagVocabulary().some(v => v.name === 'أصدقاء الجامعة')") is False
     page.evaluate("openEdit(all.find(r => r.id === 'no-phone-family'))")
     page.wait_for_function("!document.getElementById('editBg').hidden")
-    assert page.locator("#eTagPills .tag-pill.on").count() == 0
-    assert page.locator("#eTagPills button", has_text="أصحاب بابا").count() == 0
+    assert page.locator("#eGroupChips .tag-pill.on").count() == 0
+    assert page.locator("#eGroupChips button", has_text="أصدقاء الجامعة").count() == 0
     page.locator("#editCancel").click()
     page.wait_for_function("document.getElementById('editBg').hidden")
 
@@ -1335,7 +1361,7 @@ def run_browser(browser_type, browser_name, base_url):
         " confirmed: false, waitlist: true, tags: ['أصحاب بابا'], invite_sent: {}, deleted_at: null,"
         " added_by: 'fixture' }); renderAll();"
     )
-    page.evaluate("setSegment(['sent','unsent'], 'unsent'); setTagFilter('أصحاب بابا')")
+    page.evaluate("setSegment(['sent','unsent'], 'unsent'); toggleGroupFilter(tagMatchKey('أصحاب بابا'), true)")
     shown_ids = page.evaluate("() => [...document.querySelectorAll('#fullList .fam')].map(f => f.dataset.id)")
     assert set(shown_ids) == {"no-phone-family", "church-family"}, shown_ids
     snap_ids = page.evaluate("snapshotRows().map(r => r.id)")
@@ -1346,7 +1372,7 @@ def run_browser(browser_type, browser_name, base_url):
     np_display = page.evaluate("displayName(all.find(r => r.id === 'no-phone-family'))")
     ch_display = page.evaluate("displayName(all.find(r => r.id === 'church-family'))")
     assert np_display in snap_msg and ch_display in snap_msg, (np_display, ch_display, snap_msg)
-    page.evaluate("all = all.filter(r => r.id !== 'wl-dad-probe'); setSegment(['sent','unsent'], ''); setTagFilter('أصحاب بابا')")
+    page.evaluate("all = all.filter(r => r.id !== 'wl-dad-probe'); setSegment(['sent','unsent'], ''); clearAllFilters()")
     page.wait_for_function("document.querySelectorAll('#fullList .fam').length === 3")
 
     # ── RTL @ 390px: the tag filter row + waitlist row live inside the existing filter sheet —
@@ -1356,23 +1382,38 @@ def run_browser(browser_type, browser_name, base_url):
     assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 1")
     page.evaluate("closeFilterSheet()")
 
-    # ── acceptance #9: Excel export gains Tags + Waitlist columns (positioned right after
-    # Church Only), a tagged + waitlisted row exports its tags joined by "، " and "YES"
-    page.evaluate("all.find(r => r.id === 'church-family').waitlist = true; renderAll()")
+    # ── acceptance #9: Excel export has ONE unified "Groups (المجموعات)" column, no legacy label
+    # columns, and a two-label row joins tags with the Arabic comma
+    page.evaluate(
+        "all.find(r => r.id === 'church-family').waitlist = true;"
+        " all.find(r => r.id === 'church-family').confirmed = true;"
+        " all.find(r => r.id === 'church-family').tags = ['عيلة ماما','شغل'];"
+        " renderAll()"
+    )
     with page.expect_download() as dl:
         page.evaluate("exportExcel()")
     export_text = Path(dl.value.path()).read_text(encoding="utf-8").lstrip("﻿")
     export_rows = list(csv.reader(export_text.splitlines()))
     header = export_rows[0]
     church_idx = header.index("Church Only (الكنيسة فقط)")
-    assert header[church_idx + 1] == "Tags (تصنيفات)", header
-    assert header[church_idx + 2] == "Waitlist (انتظار)", header
-    tag_idx, wait_idx, name_idx = header.index("Tags (تصنيفات)"), header.index("Waitlist (انتظار)"), header.index("Name (الاسم)")
+    assert header[church_idx + 1] == "Waitlist (انتظار)", header
+    assert header[church_idx + 2] == "Confirmed (مؤكد)", header
+    assert header[church_idx + 3] == "Groups (المجموعات)", header
+    assert header.count("Groups (المجموعات)") == 1, header
+    assert "Tags (تصنيفات)" not in header and "Group (المجموعة)" not in header, header
+    grp_idx, wait_idx, conf_idx, name_idx = (
+        header.index("Groups (المجموعات)"),
+        header.index("Waitlist (انتظار)"),
+        header.index("Confirmed (مؤكد)"),
+        header.index("Name (الاسم)"),
+    )
     church_csv_row = next(r for r in export_rows[1:] if r[name_idx] == "عيلة الكنيسة")
-    assert church_csv_row[tag_idx] == "أصحاب بابا", church_csv_row
+    assert church_csv_row[grp_idx] == "عيلة ماما، شغل", church_csv_row
     assert church_csv_row[wait_idx] == "YES", church_csv_row
+    assert church_csv_row[conf_idx] == "YES", church_csv_row
     page.evaluate(
         "all.find(r => r.id === 'church-family').waitlist = false;"
+        " all.find(r => r.id === 'church-family').confirmed = false;"
         " all.find(r => r.id === 'church-family').tags = null;"
         " all.find(r => r.id === 'no-phone-family').tags = null;"
         " renderAll();"
@@ -1441,7 +1482,7 @@ def run_browser(browser_type, browser_name, base_url):
     page.wait_for_function("!document.getElementById('menuScrim').hidden")
     master_rows = menu_labels()
     assert master_rows == [
-        "List", "Add", "Fast entry", "Photos", "Tables", "Waitlist", "Deleted", "Tags", "Settings",
+        "List", "Add", "Fast entry", "Photos", "Tables", "Waitlist", "Deleted", "Groups", "Settings",
         "Excel", "Snapshot", "PIN", "بالعربي",
     ], master_rows
     page.evaluate("closeMenu()")
@@ -1918,16 +1959,17 @@ def run_browser(browser_type, browser_name, base_url):
     assert page.locator("#pinBg").is_hidden()
     assert page.evaluate("location.hash") == "#list"
 
-    # ══════════════════════════ v26.2: relationship groups ══════════════════════════
-    # One optional canonical Arabic group per family (wedding_families.relationship_group), set by
-    # the contributor at add time and editable by organizers. Storage is the Arabic canonical
-    # regardless of UI language; the EN UI shows a mapped English label. Master renames a group
-    # globally via a single PATCH per affected row touching ONLY relationship_group.
+    # ══════════════════════════ v26.2: unified groups/tags ══════════════════════════
+    # Family labels now live in wedding_families.tags as canonical Arabic values, selected via the
+    # multi-select chips at add/edit time. Storage is the Arabic canonical regardless of UI
+    # language; the EN UI shows mapped English labels. Master renames a label globally via a single
+    # PATCH per affected row touching ONLY tags.
     # State on entry: master role, English UI, #list, three ungrouped seed families.
     page.evaluate("if (orgTimer) { clearInterval(orgTimer); orgTimer = null; }")  # no auto-refresh clobbering JS-only state below
     # neutralize the post-mutation background GETs so JS-only `all` edits in this block stay put; every
     # assertion here reads the mutation log or synchronous local state, never a refresh round-trip
     page.evaluate("refreshMine = async () => {}; refreshAll = async () => {};")
+    page.evaluate("['henna-family','church-family','no-phone-family'].forEach(id => { const r = famById(id); if (r) r.tags = null; }); renderAll()")
     assert page.evaluate("L") == "en"
 
     # (i) side-aware suggestion sets: bride sees Youstina, groom sees Moheb, master the union
@@ -1958,23 +2000,37 @@ def run_browser(browser_type, browser_name, base_url):
     groom_labels = page.evaluate("[...document.querySelectorAll('#addGroupChips .tag-pill')].map(b => b.textContent)")
     assert "Moheb's friends" in groom_labels and "Youstina's friends" not in groom_labels, groom_labels
     page.evaluate("localStorage.setItem('wedOrg','master'); mySide='bride'; renderAddScreen()")
+    master_group_pill_ct = page.evaluate("document.querySelectorAll('#addGroupChips .tag-pill').length")
+    # ISC-31: mom (no PIN) gets the SAME single chip row — present and functional, and never busier
+    # than master's (master additionally lists the both-side union suggestions + used-label vocabulary)
+    page.evaluate("localStorage.removeItem('wedOrg'); mySide='bride'; renderAddScreen()")
+    assert not page.locator("#addGroupSec").is_hidden()
+    contrib_pill_ct = page.evaluate("document.querySelectorAll('#addGroupChips .tag-pill').length")
+    assert 0 < contrib_pill_ct <= master_group_pill_ct, (contrib_pill_ct, master_group_pill_ct)
+    page.locator("#addGroupChips .grp-add").click()
+    assert page.locator("#addGroupChips .add-tag-input input").is_visible()
+    page.fill("#addGroupChips .add-tag-input input", "خدمة")
+    page.press("#addGroupChips .add-tag-input input", "Enter")
+    assert page.evaluate("addTags") == ["خدمة"], page.evaluate("addTags")
+    page.evaluate("addTags = []; localStorage.setItem('wedOrg','master'); mySide='bride'; renderAddScreen()")
 
-    # (a) contributor adds a family with a group via chip → POST carries relationship_group as the
-    # canonical AR value, even though the EN UI displayed the English label on the chip
+    # (a) contributor adds a family with a label via chip → POST carries tags as the canonical AR
+    # value, even though the EN UI displayed the English label on the chip
     mut_before = len(family_mutations)
     page.wait_for_function("document.querySelectorAll('#addGroupChips .tag-pill').length > 0")
     page.evaluate("[...document.querySelectorAll('#addGroupChips .tag-pill')].find(b => b.textContent === \"Mom's family\").click()")
-    assert page.evaluate("addGroup") == "عيلة ماما"
+    assert page.evaluate("addTags") == ["عيلة ماما"]
     page.fill("#addName", "New Group Family")
     page.evaluate("saveFamilyOneScreen()")
     method, url, body = wait_new_mutation(mut_before)
     add_payload = json.loads(body)
     add_row = add_payload[0] if isinstance(add_payload, list) else add_payload
     assert method == "POST", method
-    assert add_row.get("relationship_group") == "عيلة ماما", add_row
+    assert add_row.get("tags") == ["عيلة ماما"], add_row
+    assert "relationship_group" not in add_row, add_row
 
-    # (b) skip path: no chip selected ⇒ the key is absent from the POST payload entirely
-    assert page.evaluate("addGroup") == ""  # reset after the previous save
+    # (b) skip path: no chip selected ⇒ tags is absent/null in the POST payload
+    assert page.evaluate("addTags") == []  # reset after the previous save
     mut_before = len(family_mutations)
     page.fill("#addName", "No Group Family")
     page.evaluate("saveFamilyOneScreen()")
@@ -1982,44 +2038,50 @@ def run_browser(browser_type, browser_name, base_url):
     skip_payload = json.loads(body)
     skip_row = skip_payload[0] if isinstance(skip_payload, list) else skip_payload
     assert "relationship_group" not in skip_row, skip_row
+    assert skip_row.get("tags") in (None,), skip_row
 
     # (c) freeform "+": a hamza/alef variant folds via the same Arabic matchKey the tags use — never a
-    # near-duplicate. Covers both fold targets: a canonical suggestion, and an existing in-use group.
+    # near-duplicate. Covers both fold targets: a canonical suggestion, and an existing in-use label.
     # c1: hamza-less variant of the canonical أصحاب يوستينا folds to the canonical
-    page.evaluate("addGroup = ''; renderAddGroupChips(); openAddGroupInput()")
+    page.evaluate("addTags = []; renderAddGroupChips(); openAddGroupInput()")
     page.fill("#addGroupChips .add-tag-input input", "اصحاب يوستينا")
     page.press("#addGroupChips .add-tag-input input", "Enter")
-    assert page.evaluate("addGroup") == "أصحاب يوستينا", page.evaluate("addGroup")
-    # c2: hamza/ta-marbuta variant of an existing (non-suggestion) in-use group folds to that group
-    page.evaluate("famById('henna-family').relationship_group = 'أصدقاء الجامعة'")
-    page.evaluate("addGroup = ''; renderAddGroupChips(); openAddGroupInput()")
+    assert page.evaluate("addTags") == ["أصحاب يوستينا"], page.evaluate("addTags")
+    # c2: hamza/ta-marbuta variant of an existing (non-suggestion) in-use label folds to that label
+    page.evaluate("famById('henna-family').tags = ['أصدقاء الجامعة']")
+    page.evaluate("addTags = []; renderAddGroupChips(); openAddGroupInput()")
     page.fill("#addGroupChips .add-tag-input input", "اصدقاء الجامعه")
     page.press("#addGroupChips .add-tag-input input", "Enter")
-    assert page.evaluate("addGroup") == "أصدقاء الجامعة", page.evaluate("addGroup")
-    page.evaluate("addGroup = ''; famById('henna-family').relationship_group = null; renderAddGroupChips()")
+    assert page.evaluate("addTags") == ["أصدقاء الجامعة"], page.evaluate("addTags")
+    page.evaluate("addTags = []; famById('henna-family').tags = null; renderAddGroupChips()")
 
-    # (d) organizer edit reassigns the group → PATCH round-trips relationship_group and persists
+    # (d) organizer edit adds a label → PATCH round-trips tags and persists
     page.evaluate("localStorage.setItem('wedOrg','master'); location.hash='#list'")
     page.wait_for_function("!document.getElementById('scrList').hidden")
+    # clean start: the dedupe save above persisted a tag into the mock, which the gate-block reload
+    # restored onto church-family — reset so this "add one label" case begins from no labels
+    page.evaluate("famById('church-family').tags = null; renderAll()")
     page.evaluate("openEdit(famById('church-family'))")
     page.wait_for_function("!document.getElementById('editBg').hidden")
     page.wait_for_function("document.querySelectorAll('#eGroupChips .tag-pill').length > 0")
     page.evaluate("[...document.querySelectorAll('#eGroupChips .tag-pill')].find(b => b.textContent === \"Dad's family\").click()")
-    assert page.evaluate("editingGroup") == "عيلة بابا"
+    assert page.evaluate("editingTags") == ["عيلة بابا"], page.evaluate("editingTags")
     mut_before = len(family_mutations)
     page.evaluate("saveEdit()")
     method, url, body = wait_new_mutation(mut_before)
     edit_body = json.loads(body)
     assert method == "PATCH" and "id=eq.church-family" in url, url
-    assert edit_body.get("relationship_group") == "عيلة بابا", edit_body
-    assert page.evaluate("famById('church-family').relationship_group") == "عيلة بابا"
+    assert edit_body.get("tags") == ["عيلة بابا"], edit_body
+    assert "relationship_group" not in edit_body, edit_body
+    assert page.evaluate("famById('church-family').tags") == ["عيلة بابا"]
 
     # (e) master global rename: one PATCH per affected row, each body touching ONLY
-    # relationship_group (never any other family field), rows in other groups untouched
+    # tags (never any other family field); if a row already has the destination label the rename
+    # dedupes it instead of emitting duplicates
     page.evaluate(
-        "famById('henna-family').relationship_group = 'شغل';"
-        "famById('no-phone-family').relationship_group = 'شغل';"
-        "famById('church-family').relationship_group = 'عيلة بابا';"
+        "famById('henna-family').tags = ['شغل','زملاء'];"
+        "famById('no-phone-family').tags = ['شغل'];"
+        "famById('church-family').tags = ['عيلة بابا'];"
         "renderAll();"
     )
     mut_before = len(family_mutations)
@@ -2030,20 +2092,21 @@ def run_browser(browser_type, browser_name, base_url):
     touched_ids = set()
     for _m, _u, _b in rename_patches:
         rbody = json.loads(_b)
-        assert set(rbody.keys()) == {"relationship_group"}, rbody  # ONLY relationship_group in the body
-        assert rbody["relationship_group"] == "زملاء", rbody
+        assert set(rbody.keys()) == {"tags"}, rbody  # ONLY tags in the body
+        assert rbody["tags"] == ["زملاء"], rbody
         touched_ids.add(re.search(r"id=eq\.([\w-]+)", _u).group(1))
     assert touched_ids == {"henna-family", "no-phone-family"}, touched_ids
-    assert page.evaluate("famById('church-family').relationship_group") == "عيلة بابا"  # different group, untouched
+    assert page.evaluate("famById('henna-family').tags") == ["زملاء"]
+    assert page.evaluate("famById('church-family').tags") == ["عيلة بابا"]  # different label, untouched
     page.wait_for_timeout(250)  # let the rename's trailing refresh settle before JS-only state below
 
     # (e2) the rename trigger is an explicit master-only ✏️ button per filter-sheet group row (it
     # replaced a long-press). Role-gated: only master renders it; clicking it drives the same
     # confirm-with-count → renameGroup() single-field-PATCH-per-row path.
     page.evaluate(
-        "famById('henna-family').relationship_group = 'شغل';"
-        "famById('no-phone-family').relationship_group = 'شغل';"
-        "famById('church-family').relationship_group = 'عيلة بابا';"
+        "famById('henna-family').tags = ['شغل'];"
+        "famById('no-phone-family').tags = ['شغل'];"
+        "famById('church-family').tags = ['عيلة بابا'];"
         "localStorage.setItem('wedOrg','master'); renderAll(); openFilterSheet();"
     )
     grp_row_ct = page.evaluate("document.querySelectorAll('#fsGroupRows .fs-row').length")
@@ -2059,7 +2122,7 @@ def run_browser(browser_type, browser_name, base_url):
     page.evaluate("localStorage.setItem('wedOrg','groom'); renderAll()")
     assert page.evaluate("document.querySelectorAll('#fsGroupRows .fs-grp-rename').length") == 0
     # master click-through: stubbed prompt+confirm supply the new name + acceptance; clicking the ✏️
-    # on the 'Work' (شغل) row renames exactly its two families, each PATCH body ONLY {relationship_group}
+    # on the 'Work' (شغل) row renames exactly its two families, each PATCH body ONLY {tags}
     page.evaluate("localStorage.setItem('wedOrg','master'); renderAll(); openFilterSheet();")
     page.evaluate("window.prompt = () => 'زملاء'; window.confirm = () => true;")
     mut_before = len(family_mutations)
@@ -2077,19 +2140,19 @@ def run_browser(browser_type, browser_name, base_url):
     click_touched = set()
     for _m, _u, _b in click_patches:
         cbody = json.loads(_b)
-        assert set(cbody.keys()) == {"relationship_group"}, cbody  # ONLY relationship_group
-        assert cbody["relationship_group"] == "زملاء", cbody
+        assert set(cbody.keys()) == {"tags"}, cbody  # ONLY tags
+        assert cbody["tags"] == ["زملاء"], cbody
         click_touched.add(re.search(r"id=eq\.([\w-]+)", _u).group(1))
     assert click_touched == {"henna-family", "no-phone-family"}, click_touched
-    assert page.evaluate("famById('church-family').relationship_group") == "عيلة بابا"  # other group untouched
+    assert page.evaluate("famById('church-family').tags") == ["عيلة بابا"]  # other label untouched
     page.wait_for_timeout(150)
     page.evaluate("closeFilterSheet()")
 
-    # (f) filter by group ANDs with the existing controls (group + Not-sent)
+    # (f) filter by label ANDs with the existing controls (label + Not-sent)
     page.evaluate(
-        "famById('henna-family').relationship_group = 'أصحاب بابا';"
-        "famById('church-family').relationship_group = 'أصحاب بابا';"
-        "famById('no-phone-family').relationship_group = 'عيلة ماما';"
+        "famById('henna-family').tags = ['أصحاب بابا'];"
+        "famById('church-family').tags = ['أصحاب بابا'];"
+        "famById('no-phone-family').tags = ['عيلة ماما'];"
         "famById('henna-family').invite_sent = { overall: { at: new Date().toISOString(), channel: 'whatsapp' } };"
         "clearAllFilters(); renderAll();"
     )
@@ -2107,48 +2170,157 @@ def run_browser(browser_type, browser_name, base_url):
     page.evaluate("clearAllFilters()")
     assert page.evaluate("groupFilter.size") == 0
 
-    # (g) By-group sort: group headers in label order (Dad's < Mom's), families clustered, ungrouped last
+    # (f2) OR-within-facet: selecting two group matchKeys shows the union of families carrying either
     page.evaluate(
-        "famById('henna-family').relationship_group = 'عيلة ماما';"
-        "famById('church-family').relationship_group = 'عيلة بابا';"
-        "famById('no-phone-family').relationship_group = null;"
+        "famById('henna-family').tags = ['أصحاب بابا'];"
+        "famById('church-family').tags = ['عيلة ماما'];"
+        "famById('no-phone-family').tags = ['أصحاب بابا','شغل'];"
+        "famById('henna-family').invite_sent = {};"
+        "clearAllFilters(); renderAll();"
+    )
+    page.evaluate("toggleGroupFilter(tagMatchKey('أصحاب بابا'), true)")
+    page.evaluate("toggleGroupFilter(tagMatchKey('عيلة ماما'), true)")
+    grp_union = page.evaluate("[...document.querySelectorAll('#fullList .fam')].map(f => f.dataset.id)")
+    assert set(grp_union) == {"henna-family", "church-family", "no-phone-family"}, grp_union
+    assert page.evaluate("groupFilter.size") == 2
+    page.evaluate("clearAllFilters()")
+
+    # (g) By-label sort: cluster by the FIRST tag only, headers in UI label order, unlabeled last
+    page.evaluate(
+        "famById('henna-family').tags = ['شغل','عيلة ماما'];"
+        "famById('church-family').tags = ['عيلة بابا'];"
+        "famById('no-phone-family').tags = null;"
         "famById('henna-family').invite_sent = {};"
         "clearAllFilters(); setSort('group');"
     )
     page.wait_for_function("document.querySelectorAll('#fullList .group-header').length === 2")
     headers = page.evaluate("[...document.querySelectorAll('#fullList .group-header')].map(h => h.textContent)")
-    assert headers == ["Dad's family", "Mom's family"], headers
+    assert headers == ["Dad's family", "Work"], headers
     render_order = page.evaluate(
         "[...document.querySelectorAll('#fullList > *')].map(el => el.classList.contains('group-header') ? 'H:' + el.textContent : 'F:' + el.dataset.id)"
     )
-    assert render_order == ["H:Dad's family", "F:church-family", "H:Mom's family", "F:henna-family", "F:no-phone-family"], render_order
+    assert render_order == ["H:Dad's family", "F:church-family", "H:Work", "F:henna-family", "F:no-phone-family"], render_order
     assert page.evaluate("sortMode") == "group" and page.evaluate("treeView") is False  # By-group and Tree are separate modes
 
-    # (h) Excel export gains a Group column carrying the value AS STORED (Arabic canonical, not the
-    # EN label); the Church→Tags→Waitlist adjacency the rest of the suite pins is preserved
+    # (h) Excel export has ONE unified "Groups (المجموعات)" column carrying labels AS STORED (Arabic
+    # canonical, not the EN label); header order is Church Only → Waitlist → Confirmed → Groups
     with page.expect_download() as dl:
         page.evaluate("exportExcel()")
     grp_export = Path(dl.value.path()).read_text(encoding="utf-8").lstrip("﻿")
     grp_rows = list(csv.reader(grp_export.splitlines()))
     grp_header = grp_rows[0]
-    assert "Group (المجموعة)" in grp_header, grp_header
-    g_idx, gn_idx = grp_header.index("Group (المجموعة)"), grp_header.index("Name (الاسم)")
+    assert "Groups (المجموعات)" in grp_header, grp_header
+    assert grp_header.count("Groups (المجموعات)") == 1, grp_header
+    assert "Tags (تصنيفات)" not in grp_header and "Group (المجموعة)" not in grp_header, grp_header
+    g_idx, gn_idx = grp_header.index("Groups (المجموعات)"), grp_header.index("Name (الاسم)")
     church_export = next(r for r in grp_rows[1:] if r[gn_idx] == "عيلة الكنيسة")
     assert church_export[g_idx] == "عيلة بابا", church_export  # stored Arabic canonical, never "Dad's family"
     ch_only = grp_header.index("Church Only (الكنيسة فقط)")
-    assert grp_header[ch_only + 1] == "Tags (تصنيفات)" and grp_header[ch_only + 2] == "Waitlist (انتظار)", grp_header
+    assert grp_header[ch_only + 1] == "Waitlist (انتظار)", grp_header
+    assert grp_header[ch_only + 2] == "Confirmed (مؤكد)", grp_header
+    assert grp_header[ch_only + 3] == "Groups (المجموعات)", grp_header
 
-    # (item 4) WhatsApp snapshot clusters by group when any group exists, values as stored,
-    # groups in Arabic collation (عيلة بابا before عيلة ماما), ungrouped last
+    # (item 4) WhatsApp snapshot clusters by FIRST label when any label exists, values as stored,
+    # then falls back to the side split once no shown family has tags
     page.evaluate("clearAllFilters()")
     grp_snap = page.evaluate("snapshotMessage()")
-    assert "عيلة بابا" in grp_snap and "عيلة ماما" in grp_snap, grp_snap
-    assert grp_snap.index("عيلة بابا") < grp_snap.index("عيلة ماما"), grp_snap
-    assert "——" in grp_snap, grp_snap  # ungrouped section for the no-group family
+    henna_name = page.evaluate("displayName(famById('henna-family'))")
+    assert "🤍 شغل" in grp_snap and "🤍 عيلة بابا" in grp_snap, grp_snap
+    assert henna_name in grp_snap and "طرف العروسة" not in grp_snap, grp_snap
+    assert "——" in grp_snap, grp_snap  # unlabeled section for the no-group family
+
+    # ── (v27.1) multi-label: one family carries TWO labels; it clusters under its FIRST label, its
+    # card shows both chips, and the facet lists it under EITHER label (OR within the facet)
+    page.evaluate(
+        "famById('henna-family').tags = ['عيلة ماما', 'شغل'];"
+        "famById('church-family').tags = ['شغل'];"
+        "famById('no-phone-family').tags = null;"
+        "famById('henna-family').invite_sent = {};"
+        "clearAllFilters(); setSort('nophone'); renderAll();"
+    )
+    henna_card_chips = page.evaluate(
+        "[...document.querySelectorAll('#fullList .fam[data-id=\"henna-family\"] .card-chip.tag')].map(c => c.textContent)"
+    )
+    assert henna_card_chips == ["Mom's family", "Work"], henna_card_chips   # card chips render via groupLabel, like the picker + filter facet + cluster headers
+    page.evaluate("clearAllFilters(); toggleGroupFilter(tagMatchKey('شغل'), true)")
+    work_shown = page.evaluate("[...document.querySelectorAll('#fullList .fam')].map(f => f.dataset.id)")
+    assert set(work_shown) == {"henna-family", "church-family"}, work_shown   # henna matches via its 2nd label
+    page.evaluate("clearAllFilters(); toggleGroupFilter(tagMatchKey('عيلة ماما'), true)")
+    mom_shown = page.evaluate("[...document.querySelectorAll('#fullList .fam')].map(f => f.dataset.id)")
+    assert set(mom_shown) == {"henna-family"}, mom_shown
+    page.evaluate("toggleGroupFilter(tagMatchKey('شغل'), true)")   # both labels selected → OR union
+    or_shown = page.evaluate("[...document.querySelectorAll('#fullList .fam')].map(f => f.dataset.id)")
+    assert sorted(or_shown) == sorted(["henna-family", "church-family"]) and len(or_shown) == 2, or_shown  # henna not duplicated
+    page.evaluate("clearAllFilters(); setSort('group')")
+    page.wait_for_function("document.querySelectorAll('#fullList .group-header').length === 2")
+    ml_headers = page.evaluate("[...document.querySelectorAll('#fullList .group-header')].map(h => h.textContent)")
+    assert ml_headers == ["Mom's family", "Work"], ml_headers   # henna under its FIRST label, church under Work
+    ml_order = page.evaluate(
+        "[...document.querySelectorAll('#fullList > *')].map(el => el.classList.contains('group-header') ? 'H:' + el.textContent : 'F:' + el.dataset.id)"
+    )
+    assert ml_order == ["H:Mom's family", "F:henna-family", "H:Work", "F:church-family", "F:no-phone-family"], ml_order   # ungrouped family renders flat, no header, after the clusters
+    page.evaluate("clearAllFilters(); setSort('nophone')")
+
+    # ── (v27.1) rename dedupe: renaming label A→B on a row that ALREADY has B collapses to a single B
+    page.evaluate(
+        "famById('henna-family').tags = ['شغل', 'عيلة ماما'];"   # has both A(شغل) and B(عيلة ماما)
+        "famById('church-family').tags = ['شغل'];"
+        "famById('no-phone-family').tags = null;"
+        "renderAll();"
+    )
+    mut_before = len(family_mutations)
+    renamed = page.evaluate("renameGroup('شغل','عيلة ماما')")   # A→B; henna already carries B
+    assert renamed == 2, renamed
+    dedupe_patches = [m for m in family_mutations[mut_before:] if m[0] == "PATCH"]
+    dedupe_by_id = {re.search(r"id=eq\.([\w-]+)", u).group(1): json.loads(b) for _m, u, b in dedupe_patches}
+    assert dedupe_by_id["henna-family"] == {"tags": ["عيلة ماما"]}, dedupe_by_id   # deduped to a single label
+    assert dedupe_by_id["church-family"] == {"tags": ["عيلة ماما"]}, dedupe_by_id
+    assert page.evaluate("famById('henna-family').tags") == ["عيلة ماما"]
+    page.wait_for_timeout(200)
+
+    # ── (v27.1) snapshot fallback: with NO labels anywhere, the snapshot falls back to the side split
+    page.evaluate(
+        "['henna-family','church-family','no-phone-family'].forEach(id => { const r = famById(id); if (r) r.tags = null; });"
+        "clearAllFilters(); renderAll();"
+    )
+    fb_snap = page.evaluate("snapshotMessage()")
+    assert "طرف العروسة" in fb_snap and "طرف العريس" in fb_snap, fb_snap   # side-split headers
+    assert "——" not in fb_snap, fb_snap   # no unlabeled-cluster section when there are no labels at all
+
+    # ── (v27.1) mom (contributor, no PIN) add screen: exactly ONE unified label row, NO separate tag
+    # section, and the v24 master-only gate on label creation is REMOVED (mom can add a custom label)
+    page.evaluate("localStorage.removeItem('wedOrg'); mySide = 'bride'; location.hash = '#add'")
+    page.wait_for_function("!document.getElementById('scrAdd').hidden")
+    page.wait_for_function("document.querySelectorAll('#addGroupChips .tag-pill').length > 0")
+    assert not page.locator("#addGroupSec").is_hidden()      # the one unified label row is present
+    assert page.locator("#addTagsSec").count() == 0          # the old separate tag section is gone
+    assert page.locator("#addTagPills").count() == 0
+    page.evaluate("addTags = []; renderAddGroupChips(); openAddGroupInput()")
+    page.fill("#addGroupChips .add-tag-input input", "جيران")   # a fresh custom (non-suggestion) label
+    page.press("#addGroupChips .add-tag-input input", "Enter")
+    assert page.evaluate("addTags") == ["جيران"], page.evaluate("addTags")
+    mut_before = len(family_mutations)
+    page.fill("#addName", "عيلة الجيران")
+    page.evaluate("saveFamilyOneScreen()")
+    method, url, body = wait_new_mutation(mut_before)
+    mom_payload = json.loads(body)
+    mom_row = mom_payload[0] if isinstance(mom_payload, list) else mom_payload
+    assert method == "POST", method
+    assert mom_row.get("tags") == ["جيران"], mom_row          # contributor's custom label written to tags
+    assert "relationship_group" not in mom_row, mom_row
+    page.evaluate("addTags = []; renderAddGroupChips(); localStorage.setItem('wedOrg','master'); location.hash = '#list'")
+    page.wait_for_function("!document.getElementById('scrList').hidden")
+    page.evaluate(
+        "['henna-family','church-family','no-phone-family'].forEach(id => { const r = famById(id); if (r) r.tags = null; });"
+        "renderAll();"
+    )
+    fallback_snap = page.evaluate("snapshotMessage()")
+    assert "طرف العروسة" in fallback_snap and "طرف العريس" in fallback_snap, fallback_snap
+    assert "🤍 شغل" not in fallback_snap and "🤍 ——" not in fallback_snap, fallback_snap
 
     # restore a clean, ungrouped, default-sort state before the final page-error assertion
     page.evaluate(
-        "['henna-family','church-family','no-phone-family'].forEach(id => { const r = famById(id); if (r) { r.relationship_group = null; r.invite_sent = {}; } });"
+        "['henna-family','church-family','no-phone-family'].forEach(id => { const r = famById(id); if (r) { r.tags = null; r.invite_sent = {}; } });"
         "clearAllFilters(); setSort('nophone'); location.hash = '#list';"
     )
 
@@ -2322,19 +2494,28 @@ def run_browser(browser_type, browser_name, base_url):
     fill_txt4 = page.locator(f'.seat-table-card[data-table-id="{first_table_id}"] .seat-fill-txt').inner_text()
     assert fill_txt4.startswith("2/4"), fill_txt4
 
-    # (v27 #5) pool context chips: the still-unseated No Phone Family shows side (border class),
-    # relationship_group (mapped EN label) and each tag as small chips to aid seating
+    # (v27 #5) pool context chips: the still-unseated No Phone Family shows side (border class) and each
+    # label from tags as a small chip, rendered as stored (like card chips / Excel / snapshot; only
+    # cluster headers + the filter facet EN-map canonicals)
     n_fam_ctx = len(family_mutations)
-    page.evaluate("async () => { await fetch(SUPA + '?id=eq.no-phone-family', {method:'PATCH', headers:H, body: JSON.stringify({relationship_group:'عيلة ماما', tags:['VIP']})}); }")
+    page.evaluate("async () => { await fetch(SUPA + '?id=eq.no-phone-family', {method:'PATCH', headers:H, body: JSON.stringify({tags:['عيلة ماما','VIP']})}); }")
     wait_new_mutation(n_fam_ctx)
     page.evaluate("async () => { await refreshAll(); await loadSeating(); }")
-    page.wait_for_selector("#seatTray .seat-tray-chip .seat-ctx.group")
+    # wait for THIS chip to finish rendering both label chips (loadSeating re-renders asynchronously,
+    # so a bare wait_for_selector on the first .seat-ctx.tag anywhere races the count read below)
+    page.wait_for_function(
+        "() => { const c = [...document.querySelectorAll('#seatTray .seat-tray-chip')]"
+        ".find(el => el.textContent.includes('No Phone Family'));"
+        " return !!c && c.querySelectorAll('.seat-ctx.tag').length === 2; }"
+    )
     np_chip = page.locator("#seatTray .seat-tray-chip", has_text="No Phone Family")
-    assert np_chip.locator(".seat-ctx.group").inner_text() == "Mom's family"
-    assert np_chip.locator(".seat-ctx.tag").inner_text() == "VIP"
+    ctx_labels = np_chip.locator(".seat-ctx.tag")
+    assert ctx_labels.count() == 2, ctx_labels.count()
+    assert ctx_labels.nth(0).inner_text() == "Mom's family"   # first label, EN-mapped via groupLabel
+    assert ctx_labels.nth(1).inner_text() == "VIP"          # custom label, shown as stored
     assert "b" in (np_chip.get_attribute("class") or "").split()   # bride-side border class
     n_fam_ctx2 = len(family_mutations)   # reset context so downstream exclusion assertions see a clean row
-    page.evaluate("async () => { await fetch(SUPA + '?id=eq.no-phone-family', {method:'PATCH', headers:H, body: JSON.stringify({relationship_group:null, tags:null})}); }")
+    page.evaluate("async () => { await fetch(SUPA + '?id=eq.no-phone-family', {method:'PATCH', headers:H, body: JSON.stringify({tags:null})}); }")
     wait_new_mutation(n_fam_ctx2)
     page.evaluate("async () => { await refreshAll(); await loadSeating(); }")
 

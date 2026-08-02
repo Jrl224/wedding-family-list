@@ -498,10 +498,6 @@
     <details class="more-opts" id="addMore" hidden>
       <summary id="addMoreSummary"></summary>
       <input class="wiz-in" id="addNameEn" dir="ltr" style="font-size:15px;margin-top:8px" autocomplete="off">
-      <div class="fs-section" id="addTagsSec" hidden>
-        <p class="fs-label" id="addTagsLabel"></p>
-        <div class="tag-pills" id="addTagPills"></div>
-      </div>
     </details>
 
     <button type="button" class="quiet-link" id="addFastLink" onclick="location.hash='#fast'"></button>
@@ -603,7 +599,7 @@
     </div>
   </div>
 
-  <p class="ver">٢٧٫٠ · 27.0</p>
+  <p class="ver">٢٧٫١ · 27.1</p>
 </div>
 
 <div class="modal-bg" id="filterBg" hidden onmousedown="if(event.target===this) closeFilterSheet()">
@@ -644,10 +640,6 @@
       <div class="fs-section" id="fsGroupSec" hidden>
         <p class="fs-label" id="fsGroupLbl"></p>
         <div id="fsGroupRows"></div>
-      </div>
-      <div class="fs-section" id="fsTagsSec" hidden>
-        <p class="fs-label" id="fsTagsLbl"></p>
-        <div class="tag-pills" id="fsTagPills"></div>
       </div>
       <div class="fs-section">
         <label class="fs-row" id="rowFWaitlist"><input type="checkbox" id="cbFWaitlist" onchange="toggleWaitlistFilter(this.checked)"><span id="rowFWaitlistLbl"></span><span class="fs-count" id="cntFWaitlist"></span></label>
@@ -714,10 +706,6 @@
     <div class="fs-section" id="eGroupSec">
       <p class="fs-label" id="eGroupLabel"></p>
       <div class="tag-pills" id="eGroupChips"></div>
-    </div>
-    <div class="fs-section" id="eTagsSec" hidden>
-      <p class="fs-label" id="eTagsLabel"></p>
-      <div class="tag-pills" id="eTagPills"></div>
     </div>
     <div class="fs-section" id="eWaitlistSec" hidden>
       <p class="fs-label" id="eWaitlistLabel"></p>
@@ -977,13 +965,13 @@ const STR = {
     sentOn:(d,c)=>`✓ اتبعتت ${d} · ${c}`, unmark:"تراجع",
     sentSaved:"اتعلّمت إنها اتبعتت ✓", sentCleared:"شيلنا علامة الإرسال",
     rowSent:d=>`✓ اتبعتت${d ? " · " + d : ""}`, fSent:"✓ اتبعتت", fUnsent:"◻︎ لسه",
-    tagsLabel:"تصنيفات", addTag:"+ تصنيف", waitlistLabel:"قائمة الانتظار", waitNo:"لا", waitYes:"نعم",
+    waitlistLabel:"قائمة الانتظار", waitNo:"لا", waitYes:"نعم",
     chipWaitlist:"انتظار", issueWaitlist:"⏳ انتظار",
-    groupLbl:"المجموعة", groupAddChip:"+", sortGroup:"👥 مجموعة", groupRenameTitle:"اسم المجموعة", groupRenameAria:"تعديل", groupRenameConfirm:(n,name)=>`تغيير ${n} عيلة إلى «${name}»؟`, groupRenamed:n=>`اتغيّرت ${n} عيلة ✅`,
+    groupLbl:"المجموعات", groupAddChip:"+", sortGroup:"👥 مجموعة", groupRenameTitle:"اسم المجموعة", groupRenameAria:"تعديل", groupRenameConfirm:(n,name)=>`تغيير ${n} عيلة إلى «${name}»؟`, groupRenamed:n=>`اتغيّرت ${n} عيلة ✅`,
     evReception:"الفرح", evHenna:"الحنة", evChurch:"الكنيسة",
     addedToast:"تمت الإضافة", fastEntryLbl:"إدخال سريع",
     menuPhotos:"الصور", menuHeading:"القائمة", listLbl:"القائمة", menuAdd:"إضافة", menuSnapshot:"لقطة",
-    menuPin:"الرقم السري", menuDeleted:"المحذوفات", menuTags:"الوسوم", menuOrganizers:"المنظمين",
+    menuPin:"الرقم السري", menuDeleted:"المحذوفات", menuTags:"المجموعات", menuOrganizers:"المنظمين",
     existsChip:"موجود", detailsLbl:"تفاصيل", nameLbl:"الاسم", countLbl:"العدد", phoneLbl:"التليفون",
     contactsLbl:"جهات الاتصال", capWaitlistChip:"الانتظار", excelLbl:"Excel", sideLinkLbl:"الجهة",
     menuSettings:"الإعدادات", setEventsTitle:"المناسبات",
@@ -1063,13 +1051,13 @@ const STR = {
     sentOn:(d,c)=>`✓ Sent ${d} · ${c}`, unmark:"Undo",
     sentSaved:"Marked as sent ✓", sentCleared:"Sent mark removed",
     rowSent:d=>`✓ Sent${d ? " · " + d : ""}`, fSent:"✓ Sent", fUnsent:"◻︎ Not sent",
-    tagsLabel:"Tags", addTag:"+ Tag", waitlistLabel:"Waitlist", waitNo:"No", waitYes:"Yes",
+    waitlistLabel:"Waitlist", waitNo:"No", waitYes:"Yes",
     chipWaitlist:"Waitlist", issueWaitlist:"⏳ Waitlist",
-    groupLbl:"Group", groupAddChip:"+", sortGroup:"👥 By group", groupRenameTitle:"Group name", groupRenameAria:"Rename", groupRenameConfirm:(n,name)=>`Rename ${n} families to “${name}”?`, groupRenamed:n=>`Renamed ${n} families ✅`,
+    groupLbl:"Groups", groupAddChip:"+", sortGroup:"👥 By group", groupRenameTitle:"Group name", groupRenameAria:"Rename", groupRenameConfirm:(n,name)=>`Rename ${n} families to “${name}”?`, groupRenamed:n=>`Renamed ${n} families ✅`,
     evReception:"Reception", evHenna:"Henna", evChurch:"Church",
     addedToast:"Added", fastEntryLbl:"Fast entry",
     menuPhotos:"Photos", menuHeading:"Menu", listLbl:"List", menuAdd:"Add", menuSnapshot:"Snapshot",
-    menuPin:"PIN", menuDeleted:"Deleted", menuTags:"Tags", menuOrganizers:"Organizers",
+    menuPin:"PIN", menuDeleted:"Deleted", menuTags:"Groups", menuOrganizers:"Organizers",
     existsChip:"Exists", detailsLbl:"Details", nameLbl:"Name", countLbl:"Count", phoneLbl:"Phone",
     contactsLbl:"Contacts", capWaitlistChip:"Waitlist", excelLbl:"Excel", sideLinkLbl:"Side",
     menuSettings:"Settings", setEventsTitle:"Events",
@@ -1087,10 +1075,9 @@ const STR = {
 };
 let L = localStorage.getItem("wedLang") || "ar";
 const t = k => STR[L][k];
-/* ── v26.2 relationship groups: one optional canonical group per family (wedding_families.
-   relationship_group). The Arabic canonical is what the DB stores regardless of UI language;
-   GROUP_EN maps each canonical → its English display label. Suggestions are side-aware; the
-   person-specific "friends" suggestion differs by side (Youstina vs Moheb). ── */
+/* ── unified labels: canonical Arabic values live in the row's tags array regardless of UI
+   language; GROUP_EN maps each canonical → its English display label. Suggestions are side-aware;
+   the person-specific "friends" suggestion differs by side (Youstina vs Moheb). ── */
 const GROUP_SUGGESTIONS = {
   bride: ["عيلة ماما", "عيلة بابا", "أصحاب ماما", "أصحاب بابا", "أصحاب يوستينا", "شغل"],
   groom: ["عيلة ماما", "عيلة بابا", "أصحاب ماما", "أصحاب بابا", "أصحاب محب", "شغل"],
@@ -1126,7 +1113,6 @@ function applyLang(){
   set("editTitle","editTitle"); set("editSave","editSave"); set("editCancel","cancel"); set("editDelete","deleteFamily");
   set("eParentLabel","eParentLabel");
   set("eConfirmedLabel","confirmedLabel");
-  set("eTagsLabel","tagsLabel"); set("fsTagsLbl","tagsLabel");
   set("addGroupLabel","groupLbl"); set("eGroupLabel","groupLbl"); set("fsGroupLbl","groupLbl");
   set("eWaitlistLabel","waitlistLabel"); set("eWaitNo","waitNo"); set("eWaitYes","waitYes");
   set("rowFWaitlistLbl","issueWaitlist");
@@ -1147,7 +1133,7 @@ function applyLang(){
   renderAddScreenLabels();
   if (typeof inviteRow !== "undefined" && inviteRow && !$("inviteBg").hidden) renderInviteModal();
   updateRoleChip();
-  if (typeof editing !== "undefined" && editing && !$("editBg").hidden) { renderETagPills(); renderEGroupChips(); }
+  if (typeof editing !== "undefined" && editing && !$("editBg").hidden) renderEGroupChips();
   set("tablesGenTitle","menuTables"); set("tablesGenTablesLbl","menuTables"); set("tablesGenSeatsLbl","seatsWordDef");
   set("tablesGenCreateBtn","createLbl");
   set("tblLockLabel","lockLbl"); set("tblSave","save"); set("tblCancel","cancel"); set("tblDelete","deleteLbl");
@@ -1331,7 +1317,7 @@ let device = localStorage.getItem("wedDevice");
 if (!device) { device = "d" + Math.random().toString(36).slice(2, 10); localStorage.setItem("wedDevice", device); }
 let mySide = localStorage.getItem("wedSide") || "";
 let cc = localStorage.getItem("wedCC") || "+20";
-let mine = [], all = [], activeFilters = new Set(), groupFilter = new Set(), sortMode = "nophone", treeView = false, n = 2, orgTimer = null, pending = [], step = 1, photoTick = 0, tagFilter = null;
+let mine = [], all = [], activeFilters = new Set(), groupFilter = new Set(), sortMode = "nophone", treeView = false, n = 2, orgTimer = null, pending = [], step = 1, photoTick = 0;
 let collapsed = new Set(JSON.parse(localStorage.getItem("wedCollapsed") || "[]"));
 
 const $ = id => document.getElementById(id);
@@ -1380,7 +1366,6 @@ function collectMembers(containerId){
 /* ── routing (v25: hash router replaces the 3-step wizard) ── */
 let addSide = "";           // master's chosen target side on #add; side-locked roles ignore this
 let addTags = [];
-let addGroup = "";          // v26.2: contributor-chosen relationship group (canonical Arabic) on the Add screen
 let addDupConfirmed = false;
 let photoCount = 0;
 
@@ -1435,7 +1420,7 @@ function showScreen(scr){
   if (domId === "scrSettings") renderSettingsScreen();
   if (scr === "waitlist") { activeFilters.clear(); activeFilters.add("waitlist"); renderAll(); }
   else if (scr === "deleted") { activeFilters.clear(); activeFilters.add("deleted"); renderAll(); }
-  else if (scr === "tags") { activeFilters.clear(); tagFilter = null; renderAll(); openFilterSheet(); }
+  else if (scr === "tags") { activeFilters.clear(); groupFilter.clear(); renderAll(); openFilterSheet(); }
   else if (enteringList) renderAll();
 }
 function screenRoute(){
@@ -1597,78 +1582,20 @@ async function saveFamilyOneScreen(){
   const atCap = !!(side && sideTotals[side] !== undefined && sideTotals[side] >= (CAPS[side] != null ? CAPS[side] : Infinity));
   const org = isOrg();
   const nameEn = (org && $("addNameEn").value.trim()) || "";
-  const tags = (isMasterRole() && addTags.length) ? addTags.slice() : null;
-  const item = { name, name_en: nameEn, count: n, phone, event2: wEv2, church_only: wChurch, waitlist: atCap, side, tags, relationship_group: addGroup || null };
+  const tags = addTags.length ? addTags.slice() : null;
+  const item = { name, name_en: nameEn, count: n, phone, event2: wEv2, church_only: wChurch, waitlist: atCap, side, tags };
   const ok = await insertRows([item], { bypassDupModal: true });
   btn.disabled = false;
   if (ok) {
     toast(t("addedToast"));
     nameEl.value = ""; $("addPhone").value = ""; $("addNameEn").value = "";
-    addTags = []; if (isMasterRole()) renderAddTagPills();
-    addGroup = ""; renderAddGroupChips();
+    addTags = []; renderAddGroupChips();
     setEv2(false); setChurch(false); renderAddEventPills();
     n = 2; $("addCount").textContent = localDigits(n);
     resetAddDupState();
     nameEl.focus();
     renderAddCapChip();
   }
-}
-function toggleAddTag(name){
-  const mk = tagMatchKey(name);
-  const idx = addTags.findIndex(tg => tagMatchKey(tg) === mk);
-  if (idx >= 0) addTags.splice(idx, 1); else addTags.push(normalizeTag(name));
-  renderAddTagPills();
-}
-function commitAddTag(raw){
-  const val = normalizeTag(raw);
-  if (val) {
-    const mk = tagMatchKey(val);
-    const vocabHit = tagVocabulary().find(v => v.mk === mk);
-    const selHit = addTags.find(tg => tagMatchKey(tg) === mk);
-    toggleAddTag(vocabHit ? vocabHit.name : (selHit || val));
-  } else renderAddTagPills();
-}
-function openAddTagInput(){
-  const el = $("addTagPills"); if (!el) return;
-  const old = el.querySelector(".add-tag"); if (!old) return;
-  const wrap = document.createElement("span");
-  wrap.className = "tag-pill add-tag-input";
-  const inp = document.createElement("input");
-  inp.type = "text"; inp.autocomplete = "off";
-  wrap.appendChild(inp);
-  el.replaceChild(wrap, old);
-  inp.focus();
-  let done = false;
-  const commit = () => { if (done) return; done = true; commitAddTag(inp.value); };
-  inp.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); commit(); } });
-  inp.addEventListener("blur", commit);
-}
-function renderAddTagPills(){
-  const el = $("addTagPills"); if (!el) return;
-  el.innerHTML = "";
-  const vocab = tagVocabulary();
-  const selKeys = new Set(addTags.map(tagMatchKey));
-  const seen = new Set();
-  vocab.forEach(v => {
-    seen.add(v.mk);
-    const btn = document.createElement("button");
-    btn.type = "button"; btn.className = "tag-pill" + (selKeys.has(v.mk) ? " on" : "");
-    btn.textContent = v.name; btn.onclick = () => toggleAddTag(v.name);
-    el.appendChild(btn);
-  });
-  addTags.forEach(tg => {
-    const mk = tagMatchKey(tg);
-    if (seen.has(mk)) return;
-    seen.add(mk);
-    const btn = document.createElement("button");
-    btn.type = "button"; btn.className = "tag-pill on"; btn.textContent = tg;
-    btn.onclick = () => toggleAddTag(tg);
-    el.appendChild(btn);
-  });
-  const add = document.createElement("button");
-  add.type = "button"; add.className = "tag-pill add-tag"; add.textContent = t("addTag");
-  add.onclick = openAddTagInput;
-  el.appendChild(add);
 }
 async function pickContactSingle(){
   try {
@@ -1685,7 +1612,6 @@ function renderAddScreenLabels(){
   const set = (id, k) => { const el = $(id); if (el) el.textContent = t(k); };
   set("addSaveBtn", "save");
   set("addMoreSummary", "detailsLbl");
-  set("addTagsLabel", "tagsLabel");
   set("addContactsBtn", "contactsLbl");
   set("addFastLink", "fastEntryLbl");
   const nameEl = $("addName"), nameEnEl = $("addNameEn"), phoneEl = $("addPhone");
@@ -1698,11 +1624,9 @@ function renderAddScreenLabels(){
   renderAddGroupChips();
 }
 function renderAddScreen(){
-  const org = isOrg(), master = isMasterRole();
+  const org = isOrg();
   $("addContactsBtn").hidden = !("contacts" in navigator && "select" in navigator.contacts);
   $("addMore").hidden = !org;
-  $("addTagsSec").hidden = !master;
-  if (master) renderAddTagPills();
   renderAddScreenLabels();
   updateAddSaveEnabled();
   renderMine();
@@ -1921,7 +1845,6 @@ async function insertRows(items, opts){
     if (i.name_en) row.name_en = i.name_en;
     if (i.waitlist) row.waitlist = true;
     if (i.tags) row.tags = i.tags;
-    if (i.relationship_group) row.relationship_group = i.relationship_group;
     return row;
   });
   try {
@@ -2014,73 +1937,14 @@ function tagVocabulary(){
   });
   return Object.keys(counts).map(mk => ({ mk, name: names[mk], count: counts[mk] })).sort((a, b) => b.count - a.count);
 }
+function toggleLabelIn(arr, canon){ const mk = tagMatchKey(canon); const i = arr.findIndex(x => tagMatchKey(x) === mk); if (i >= 0) arr.splice(i, 1); else arr.push(normalizeTag(canon)); return arr; }
+function addLabelIn(arr, canon){ const mk = tagMatchKey(canon); if (!arr.some(x => tagMatchKey(x) === mk)) arr.push(normalizeTag(canon)); return arr; }
 
-/* ── Edit modal: tag pills (master-only) ── */
 let editingTags = [];
-function toggleEditTag(name){
-  const mk = tagMatchKey(name);
-  const idx = editingTags.findIndex(tg => tagMatchKey(tg) === mk);
-  if (idx >= 0) editingTags.splice(idx, 1); else editingTags.push(normalizeTag(name));
-  renderETagPills();
-}
-function commitNewTag(raw){
-  const val = normalizeTag(raw);
-  if (val) {
-    const mk = tagMatchKey(val);
-    const vocabHit = tagVocabulary().find(v => v.mk === mk);
-    const selHit = editingTags.find(tg => tagMatchKey(tg) === mk);
-    toggleEditTag(vocabHit ? vocabHit.name : (selHit || val));
-  } else renderETagPills();
-}
-function openTagInput(){
-  const el = $("eTagPills"); if (!el) return;
-  const old = el.querySelector(".add-tag"); if (!old) return;
-  const wrap = document.createElement("span");
-  wrap.className = "tag-pill add-tag-input";
-  const inp = document.createElement("input");
-  inp.type = "text"; inp.autocomplete = "off";
-  wrap.appendChild(inp);
-  el.replaceChild(wrap, old);
-  inp.focus();
-  let done = false;
-  const commit = () => { if (done) return; done = true; commitNewTag(inp.value); };
-  inp.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); commit(); } });
-  inp.addEventListener("blur", commit);
-}
-function renderETagPills(){
-  const el = $("eTagPills"); if (!el) return;
-  el.innerHTML = "";
-  const vocab = tagVocabulary();
-  const selKeys = new Set(editingTags.map(tagMatchKey));
-  const seen = new Set();
-  vocab.forEach(v => {
-    seen.add(v.mk);
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "tag-pill" + (selKeys.has(v.mk) ? " on" : "");
-    btn.textContent = v.name;
-    btn.onclick = () => toggleEditTag(v.name);
-    el.appendChild(btn);
-  });
-  editingTags.forEach(tg => {
-    const mk = tagMatchKey(tg);
-    if (seen.has(mk)) return;
-    seen.add(mk);
-    const btn = document.createElement("button");
-    btn.type = "button"; btn.className = "tag-pill on"; btn.textContent = tg;
-    btn.onclick = () => toggleEditTag(tg);
-    el.appendChild(btn);
-  });
-  const add = document.createElement("button");
-  add.type = "button"; add.className = "tag-pill add-tag"; add.textContent = t("addTag");
-  add.onclick = openTagInput;
-  el.appendChild(add);
-}
 
 /* ── v26.2 relationship groups: one canonical Arabic group per family, set by the contributor at
    add time and editable by organizers. Freeform folds into existing canonicals/vocabulary via the
    same Arabic-fold matchKey as tags (typo/hamza variants reuse the existing group, never a dup). ── */
-let editingGroup = "";
 // suggestion set: side-locked roles see their side's; master sees the deduped union of both sides
 function groupSuggestions(role, side){
   if (role === "master") {
@@ -2095,19 +1959,6 @@ function groupLabel(canon){
   const c = normalizeTag(canon);
   return (L === "en" && GROUP_EN[c]) ? GROUP_EN[c] : c;
 }
-// groups actually in use across live rows, most-used first (drives the filter + rename surfaces)
-function groupVocabulary(){
-  const counts = {}, names = {};
-  all.forEach(r => {
-    if (r.deleted_at) return;
-    const g = normalizeTag(r.relationship_group);
-    const mk = tagMatchKey(g);
-    if (!mk) return;
-    counts[mk] = (counts[mk] || 0) + 1;
-    if (!names[mk]) names[mk] = g;
-  });
-  return Object.keys(counts).map(mk => ({ mk, name: names[mk], count: counts[mk] })).sort((a, b) => b.count - a.count);
-}
 // fold a raw entry to a canonical value: a matching suggestion wins, then an existing used group,
 // then the normalized freeform text itself. `side` biases the suggestion match toward that side.
 function resolveGroupValue(raw, side){
@@ -2118,34 +1969,31 @@ function resolveGroupValue(raw, side){
   const allCanon = [...GROUP_SUGGESTIONS.bride, ...GROUP_SUGGESTIONS.groom];
   const canonHit = sideSet.find(c => tagMatchKey(c) === mk) || allCanon.find(c => tagMatchKey(c) === mk);
   if (canonHit) return canonHit;
-  const vocabHit = groupVocabulary().find(v => v.mk === mk);
+  const vocabHit = tagVocabulary().find(v => v.mk === mk);
   if (vocabHit) return vocabHit.name;
   return val;
 }
 
-/* single-select chip row shared by Add (contributor) and Edit (organizer). `pillsId` renders into
-   that container; `getSel`/`setSel` read/write the caller's selection; `side`/`role` pick the set. */
-function renderGroupChips(pillsId, side, role, getSel, setSel, openInput){
+function renderGroupChips(pillsId, side, role, getSel, toggle, openInput){
   const el = $(pillsId); if (!el) return;
   el.innerHTML = "";
-  const sel = getSel();
-  const selMk = sel ? tagMatchKey(sel) : "";
+  const sel = getSel() || [];
+  const selKeys = new Set(sel.map(tagMatchKey));
   const seen = new Set();
-  const addPill = (canon, on) => {
+  const addPill = (canon) => {
     const mk = tagMatchKey(canon);
     if (seen.has(mk)) return;
     seen.add(mk);
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.className = "tag-pill" + (on ? " on" : "");
+    btn.className = "tag-pill" + (selKeys.has(mk) ? " on" : "");
     btn.textContent = groupLabel(canon);
-    btn.onclick = () => { setSel(on ? "" : canon); };   // one tap selects; tapping the selected chip clears it
+    btn.onclick = () => toggle(canon);
     el.appendChild(btn);
   };
-  groupSuggestions(role, side).forEach(canon => addPill(canon, tagMatchKey(canon) === selMk));
-  // Edit surface additionally offers already-used groups so any existing value is one tap away
-  if (role !== "add") groupVocabulary().forEach(v => addPill(v.name, v.mk === selMk));
-  if (sel && !seen.has(selMk)) addPill(sel, true);      // a freeform selection not in any set stays visible
+  groupSuggestions(role, side).forEach(addPill);
+  tagVocabulary().forEach(v => addPill(v.name));
+  sel.forEach(s => { if (!seen.has(tagMatchKey(s))) addPill(s); });
   const add = document.createElement("button");
   add.type = "button"; add.className = "tag-pill grp-add"; add.textContent = t("groupAddChip");
   add.onclick = openInput;
@@ -2168,17 +2016,15 @@ function openGroupInput(pillsId, commit){
   inp.addEventListener("blur", fire);
 }
 
-/* Add screen (contributor-facing, never gated behind organizer-only surfaces) */
-function addGroupSide(){ return isMasterRole() ? "master" : targetSide(); }
 function renderAddGroupChips(){
   if (!$("addGroupChips")) return;
   const role = isMasterRole() ? "master" : "add";
-  renderGroupChips("addGroupChips", targetSide(), role, () => addGroup, v => { addGroup = v; renderAddGroupChips(); }, openAddGroupInput);
+  renderGroupChips("addGroupChips", targetSide(), role, () => addTags, canon => { toggleLabelIn(addTags, canon); renderAddGroupChips(); }, openAddGroupInput);
 }
 function openAddGroupInput(){
   openGroupInput("addGroupChips", raw => {
     const v = normalizeTag(raw);
-    addGroup = v ? resolveGroupValue(v, targetSide()) : addGroup;
+    if (v) addLabelIn(addTags, resolveGroupValue(v, targetSide()));
     renderAddGroupChips();
   });
 }
@@ -2188,13 +2034,13 @@ function renderEGroupChips(){
   if (!$("eGroupChips")) return;
   const role = isMasterRole() ? "master" : "add";
   const side = editing ? editing.side : (mySide || "bride");
-  renderGroupChips("eGroupChips", side, role, () => editingGroup, v => { editingGroup = v; renderEGroupChips(); }, openEGroupInput);
+  renderGroupChips("eGroupChips", side, role, () => editingTags, canon => { toggleLabelIn(editingTags, canon); renderEGroupChips(); }, openEGroupInput);
 }
 function openEGroupInput(){
   openGroupInput("eGroupChips", raw => {
     const v = normalizeTag(raw);
     const side = editing ? editing.side : (mySide || "bride");
-    editingGroup = v ? resolveGroupValue(v, side) : editingGroup;
+    if (v) addLabelIn(editingTags, resolveGroupValue(v, side));
     renderEGroupChips();
   });
 }
@@ -2208,11 +2054,13 @@ function renderGroupFilterSection(countBase){
   const filtered = countBase.filter(r => preds.every(p => p(r)));
   const counts = {}, names = {};
   filtered.forEach(r => {
-    const g = normalizeTag(r.relationship_group);
-    const mk = tagMatchKey(g);
-    if (!mk) return;
-    counts[mk] = (counts[mk] || 0) + 1;
-    if (!names[mk]) names[mk] = g;
+    (Array.isArray(r.tags) ? r.tags : []).forEach(tg => {
+      const g = normalizeTag(tg);
+      const mk = tagMatchKey(g);
+      if (!mk) return;
+      counts[mk] = (counts[mk] || 0) + 1;
+      if (!names[mk]) names[mk] = g;
+    });
   });
   const keys = Object.keys(counts).sort((a, b) => groupLabel(names[a]).localeCompare(groupLabel(names[b]), L === "ar" ? "ar" : "en"));
   sec.hidden = keys.length === 0;
@@ -2246,13 +2094,13 @@ function toggleGroupFilter(mk, on){
   renderAll();
 }
 
-/* master-only global rename: one PATCH per affected row touching ONLY relationship_group */
+/* master-only global rename: one PATCH per affected row rewriting the label inside its tags */
 function promptRenameGroup(oldCanon){
   const raw = window.prompt(t("groupRenameTitle"), oldCanon);
   if (raw == null) return;
   const newCanon = resolveGroupValue(String(raw), null);
   if (!newCanon || tagMatchKey(newCanon) === tagMatchKey(oldCanon)) return;
-  const affected = all.filter(r => !r.deleted_at && r.relationship_group && tagMatchKey(r.relationship_group) === tagMatchKey(oldCanon));
+  const affected = all.filter(r => !r.deleted_at && Array.isArray(r.tags) && r.tags.some(tg => tagMatchKey(tg) === tagMatchKey(oldCanon)));
   if (!affected.length) return;
   if (!window.confirm(t("groupRenameConfirm")(affected.length, groupLabel(newCanon)))) return;
   renameGroup(oldCanon, newCanon);
@@ -2262,15 +2110,16 @@ async function renameGroup(oldCanon, newRaw){
   if (!newCanon) return 0;
   const oldMk = tagMatchKey(String(oldCanon));
   if (!oldMk || tagMatchKey(newCanon) === oldMk) return 0;
-  const affected = all.filter(r => !r.deleted_at && r.relationship_group && tagMatchKey(r.relationship_group) === oldMk);
+  const affected = all.filter(r => !r.deleted_at && Array.isArray(r.tags) && r.tags.some(tg => tagMatchKey(tg) === oldMk));
   if (!affected.length) return 0;
-  affected.forEach(r => { r.relationship_group = newCanon; });
+  const rewrite = tags => { const out = [], seen = new Set(); (Array.isArray(tags) ? tags : []).forEach(tg => { const canon = tagMatchKey(tg) === oldMk ? newCanon : tg; const mk = tagMatchKey(canon); if (mk && !seen.has(mk)) { seen.add(mk); out.push(normalizeTag(canon)); } }); return out; };
+  affected.forEach(r => { r.tags = rewrite(r.tags); });
   if (groupFilter.delete(oldMk)) groupFilter.add(tagMatchKey(newCanon));
   renderAll(); renderMine();
   let ok = 0;
   for (const r of affected) {
     try {
-      const res = await fetch(`${SUPA}?id=eq.${r.id}`, { method: "PATCH", headers: H, body: JSON.stringify({ relationship_group: newCanon }) });
+      const res = await fetch(`${SUPA}?id=eq.${r.id}`, { method: "PATCH", headers: H, body: JSON.stringify({ tags: r.tags }) });
       if (res.ok) ok++;
     } catch(e) { /* best effort — local state already reflects the rename */ }
   }
@@ -2565,14 +2414,13 @@ function famRow(r, canDelete, navIds){
   const sideWord = r.side === "bride" ? t("sideWordB") : t("sideWordG");
   const orgCtx = isOrg() && !$("scrList").hidden;
   const chip = (cls, emoji, key) => `<span class="card-chip ${cls}">${emoji}${orgCtx ? " " + t(key) : ""}</span>`;
-  const tagList = masterCtx && Array.isArray(r.tags) ? r.tags.filter(Boolean) : [];
+  const labels = Array.isArray(r.tags) ? r.tags.filter(Boolean) : [];
   const chips = (masterCtx && r.waitlist ? chip("waitlist", "⏳", "chipWaitlist") : "")
     + (!r.church_only ? chip("reception", "🏛", "chipReception") : "")
     + (r.event2 ? chip("henna", "🌿" + (hennaOverridden(r) ? " " + localDigits(r.seats.henna) : ""), "chipHenna") : "")
     + (r.confirmed ? chip("confirmed", "✅", "chipConfirmed") : "")
-    + (r.relationship_group ? `<span class="card-chip group">${esc(groupLabel(r.relationship_group))}</span>` : "")
-    + tagList.slice(0, 2).map(tg => `<span class="card-chip tag">${esc(tg)}</span>`).join("")
-    + (tagList.length > 2 ? `<span class="card-chip tag">+${localDigits(tagList.length - 2)}</span>` : "")
+    + labels.slice(0, 2).map(tg => `<span class="card-chip tag">${esc(groupLabel(tg))}</span>`).join("")
+    + (labels.length > 2 ? `<span class="card-chip tag">+${localDigits(labels.length - 2)}</span>` : "")
     + (orgCtx && liveParent(r)
         ? `<span class="card-chip crumb" data-parent="${liveParent(r).id}">${crumbArrow()} ${esc(breadcrumb(r).join(" › "))}</span>`
         : (orgCtx && r.parent_id && famById(r.parent_id)
@@ -2634,7 +2482,7 @@ function openEdit(r){
   setEEv2(!!r.event2); setEChurch(!!r.church_only);
   $("eName").value = r.name; $("eNameEn").value = r.name_en || ""; $("ePhone").value = r.phone || ""; $("eCount").textContent = eCount;
   $("eConfirmedChk").checked = !!r.confirmed;
-  editingGroup = r.relationship_group ? normalizeTag(r.relationship_group) : "";
+  editingTags = Array.isArray(r.tags) ? r.tags.slice() : [];
   renderEGroupChips();
   fillParentOptions(r);
   // v23.2 acceptance #9: contributor PIN edits (mineWrap re-uses this same modal) never show the
@@ -2642,16 +2490,12 @@ function openEdit(r){
   const showParent = isOrg();
   $("eParentLabel").hidden = !showParent;
   $("eParent").hidden = !showParent;
-  // v24: tags + waitlist are master-only — hidden for side roles, guests, and never in the add wizard
   const showMasterFields = isMasterRole();
-  $("eTagsSec").hidden = !showMasterFields;
   $("eWaitlistSec").hidden = !showMasterFields;
   if (showMasterFields) {
-    editingTags = Array.isArray(r.tags) ? r.tags.slice() : [];
     eWaitlistVal = !!r.waitlist;
-    renderETagPills();
     renderEWaitlistSeg();
-  } else { editingTags = []; eWaitlistVal = false; }
+  } else { eWaitlistVal = false; }
   renderMemberInputs("eMembers", eCount, Array.isArray(r.members) ? r.members : [], displayName(r));
   $("eMore").open = !!((showParent && r.parent_id) || (Array.isArray(r.members) && r.members.some(v => v)));
   $("editBg").hidden = false;
@@ -2671,11 +2515,11 @@ async function saveEdit(){
   if (eEv2 && eHenna > 0 && eHenna < eCount) seats.henna = eHenna; else delete seats.henna;
   const seatsVal = Object.keys(seats).length ? seats : null;
   const masterFields = isMasterRole();
-  const body = { name, name_en: name_en || null, count: eCount, phone, event2: eEv2, church_only: eChurch, confirmed, seats: seatsVal, parent_id, members, relationship_group: editingGroup || null };
-  if (masterFields) { body.tags = editingTags.length ? editingTags : null; body.waitlist = eWaitlistVal; }
+  const body = { name, name_en: name_en || null, count: eCount, phone, event2: eEv2, church_only: eChurch, confirmed, seats: seatsVal, parent_id, members, tags: editingTags.length ? editingTags : null };
+  if (masterFields) { body.waitlist = eWaitlistVal; }
   $("editBg").hidden = true;
-  editing.name = name; editing.name_en = name_en || null; editing.count = eCount; editing.phone = phone; editing.event2 = eEv2; editing.church_only = eChurch; editing.confirmed = confirmed; editing.seats = seatsVal; editing.parent_id = parent_id; editing.members = members; editing.relationship_group = editingGroup || null;
-  if (masterFields) { editing.tags = body.tags; editing.waitlist = body.waitlist; }
+  editing.name = name; editing.name_en = name_en || null; editing.count = eCount; editing.phone = phone; editing.event2 = eEv2; editing.church_only = eChurch; editing.confirmed = confirmed; editing.seats = seatsVal; editing.parent_id = parent_id; editing.members = members; editing.tags = editingTags.length ? editingTags : null;
+  if (masterFields) { editing.waitlist = body.waitlist; }
   renderMine(); renderAll();
   try {
     await fetch(`${SUPA}?id=eq.${editing.id}`, { method: "PATCH", headers: H, body: JSON.stringify(body) });
@@ -3289,11 +3133,10 @@ function renderSeatTray(unseated){
     chip.className = "seat-tray-chip " + (f.side === "groom" ? "g" : "b") + (seatArmed && seatArmed.familyId === f.id && !seatArmed.moveFrom ? " armed" : "");
     chip.dataset.familyId = f.id;
     const isPartial = remaining < famReceptionCount(f);
-    // side is already the chip's start-border; add relationship_group + tags as small context
-    // chips (existing card-chip visual language) so the seater has who-sits-with-whom cues
+    // side is already the chip's start-border; add the family's labels as small context chips
+    // (existing card-chip visual language) so the seater has who-sits-with-whom cues
     const ctx = [];
-    if (f.relationship_group) ctx.push(`<span class="seat-ctx group">${esc(groupLabel(f.relationship_group))}</span>`);
-    if (Array.isArray(f.tags)) f.tags.forEach(tg => { if (tg) ctx.push(`<span class="seat-ctx tag">${esc(tg)}</span>`); });
+    if (Array.isArray(f.tags)) f.tags.forEach(tg => { if (tg) ctx.push(`<span class="seat-ctx tag">${esc(groupLabel(tg))}</span>`); });
     chip.innerHTML = `<b>${esc(displayName(f))}</b><span>${isPartial ? esc(t("restChip")(localDigits(remaining))) : localDigits(remaining)}</span>`
       + (ctx.length ? `<div class="seat-ctx-row">${ctx.join("")}</div>` : "");
     chip.onclick = () => tapTrayChip(f.id);
@@ -3377,7 +3220,7 @@ function sortRows(rows){
 }
 /* v24: single source of truth for "what's visible right now" — master/side role split, the
    waitlist global-exclusion rule (excluded everywhere except the exclusive ⏳ filter, entirely
-   excluded for side roles), and (in currentShow) the activeFilters/tagFilter/search predicate.
+   excluded for side roles), and (in currentShow) the activeFilters/groupFilter/search predicate.
    renderAll AND sendSnapshot both read through here so the WhatsApp snapshot always matches
    exactly what's on screen. */
 function computeVisible(role){
@@ -3396,8 +3239,7 @@ function currentShow(role){
   const q = ($("search").value || "").toLowerCase().replace(/\s+/g, " ").trim();
   const nm = s => (s || "").toLowerCase().replace(/\s+/g, " ").trim();
   return base.filter(r => preds.every(p => p(r))
-    && (!tagFilter || (Array.isArray(r.tags) && r.tags.includes(tagFilter)))
-    && (!groupFilter.size || (r.relationship_group && groupFilter.has(tagMatchKey(r.relationship_group))))
+    && (!groupFilter.size || (Array.isArray(r.tags) && r.tags.some(tg => groupFilter.has(tagMatchKey(tg)))))
     && (!q || nm(r.name).includes(q) || nm(r.name_en).includes(q) || (r.phone || "").includes(q) || nm(breadcrumb(r).join(" ")).includes(q)));
 }
 function renderAll(){
@@ -3407,7 +3249,7 @@ function renderAll(){
   const anyTree = live.some(r => r.parent_id);
   $("sortTree").hidden = !anyTree;
   if (!anyTree) treeView = false;
-  const anyGroup = live.some(r => r.relationship_group);
+  const anyGroup = live.some(r => Array.isArray(r.tags) && r.tags.length);
   $("sortGroup").hidden = !anyGroup;
   if (!anyGroup && sortMode === "group") { sortMode = "nophone"; $("sortNoPhone").className = "on"; $("sortGroup").className = ""; }
   // header totals + filter-sheet counts always read the waitlist-excluded set, even while the
@@ -3423,7 +3265,6 @@ function renderAll(){
   const c = pred => countBase.filter(pred).length;
   const waitlistCount = all.filter(r => !r.deleted_at && r.waitlist && (role === "master" || r.side === role)).length;
   renderFilterSheet(role, c, delRows.length, waitlistCount);
-  renderTagFilterRow(countBase);
   renderGroupFilterSection(countBase);
   const nameBuckets = {}, phoneBuckets = {};
   countBase.forEach(r => {
@@ -3477,10 +3318,11 @@ function renderGroupClusters(el, show){
   const lc = L === "ar" ? "ar" : "en";
   const groups = {}, names = {}, ungrouped = [];
   show.forEach(r => {
-    const mk = tagMatchKey(normalizeTag(r.relationship_group));
+    const first = Array.isArray(r.tags) && r.tags.length ? r.tags[0] : "";
+    const mk = tagMatchKey(normalizeTag(first));
     if (!mk) { ungrouped.push(r); return; }
     (groups[mk] = groups[mk] || []).push(r);
-    if (!names[mk]) names[mk] = normalizeTag(r.relationship_group);
+    if (!names[mk]) names[mk] = normalizeTag(first);
   });
   const byName = (a, b) => displayName(a).localeCompare(displayName(b), lc);
   const order = Object.keys(groups).sort((a, b) => groupLabel(names[a]).localeCompare(groupLabel(names[b]), lc));
@@ -3534,9 +3376,8 @@ function toggleWaitlistFilter(on){
   else activeFilters.delete("waitlist");
   renderAll();
 }
-function clearAllFilters(){ activeFilters.clear(); tagFilter = null; groupFilter.clear(); renderAll(); }
+function clearAllFilters(){ activeFilters.clear(); groupFilter.clear(); renderAll(); }
 function removeActiveFilter(k){ activeFilters.delete(k); renderAll(); }
-function setTagFilter(name){ tagFilter = (tagFilter === name) ? null : name; renderAll(); }
 function openFilterSheet(){ $("filterBg").hidden = false; }
 function closeFilterSheet(){ $("filterBg").hidden = true; }
 function filterChipLabel(k){
@@ -3546,29 +3387,6 @@ function filterChipLabel(k){
     confirmed: t("fConfirmed"), nophone: t("issueNoPhone"), wrong: t("issueWrong"), deleted: t("trashLbl"),
     waitlist: t("issueWaitlist"),
   }[k] || k;
-}
-function renderTagFilterRow(countBase){
-  const sec = $("fsTagsSec"); if (!sec) return;
-  const role = orgRole() || "master";
-  const vocab = tagVocabulary();
-  sec.hidden = role !== "master" || vocab.length === 0;
-  if (sec.hidden) return;
-  const disabled = activeFilters.has("deleted") || activeFilters.has("waitlist");
-  const preds = [...activeFilters].filter(k => FILTER_PREDS[k]).map(k => FILTER_PREDS[k]);
-  const filtered = countBase.filter(r => preds.every(p => p(r)));
-  const tally = {};
-  filtered.forEach(r => (Array.isArray(r.tags) ? r.tags : []).forEach(tg => { const mk = tagMatchKey(tg); if (mk) tally[mk] = (tally[mk] || 0) + 1; }));
-  const pillsEl = $("fsTagPills");
-  pillsEl.innerHTML = "";
-  vocab.forEach(v => {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "tag-pill" + (tagFilter === v.name ? " on" : "");
-    btn.disabled = disabled;
-    btn.textContent = v.name + " · " + localDigits(tally[v.mk] || 0);
-    btn.onclick = () => setTagFilter(v.name);
-    pillsEl.appendChild(btn);
-  });
 }
 function renderFilterSheet(role, c, trashCount, waitlistCount){
   const trashOn = activeFilters.has("deleted");
@@ -3604,7 +3422,7 @@ function renderFilterSheet(role, c, trashCount, waitlistCount){
   $("cbFWaitlist").disabled = trashOn;
   $("rowFWaitlist").classList.toggle("fs-disabled", trashOn);
   $("cntFWaitlist").textContent = localDigits(waitlistCount);
-  const activeCount = activeFilters.size + (tagFilter ? 1 : 0) + groupFilter.size;
+  const activeCount = activeFilters.size + groupFilter.size;
   $("filtersBadge").hidden = activeCount === 0;
   if (activeCount) $("filtersBadge").textContent = "· " + localDigits(activeCount);
   $("filtersBtn").className = "fs-trigger" + (activeCount ? " on" : "");
@@ -3617,15 +3435,8 @@ function renderFilterSheet(role, c, trashCount, waitlistCount){
     b.onclick = () => removeActiveFilter(k);
     echoEl.appendChild(b);
   });
-  if (tagFilter) {
-    const b = document.createElement("button");
-    b.type = "button"; b.className = "echo-chip";
-    b.textContent = tagFilter + " ✕";
-    b.onclick = () => setTagFilter(tagFilter);
-    echoEl.appendChild(b);
-  }
   if (groupFilter.size) {
-    const vocab = groupVocabulary();
+    const vocab = tagVocabulary();
     [...groupFilter].forEach(mk => {
       const v = vocab.find(x => x.mk === mk);
       const b = document.createElement("button");
@@ -3829,13 +3640,14 @@ async function handleFiles(files){
 
 /* ── exports ── */
 function exportExcel(){
-  const head = ["Name (الاسم)", "Name (English)", "Side (الطرف)", "People (الأفراد)", "WhatsApp", ev2Name(), "Church Only (الكنيسة فقط)", "Tags (تصنيفات)", "Waitlist (انتظار)", "Confirmed (مؤكد)", "Group (المجموعة)", "Family (العائلة)", "Table (الطاولة)", "Members (الأفراد بالاسم)", "Invite Sent (اتبعتت)", "Sent On (تاريخ الإرسال)", "Added"];
+  // grep anchor: Groups المجموعات
+  const head = ["Name (الاسم)", "Name (English)", "Side (الطرف)", "People (الأفراد)", "WhatsApp", ev2Name(), "Church Only (الكنيسة فقط)", "Waitlist (انتظار)", "Confirmed (مؤكد)", "Groups (المجموعات)", "Family (العائلة)", "Table (الطاولة)", "Members (الأفراد بالاسم)", "Invite Sent (اتبعتت)", "Sent On (تاريخ الإرسال)", "Added"];
   const xrole = orgRole() || "master";
   const xrows = (xrole === "master" ? all : all.filter(r => r.side === xrole)).filter(r => !r.deleted_at);
   const rows_ = xrows.map(r => {
     const entry = sentEntry(r);
     const sentAt = entry && entry.at ? entry.at : "";
-    return [r.name, r.name_en || "", r.side === "bride" ? "Bride عروسة" : "Groom عريس", r.count, r.phone || "", r.event2 ? (hennaOverridden(r) ? "YES (" + r.seats.henna + ")" : "YES") : "", r.church_only ? "YES" : "", (Array.isArray(r.tags) && r.tags.length ? r.tags.join("، ") : ""), r.waitlist ? "YES" : "", r.confirmed ? "YES" : "", r.relationship_group || "", [...breadcrumb(r), displayName(r)].join(" › "), familyTableLabels(r.id), (Array.isArray(r.members) ? r.members.filter(v => v && memNorm(v) !== memNorm(r.name) && memNorm(v) !== memNorm(r.name_en)).join(", ") : ""),
+    return [r.name, r.name_en || "", r.side === "bride" ? "Bride عروسة" : "Groom عريس", r.count, r.phone || "", r.event2 ? (hennaOverridden(r) ? "YES (" + r.seats.henna + ")" : "YES") : "", r.church_only ? "YES" : "", r.waitlist ? "YES" : "", r.confirmed ? "YES" : "", (Array.isArray(r.tags) && r.tags.length ? r.tags.join("، ") : ""), [...breadcrumb(r), displayName(r)].join(" › "), familyTableLabels(r.id), (Array.isArray(r.members) ? r.members.filter(v => v && memNorm(v) !== memNorm(r.name) && memNorm(v) !== memNorm(r.name_en)).join(", ") : ""),
       entry ? "YES" : "", sentAt.slice(0, 10), (r.created_at || "").slice(0, 10)];
   });
   const csv = "﻿" + [head, ...rows_].map(row => row.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\r\n");
@@ -3862,13 +3674,14 @@ function snapshotMessage(){
   const header = `قائمة عزومة فرح محب ويوستينا 🤍\n${src.length} عيلة · ${total} فرد\n⛪ الكنيسة فقط: ${church.length} عيلة · ${churchP} فرد`;
   // v26.2: when any shown family carries a group, cluster the snapshot by group (values as stored,
   // ungrouped last) instead of by side; with no groups anywhere it falls back to the side split.
-  if (src.some(r => r.relationship_group)) {
+  if (src.some(r => Array.isArray(r.tags) && r.tags.length)) {
     const groups = {}, names = {}, ungrouped = [];
     src.forEach(r => {
-      const mk = tagMatchKey(normalizeTag(r.relationship_group));
+      const first = Array.isArray(r.tags) && r.tags.length ? r.tags[0] : "";
+      const mk = tagMatchKey(normalizeTag(first));
       if (!mk) { ungrouped.push(r); return; }
       (groups[mk] = groups[mk] || []).push(r);
-      if (!names[mk]) names[mk] = normalizeTag(r.relationship_group);
+      if (!names[mk]) names[mk] = normalizeTag(first);
     });
     const order = Object.keys(groups).sort((a, b) => names[a].localeCompare(names[b], "ar"));
     const sections = order.map(mk => `🤍 ${names[mk]} (${groups[mk].reduce((s, r) => s + r.count, 0)} فرد):\n${fmt(groups[mk])}`);

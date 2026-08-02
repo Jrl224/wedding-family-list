@@ -6,7 +6,11 @@ Single-file guest-list app (index.html) + Playwright suite (tests/). Supabase pr
 
 Work ONLY the topmost unshipped version. Do not start the next until the current one is reported, reviewed, committed, pushed, and live-verified. No mid-run scope additions: new asks get appended here by Nova and wait their turn.
 
-### 🔥 v23.1 — HOTFIX (ACTIVE — jumps everything; v24 WIP stashed)
+### ✅ QUEUE EMPTY — v23→v27 roadmap COMPLETE (2026-08-02 overnight run)
+All shipped, live-verified, 25-scenario live battery green at v27.0 `9dd1602`: v23.1 `0a661b3` · v23.2 `df0cd13` · v24 `fcd7cf8` · v25 `8629003` · v26 `8f9bf2a` · **v26.1 `83d5098` gate hardening** (organizer-only gallery — closed v25 anon gallery leak; role chip + switchPin exit; side-scoped org fetches; PIN-gate regression tests; NOTE: version marker bumps must update BOTH index.html `.ver` AND the suite `VERSION` constant) · **v26.2 `59e207d` relationship groups** (contributor chip row, canonical AR values in new `relationship_group` column — never `group_name`; filter facet; by-group clustering; master ✏️ rename; Excel Group col; grouped snapshot) · **v27 `9dd1602` seating** (tables CRUD w/ guarded empty-only hard-delete — schema has no soft-delete col, FK RESTRICT protects occupied; tap-to-place; people-count meters; over-cap amber+confirm; print overview; Excel Table col — populates after visiting #tables once/session; master-only). Green-SHA ledger + battery evidence: `~/.claude/PAI/MEMORY/WORK/wedding-app-overnight/`.
+Backlog (unqueued): auto-seat suggestions by group/side/tag · venue share link · security architecture (anon-key DB/storage exposure — Joseph's call, see checklist page).
+
+### 🔥 v23.1 — HOTFIX (SHIPPED — reference)
 Root cause of live "nothing saves" (2026-07-30): saveEdit PATCHed `seats:null`; column was NOT NULL → PostgREST rejected the whole payload → every Edit save silently rolled back. DB fixed by Nova (seats now nullable, verified end-to-end in the live UI). App fixes: (1) member-input accumulation (6 inputs rendered for count-4; idempotent render required); (2) member semantics = contact IS person #1 → count−1 inputs, contact displayName shown as fixed line 1, send-modal/export dedupe, one-time normalization of over-length members arrays; (3) suite hardening — mocked Supabase enforces live column constraints (400 on null into NOT NULL) + full-default-family save round-trip test. Version ٢٣٫١ · 23.1.
 
 ### v23.2 — Relationships + filter sheet
