@@ -46,6 +46,7 @@ from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from threading import Thread
+from urllib.parse import parse_qs, urlparse
 
 from playwright.sync_api import sync_playwright
 
@@ -57,7 +58,7 @@ CHURCH_LINK = (
     "?cat=3eff4b55-85f1-4322-8ab6-f1bf8fd8c85c"
     "&g=rsvp-7110440c-c1ca-4577-abac-3cae79bce03c"
 )
-VERSION = "٢٦٫٢ · 26.2"
+VERSION = "٢٧٫٠ · 27.0"
 TEMPLATE_VERSION = "21.0"
 ARABIC = re.compile(r"[؀-ۿ]")
 FAMILIES = [
@@ -195,8 +196,169 @@ def run_browser(browser_type, browser_name, base_url):
     event_inserted = []
     family_gets = []
 
+    # v27: seating — two fresh tables, empty until the test creates rows through the app (mirrors
+    # the live migration: additive, zero pre-existing data). Ids are server-assigned identity
+    # columns; updated_at is a monotonic fake timestamp so the move/delete concurrency guard
+    # (DELETE ...&updated_at=eq.<ts>, 0 rows back = someone else moved it first) is exercisable.
+    seat_tables = []
+    seat_assign = []
+    seat_ids = {"table": 0, "assign": 0}
+    seat_clock = {"n": 0}
+    seat_table_mutations = []
+    seat_assign_mutations = []
+
+    def next_seat_id(kind):
+        seat_ids[kind] += 1
+        return seat_ids[kind]
+
+    def next_seat_ts():
+        seat_clock["n"] += 1
+        return f"2026-08-01T00:00:00.{seat_clock['n']:06d}Z"
+
+    def qparam(url, key):
+        vals = parse_qs(urlparse(url).query).get(key)
+        return vals[0] if vals else None
+
+    def eq_val(raw):
+        return raw[3:] if raw and raw.startswith("eq.") else None
+
+    def mock_seating_tables(route, request):
+        method = request.method
+        if method == "GET":
+            ek = eq_val(qparam(request.url, "event_key"))
+            rows = [r for r in seat_tables if ek is None or r["event_key"] == ek]
+            rows = sorted(rows, key=lambda r: r.get("pos", 0))
+            route.fulfill(status=200, content_type="application/json", body=json.dumps(rows))
+            return True
+        if method == "POST":
+            body = json.loads(request.post_data or "[]")
+            items = body if isinstance(body, list) else [body]
+            seat_table_mutations.append(("POST", request.url, request.post_data))
+            out = []
+            for it in items:
+                if it.get("event_key") is None or it.get("pos") is None or it.get("seats") is None:
+                    route.fulfill(status=400, content_type="application/json", body='{"message":"null value violates not-null constraint"}')
+                    return True
+                seats = it["seats"]
+                if not isinstance(seats, int) or not (1 <= seats <= 30):
+                    route.fulfill(status=400, content_type="application/json", body='{"message":"seating_tables_seats_check"}')
+                    return True
+                row = {
+                    "id": next_seat_id("table"), "event_key": it["event_key"], "pos": it["pos"],
+                    "label_ar": it.get("label_ar"), "label_en": it.get("label_en"),
+                    "seats": seats, "locked": bool(it.get("locked", False)), "updated_at": next_seat_ts(),
+                }
+                seat_tables.append(row)
+                out.append(row)
+            route.fulfill(status=200, content_type="application/json", body=json.dumps(out))
+            return True
+        if method == "PATCH":
+            tid = eq_val(qparam(request.url, "id"))
+            body = json.loads(request.post_data or "{}")
+            seat_table_mutations.append(("PATCH", request.url, request.post_data))
+            if "seats" in body and (body["seats"] is None or not (1 <= body["seats"] <= 30)):
+                route.fulfill(status=400, content_type="application/json", body='{"message":"seating_tables_seats_check"}')
+                return True
+            row = next((r for r in seat_tables if str(r["id"]) == tid), None)
+            if row:
+                row.update(body)
+                row["updated_at"] = next_seat_ts()
+                route.fulfill(status=200, content_type="application/json", body=json.dumps([row]))
+            else:
+                route.fulfill(status=200, content_type="application/json", body="[]")
+            return True
+        if method == "DELETE":
+            tid = eq_val(qparam(request.url, "id"))
+            seat_table_mutations.append(("DELETE", request.url, request.post_data))
+            occupied = any(str(a["table_id"]) == tid for a in seat_assign)
+            if occupied:
+                route.fulfill(status=409, content_type="application/json", body='{"message":"update or delete on table \\"seating_tables\\" violates foreign key constraint \\"seating_assignments_table_id_fkey\\""}')
+                return True
+            row = next((r for r in seat_tables if str(r["id"]) == tid), None)
+            if row:
+                seat_tables.remove(row)
+                route.fulfill(status=200, content_type="application/json", body=json.dumps([row]))
+            else:
+                route.fulfill(status=200, content_type="application/json", body="[]")
+            return True
+        return False
+
+    def mock_seating_assignments(route, request):
+        method = request.method
+        if method == "GET":
+            ek = eq_val(qparam(request.url, "event_key"))
+            rows = [r for r in seat_assign if ek is None or r["event_key"] == ek]
+            route.fulfill(status=200, content_type="application/json", body=json.dumps(rows))
+            return True
+        if method == "POST":
+            on_conflict = qparam(request.url, "on_conflict")
+            body = json.loads(request.post_data or "{}")
+            items = body if isinstance(body, list) else [body]
+            seat_assign_mutations.append(("POST", request.url, request.post_data))
+            out = []
+            for it in items:
+                if it.get("event_key") is None or it.get("table_id") is None or it.get("family_id") is None or it.get("seats") is None:
+                    route.fulfill(status=400, content_type="application/json", body='{"message":"null value violates not-null constraint"}')
+                    return True
+                if not isinstance(it["seats"], int) or it["seats"] <= 0:
+                    route.fulfill(status=400, content_type="application/json", body='{"message":"seating_assignments_seats_check"}')
+                    return True
+                existing = None
+                if on_conflict:
+                    existing = next((r for r in seat_assign if r["event_key"] == it["event_key"]
+                                      and r["table_id"] == it["table_id"] and r["family_id"] == it["family_id"]), None)
+                if existing:
+                    existing["seats"] = it["seats"]
+                    existing["locked"] = bool(it.get("locked", existing.get("locked", False)))
+                    existing["updated_at"] = next_seat_ts()
+                    out.append(existing)
+                else:
+                    row = {
+                        "id": next_seat_id("assign"), "event_key": it["event_key"], "table_id": it["table_id"],
+                        "family_id": it["family_id"], "seats": it["seats"], "locked": bool(it.get("locked", False)),
+                        "updated_at": next_seat_ts(),
+                    }
+                    seat_assign.append(row)
+                    out.append(row)
+            route.fulfill(status=200, content_type="application/json", body=json.dumps(out))
+            return True
+        if method == "PATCH":
+            aid = eq_val(qparam(request.url, "id"))
+            body = json.loads(request.post_data or "{}")
+            seat_assign_mutations.append(("PATCH", request.url, request.post_data))
+            if "seats" in body and (body["seats"] is None or body["seats"] <= 0):
+                route.fulfill(status=400, content_type="application/json", body='{"message":"seating_assignments_seats_check"}')
+                return True
+            row = next((r for r in seat_assign if str(r["id"]) == aid), None)
+            if row:
+                row.update(body)
+                row["updated_at"] = next_seat_ts()
+                route.fulfill(status=200, content_type="application/json", body=json.dumps([row]))
+            else:
+                route.fulfill(status=200, content_type="application/json", body="[]")
+            return True
+        if method == "DELETE":
+            aid = eq_val(qparam(request.url, "id"))
+            guard = eq_val(qparam(request.url, "updated_at"))
+            seat_assign_mutations.append(("DELETE", request.url, request.post_data))
+            row = next((r for r in seat_assign if str(r["id"]) == aid), None)
+            if row and (guard is None or row["updated_at"] == guard):
+                seat_assign.remove(row)
+                route.fulfill(status=200, content_type="application/json", body=json.dumps([row]))
+            else:
+                route.fulfill(status=200, content_type="application/json", body="[]")
+            return True
+        return False
+
     def mock_supabase(route):
         request = route.request
+        # v27: seating_tables / seating_assignments — checked first (own id space, own resource);
+        # returns True when handled so the shared wedding_families/wedding_events dispatch below
+        # never sees these URLs.
+        if "seating_tables" in request.url and mock_seating_tables(route, request):
+            return
+        if "seating_assignments" in request.url and mock_seating_assignments(route, request):
+            return
         # v26: wedding_events — same live-constraint enforcement pattern as wedding_families below
         # (400 on null into a NOT NULL column), kept as its own table/mutation log since it's a
         # separate resource with its own id space (church/reception/henna + ev_xxxxxx customs).
@@ -278,6 +440,20 @@ def run_browser(browser_type, browser_name, base_url):
             assert time.monotonic() < deadline, event_mutations
             page.wait_for_timeout(30)
         return event_mutations[-1]
+
+    def wait_new_seat_table_mutation(n_before, timeout=10):
+        deadline = time.monotonic() + timeout
+        while len(seat_table_mutations) <= n_before:
+            assert time.monotonic() < deadline, seat_table_mutations
+            page.wait_for_timeout(30)
+        return seat_table_mutations[-1]
+
+    def wait_new_seat_assign_mutation(n_before, timeout=10):
+        deadline = time.monotonic() + timeout
+        while len(seat_assign_mutations) <= n_before:
+            assert time.monotonic() < deadline, seat_assign_mutations
+            page.wait_for_timeout(30)
+        return seat_assign_mutations[-1]
 
     def sent_patches():
         return [m for m in family_mutations if m[0] == "PATCH" and "invite_sent" in (m[2] or "")]
@@ -1254,7 +1430,7 @@ def run_browser(browser_type, browser_name, base_url):
     page.wait_for_function("all.length === 3")
 
     # ── per-role hamburger menu contents (exact rows; v26 adds master-only Settings after Tags;
-    # Tables stays a dead row reserved for v27 seating)
+    # v27 adds master-only Tables in the top slot, before Waitlist, per the reconciled v25 grammar)
     def menu_labels():
         return page.evaluate(
             "[...document.querySelectorAll('#menuRows .menu-row > span:first-child')]"
@@ -1265,10 +1441,9 @@ def run_browser(browser_type, browser_name, base_url):
     page.wait_for_function("!document.getElementById('menuScrim').hidden")
     master_rows = menu_labels()
     assert master_rows == [
-        "List", "Add", "Fast entry", "Photos", "Waitlist", "Deleted", "Tags", "Settings",
+        "List", "Add", "Fast entry", "Photos", "Tables", "Waitlist", "Deleted", "Tags", "Settings",
         "Excel", "Snapshot", "PIN", "بالعربي",
     ], master_rows
-    assert "Tables" not in master_rows
     page.evaluate("closeMenu()")
 
     page.evaluate("localStorage.setItem('wedOrg', 'bride')")
@@ -1979,9 +2154,287 @@ def run_browser(browser_type, browser_name, base_url):
 
     assert len(page_errors) == err_before, page_errors[err_before:]
 
+    # ══════════════════════════════════════════════════════════════════════════
+    # v27 — SEATING CHART: master-only #tables route; tables×seats CONFIGURATION
+    # lives in Settings (generator), the assignment surface is its own screen.
+    # Runs last in this suite so it's free to mutate waitlist/deleted state below
+    # without disturbing any v22-v26 assertion that already ran above.
+    # ══════════════════════════════════════════════════════════════════════════
+
+    # the fixture rows have been churned by 1800+ lines of prior v22-v26 mutation
+    # (church-only toggled for the "wrong number" probe, waitlist round-trips,
+    # soft-delete/restore, etc.) — pin the two reception-eligible families back to
+    # known values so the pool math below is deterministic regardless of upstream
+    # test order, instead of assuming untouched fixture defaults survived
+    # the v26.2 relationship-group block above deliberately stubbed refreshMine/refreshAll to
+    # no-ops and cleared orgTimer to protect its JS-only `all` edits, and left the filter sheet
+    # open. Reload once to restore the real refresh functions (so the re-pin's await refreshAll()
+    # actually re-fetches the families it PATCHes below) and to clear that stray overlay — the
+    # role in localStorage and the Supabase route mock both survive the reload.
+    page.reload(wait_until="domcontentloaded")
+    page.wait_for_function("typeof refreshAll === 'function' && refreshAll.toString().includes('fetch')")
+    page.evaluate(
+        "async () => { "
+        "await fetch(SUPA + '?id=eq.no-phone-family', {method:'PATCH', headers:H, body: JSON.stringify({church_only:false, waitlist:false, deleted_at:null, count:3, name_en:'No Phone Family'})}); "
+        "await fetch(SUPA + '?id=eq.henna-family', {method:'PATCH', headers:H, body: JSON.stringify({church_only:false, waitlist:false, deleted_at:null, count:2, name_en:'Henna Test Family'})}); "
+        "await fetch(SUPA + '?id=eq.church-family', {method:'PATCH', headers:H, body: JSON.stringify({church_only:true, waitlist:false, deleted_at:null, name_en:'Church Test Family'})}); "
+        "await refreshAll(); }"
+    )
+
+    # snapshot pre-seating capacity/gauge numbers — proves seating writes to
+    # seating_tables/seating_assignments ONLY and never touches wedding_families
+    page.evaluate("location.hash = '#list'")
+    page.wait_for_function("!document.getElementById('scrList').hidden")
+    page.evaluate("async () => { await refreshSideTotals(); }")
+    pre_bride_used = page.locator("#orgCapBUsed").inner_text()
+    pre_groom_used = page.locator("#orgCapGUsed").inner_text()
+    pre_henna_gauge = page.inner_text('#orgCapEvents .cap-card[data-event="henna"]')
+
+    # ── master-only routing: a non-master role deep-linking straight to #tables
+    # redirects to #add at the router level (not just a hidden nav row) ──
+    page.evaluate("localStorage.setItem('wedOrg', 'bride')")
+    page.evaluate("location.hash = '#tables'")
+    page.wait_for_function("location.hash === '#add'")
+    assert page.locator("#scrTables").is_hidden()
+    page.evaluate("localStorage.setItem('wedOrg', 'master')")
+    page.evaluate("location.hash = '#tables'")
+    page.wait_for_function("location.hash === '#tables'")
+    page.wait_for_function("!document.getElementById('scrTables').hidden")
+
+    # (v27 #9) empty state before any table exists: a bare-noun instruction card carrying a
+    # Settings shortcut (tables are generated in Settings), never a blank grid
+    page.wait_for_function("document.querySelector('#seatGrid .seat-empty-card') !== null")
+    assert page.locator("#seatGrid .seat-empty-card").is_visible()
+    assert page.locator("#seatGrid .seat-empty-card .seat-empty-t").inner_text() == "No tables yet"
+    assert page.locator("#seatGrid .seat-empty-card .seat-empty-btn").inner_text() == "Settings"
+    assert page.locator("#seatGrid .seat-table-card").count() == 0
+
+    # ── table×seats configuration lives in Settings: generator creates 2 tables
+    # of 3 seats each; re-running with a higher target TOPS UP rather than
+    # duplicating (acceptance test: 20x10 then 22 adds 2, never 22 more) ──
+    page.evaluate("location.hash = '#settings'")
+    page.wait_for_function("!document.getElementById('scrSettings').hidden")
+    page.evaluate("while (genTables > 2) tablesGenBump('t', -1)")
+    page.evaluate("while (genSeats > 3) tablesGenBump('s', -1)")
+    assert page.locator("#tablesGenTablesVal").inner_text() == "2"
+    assert page.locator("#tablesGenSeatsVal").inner_text() == "3"
+    n_tbl = len(seat_table_mutations)
+    page.click("#tablesGenCreateBtn")
+    mut = wait_new_seat_table_mutation(n_tbl)
+    assert mut[0] == "POST", mut
+    posted = json.loads(mut[2])
+    assert [r["seats"] for r in posted] == [3, 3], posted
+    assert [r["pos"] for r in posted] == [1, 2], posted
+    assert [r["event_key"] for r in posted] == ["reception", "reception"], posted
+
+    page.evaluate("tablesGenBump('t', 1)")  # target 3 — only ONE new table should POST
+    assert page.locator("#tablesGenTablesVal").inner_text() == "3"
+    n_tbl2 = len(seat_table_mutations)
+    page.click("#tablesGenCreateBtn")
+    mut2 = wait_new_seat_table_mutation(n_tbl2)
+    posted2 = json.loads(mut2[2])
+    assert len(posted2) == 1 and posted2[0]["pos"] == 3, posted2
+
+    # ── #tables: pool math + church_only exclusion. henna-family (2, confirmed) +
+    # no-phone-family (3) are eligible; church-family (church_only) is excluded —
+    # total invited 5, both eligible families start unseated ──
+    page.evaluate("location.hash = '#tables'")
+    page.wait_for_function("!document.getElementById('scrTables').hidden")
+    page.wait_for_function("document.querySelectorAll('#seatGrid .seat-table-card').length === 3")
+    assert page.locator("#seatStatSeated").inner_text() == "Seated 0/5"
+    assert page.locator("#seatStatUnseated").inner_text() == "Unseated 2"
+    tray_names = page.evaluate("[...document.querySelectorAll('#seatTray .seat-tray-chip b')].map(e => e.textContent)")
+    assert set(tray_names) == {"Henna Test Family", "No Phone Family"}, tray_names
+    assert "Church Test Family" not in tray_names
+
+    # ── touch-first tap-to-place: arm the tray chip, tap the target table's body ──
+    n_assign = len(seat_assign_mutations)
+    page.locator("#seatTray .seat-tray-chip", has_text="Henna Test Family").click()
+    page.wait_for_function("document.querySelector('#seatTray .seat-tray-chip.armed') !== null")
+    first_table_id = page.evaluate("SEAT_TABLES[0].id")
+    page.locator(f'.seat-table-card[data-table-id="{first_table_id}"] .seat-table-body').click()
+    mut = wait_new_seat_assign_mutation(n_assign)
+    assert mut[0] == "POST", mut
+    posted_assign = json.loads(mut[2])
+    assert posted_assign["family_id"] == "henna-family" and posted_assign["seats"] == 2, posted_assign
+    assert posted_assign["table_id"] == first_table_id, posted_assign
+    page.wait_for_function("document.querySelectorAll('#seatGrid .seat-occ-chip').length === 1")
+
+    # ── fill meter: literal N/M reading ──
+    fill_txt = page.locator(f'.seat-table-card[data-table-id="{first_table_id}"] .seat-fill-txt').inner_text()
+    assert fill_txt.startswith("2/3"), fill_txt
+    assert page.locator("#seatStatSeated").inner_text() == "Seated 2/5"
+    assert page.locator("#seatStatUnseated").inner_text() == "Unseated 1"
+
+    # ── over-capacity: arm No Phone Family (3) at the same table (1 free seat) →
+    # room < remaining opens the split sheet preset to the 1 free seat; deliberately
+    # bump PAST room to force a manual overfill — allowed, loud, never blocking ──
+    page.locator("#seatTray .seat-tray-chip", has_text="No Phone Family").click()
+    page.locator(f'.seat-table-card[data-table-id="{first_table_id}"] .seat-table-body').click()
+    page.wait_for_function("!document.getElementById('splitBg').hidden")
+    assert page.locator("#splitVal").inner_text() == "1"
+    # (v27 #4) at the free-seat count the amber over-capacity warning is silent…
+    assert page.locator("#splitOverWarn").is_hidden()
+    page.click("#splitPlus")
+    page.click("#splitPlus")
+    assert page.locator("#splitVal").inner_text() == "3"
+    # …bumping 2 past the single free seat surfaces it (amber, "2 over"), and never blocks confirm
+    assert not page.locator("#splitOverWarn").is_hidden()
+    assert page.locator("#splitOverWarn").inner_text() == "2 over"
+    n_assign2 = len(seat_assign_mutations)
+    page.click("#splitConfirmBtn")
+    wait_new_seat_assign_mutation(n_assign2)
+    page.wait_for_function("document.querySelectorAll('#seatGrid .seat-occ-chip').length === 2")
+    fill_txt2 = page.locator(f'.seat-table-card[data-table-id="{first_table_id}"] .seat-fill-txt').inner_text()
+    assert fill_txt2.startswith("5/3"), fill_txt2
+    assert "over" in fill_txt2, fill_txt2
+    over_class = page.locator(f'.seat-table-card[data-table-id="{first_table_id}"] .seat-fillfill').get_attribute("class")
+    assert over_class == "seat-fillfill over", over_class
+    assert not page.locator("#seatStatOver").is_hidden()
+    assert page.locator("#seatStatOver").inner_text() == "2 over"
+
+    # ── unassign: seated-chip sheet Remove sends the family back out (hard DELETE on
+    # seating_assignments — spec-mandated for this join table, distinct from the guest-row
+    # soft-delete invariant) ──
+    n_assign3 = len(seat_assign_mutations)
+    page.locator(f'.seat-table-card[data-table-id="{first_table_id}"] .seat-occ-chip', has_text="No Phone Family").click()
+    page.wait_for_function("!document.getElementById('seatChipBg').hidden")
+    page.click("#seatChipRemoveBtn")
+    mut3 = wait_new_seat_assign_mutation(n_assign3)
+    assert mut3[0] == "DELETE", mut3
+    page.wait_for_function("document.querySelectorAll('#seatGrid .seat-occ-chip').length === 1")
+    assert page.locator("#seatStatUnseated").inner_text() == "Unseated 1"
+    fill_txt3 = page.locator(f'.seat-table-card[data-table-id="{first_table_id}"] .seat-fill-txt').inner_text()
+    assert fill_txt3.startswith("2/3"), fill_txt3
+
+    # ── table edit round-trip: rename + change seats via the header sheet ──
+    n_tbl3 = len(seat_table_mutations)
+    page.locator(f'.seat-table-card[data-table-id="{first_table_id}"] .seat-table-hd').click()
+    page.wait_for_function("!document.getElementById('tableEditBg').hidden")
+    page.fill("#tblLabelEn", "Head Table")
+    page.click("#tblSeatsPlus")  # 3 -> 4
+    assert page.locator("#tblSeatsVal").inner_text() == "4"
+    page.click("#tblSave")
+    mut_tbl = wait_new_seat_table_mutation(n_tbl3)
+    assert mut_tbl[0] == "PATCH" and f"id=eq.{first_table_id}" in mut_tbl[1], mut_tbl
+    assert json.loads(mut_tbl[2])["seats"] == 4, mut_tbl
+    page.wait_for_function(f'document.querySelector(\'.seat-table-card[data-table-id="{first_table_id}"] .seat-table-hd b\').textContent === "Head Table"')
+    fill_txt4 = page.locator(f'.seat-table-card[data-table-id="{first_table_id}"] .seat-fill-txt').inner_text()
+    assert fill_txt4.startswith("2/4"), fill_txt4
+
+    # (v27 #5) pool context chips: the still-unseated No Phone Family shows side (border class),
+    # relationship_group (mapped EN label) and each tag as small chips to aid seating
+    n_fam_ctx = len(family_mutations)
+    page.evaluate("async () => { await fetch(SUPA + '?id=eq.no-phone-family', {method:'PATCH', headers:H, body: JSON.stringify({relationship_group:'عيلة ماما', tags:['VIP']})}); }")
+    wait_new_mutation(n_fam_ctx)
+    page.evaluate("async () => { await refreshAll(); await loadSeating(); }")
+    page.wait_for_selector("#seatTray .seat-tray-chip .seat-ctx.group")
+    np_chip = page.locator("#seatTray .seat-tray-chip", has_text="No Phone Family")
+    assert np_chip.locator(".seat-ctx.group").inner_text() == "Mom's family"
+    assert np_chip.locator(".seat-ctx.tag").inner_text() == "VIP"
+    assert "b" in (np_chip.get_attribute("class") or "").split()   # bride-side border class
+    n_fam_ctx2 = len(family_mutations)   # reset context so downstream exclusion assertions see a clean row
+    page.evaluate("async () => { await fetch(SUPA + '?id=eq.no-phone-family', {method:'PATCH', headers:H, body: JSON.stringify({relationship_group:null, tags:null})}); }")
+    wait_new_mutation(n_fam_ctx2)
+    page.evaluate("async () => { await refreshAll(); await loadSeating(); }")
+
+    # (v27 #7) Excel export carries a "Table" column populated for seated families
+    with page.expect_download() as dl_tbl:
+        page.evaluate("exportExcel()")
+    seat_rows = list(csv.reader(Path(dl_tbl.value.path()).read_text(encoding="utf-8").lstrip("﻿").splitlines()))
+    seat_header = seat_rows[0]
+    assert "Table (الطاولة)" in seat_header, seat_header
+    seat_tbl_idx, seat_name_idx = seat_header.index("Table (الطاولة)"), seat_header.index("Name (English)")
+    henna_row = next(r for r in seat_rows[1:] if r[seat_name_idx] == "Henna Test Family")
+    assert henna_row[seat_tbl_idx] == "Head Table", henna_row[seat_tbl_idx]
+    church_row = next(r for r in seat_rows[1:] if r[seat_name_idx] == "Church Test Family")
+    assert church_row[seat_tbl_idx] == "", church_row[seat_tbl_idx]   # unseated ⇒ blank
+
+    # (v27 #8) print / overview view renders per-table groups (label, people/seats, families + counts)
+    page.click("#seatPrintOpenBtn")
+    page.wait_for_function("!document.getElementById('seatPrintBg').hidden")
+    print_body = page.locator("#seatPrintBody").inner_text()
+    assert "Head Table" in print_body and "Henna Test Family" in print_body, print_body
+    assert page.locator("#seatPrintBody .sp-table:not(.sp-unseated)").count() == 3   # one section per table
+    assert page.locator("#seatPrintBody .sp-unseated").count() == 1                  # still-unseated pool section
+    assert page.locator('#seatPrintBody .sp-table', has_text="Head Table").locator(".sp-count").inner_text() == "2/4"
+    page.click("#seatPrintCloseBtn")
+    page.wait_for_function("document.getElementById('seatPrintBg').hidden")
+
+    # (v27 #1) table CRUD — Delete: blocked while occupied, allowed (FK-guarded hard delete, the
+    # live seating_tables schema has no soft-delete column) once empty, so no seating data is lost
+    page.locator(f'.seat-table-card[data-table-id="{first_table_id}"] .seat-table-hd').click()
+    page.wait_for_function("!document.getElementById('tableEditBg').hidden")
+    assert page.locator("#tblDelete").is_disabled()   # Head Table has henna seated ⇒ delete blocked
+    page.click("#tblCancel")
+    page.wait_for_function("document.getElementById('tableEditBg').hidden")
+    empty_table_id = page.evaluate("(fid) => SEAT_TABLES.find(t => t.id !== fid).id", first_table_id)
+    page.locator(f'.seat-table-card[data-table-id="{empty_table_id}"] .seat-table-hd').click()
+    page.wait_for_function("!document.getElementById('tableEditBg').hidden")
+    assert page.locator("#tblDelete").is_enabled()    # empty table ⇒ deletable
+    n_tbl_del = len(seat_table_mutations)
+    page.click("#tblDelete")
+    mut_del = wait_new_seat_table_mutation(n_tbl_del)
+    assert mut_del[0] == "DELETE" and f"id=eq.{empty_table_id}" in mut_del[1], mut_del
+    page.wait_for_function("document.querySelectorAll('#seatGrid .seat-table-card').length === 2")
+    assert page.locator(f'.seat-table-card[data-table-id="{empty_table_id}"]').count() == 0
+
+    # ── unseated pool also excludes waitlist + deleted, on top of church_only above ──
+    n_fam_mut = len(family_mutations)
+    page.evaluate("async () => { await fetch(SUPA + '?id=eq.no-phone-family', {method:'PATCH', headers:H, body: JSON.stringify({waitlist:true})}); }")
+    wait_new_mutation(n_fam_mut)
+    page.evaluate("async () => { await refreshAll(); await loadSeating(); }")
+    tray_names2 = page.evaluate("[...document.querySelectorAll('#seatTray .seat-tray-chip b')].map(e => e.textContent)")
+    assert "No Phone Family" not in tray_names2, tray_names2
+
+    # (v27 #6) henna is still seated at Head Table (2/4); soft-deleting it now must hide its chip
+    # and free its seats without crashing the chart — the seating_assignments row is left intact
+    seat_err_before = len(page_errors)
+    n_fam_mut2 = len(family_mutations)
+    page.evaluate("async () => { await fetch(SUPA + '?id=eq.henna-family', {method:'PATCH', headers:H, body: JSON.stringify({deleted_at: new Date().toISOString()})}); }")
+    wait_new_mutation(n_fam_mut2)
+    page.evaluate("async () => { await refreshAll(); await loadSeating(); }")
+    assert page.locator("#seatStatUnseated").inner_text() == "Unseated 0"
+    page.wait_for_function("document.querySelectorAll('#seatGrid .seat-occ-chip').length === 0")   # hidden, not rendered
+    assert page.locator(f'.seat-table-card[data-table-id="{first_table_id}"] .seat-fill-txt').inner_text().startswith("0/4")
+    assert page.locator("#seatStatOver").is_hidden()   # no phantom over-capacity from the released seats
+    assert len(page_errors) == seat_err_before, page_errors[seat_err_before:]   # no crash
+
+    # restore both — gauge-untouched check below must see the same family state as the
+    # pre-seating snapshot at the top of this section
+    page.evaluate(
+        "async () => { "
+        "await fetch(SUPA + '?id=eq.no-phone-family', {method:'PATCH', headers:H, body: JSON.stringify({waitlist:false})}); "
+        "await fetch(SUPA + '?id=eq.henna-family', {method:'PATCH', headers:H, body: JSON.stringify({deleted_at:null})}); }"
+    )
+
+    # ── existing reception/henna caps + gauges are byte-identical to the pre-seating
+    # snapshot — every mutation above touched seating_tables/seating_assignments only ──
+    page.evaluate("location.hash = '#list'")
+    page.wait_for_function("!document.getElementById('scrList').hidden")
+    page.evaluate("async () => { await refreshAll(); await refreshSideTotals(); }")
+    assert page.locator("#orgCapBUsed").inner_text() == pre_bride_used
+    assert page.locator("#orgCapGUsed").inner_text() == pre_groom_used
+    assert page.inner_text('#orgCapEvents .cap-card[data-event="henna"]') == pre_henna_gauge
+
+    # ── footer version marker ──
+    assert page.locator(".ver").inner_text() == VERSION
+
     browser.close()
     print(
-        f"PASS {browser_name}: v26 — Event Setup: master-only #settings route (router-level "
+        f"PASS {browser_name}: v27 — Seating: master-only #tables route (router-level redirect "
+        "for every other role, deep links included) reached via the ☰ Tables row (top slot, "
+        "before Waitlist); tables×seats configuration lives in Settings (bulk generator tops up "
+        "to a target count on re-run instead of duplicating); unseated pool = active, "
+        "non-deleted, non-waitlist, non-church_only families minus already-seated seats, using "
+        "the v26 eventEff/eventInvited reception math; touch-first tap-to-place (arm a tray chip, "
+        "tap a table body) upserts a seating_assignments row; per-table fill meter reads a "
+        "literal N/M; over-capacity via the split sheet's seats stepper renders red and is never "
+        "blocked; unassign via the seated-chip sheet issues a real DELETE on seating_assignments "
+        "(spec-mandated hard delete on this join table, distinct from the guest-row soft-delete "
+        "invariant); table edit sheet round-trips label+seats via PATCH; every seating mutation "
+        "above leaves the existing reception/henna caps and gauges byte-identical to their "
+        "pre-seating snapshot. On top of v26 — Event Setup: master-only #settings route (router-level "
         "redirect for every other role, deep links included) reached via the ☰ Settings row; one "
         "collapsed card per active wedding_events row (church locked Everyone, no capacity/split), "
         "field edits round-trip via PATCH, bride/groom split is one number with a live-derived "

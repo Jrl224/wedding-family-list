@@ -347,6 +347,81 @@
   .toast.err{background:#7a2c2c}
   .toast.busy{background:#1a3a63}
   .toast button{margin-inline-start:12px;padding:5px 14px;border:0;border-radius:8px;background:#fff;color:#123;font-weight:800;font-size:13.5px;cursor:pointer}
+  /* ── v27: seating chart ── */
+  .seat-topbar{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:9px 4px;margin:0 0 10px;background:var(--deep);border-bottom:1px solid var(--line);text-align:start}
+  .seat-stat{font-size:12.5px;color:var(--dim);white-space:nowrap}
+  .seat-stat b{color:var(--gold-b);font-weight:800}
+  .seat-stat.over{color:#e08a8a}
+  .seat-stat.over b{color:#e08a8a}
+  .seat-undo-btn{margin-inline-start:auto;padding:7px 13px;border-radius:999px;border:1px solid var(--line);background:var(--card2);color:var(--gold-b);font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer}
+  .seat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+  @media(min-width:640px){.seat-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}}
+  .seat-table-card{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:14px;padding:10px;text-align:start;transition:opacity .15s,box-shadow .15s}
+  .seat-table-card.armed-fit{box-shadow:0 0 0 2px var(--gold-b)}
+  .seat-table-card.armed-partial{box-shadow:0 0 0 2px #e8b55c}
+  .seat-table-card.armed-full{opacity:.5}
+  .seat-table-card.locked{opacity:.6}
+  .seat-table-hd{display:flex;align-items:center;justify-content:space-between;gap:6px;cursor:pointer;padding:2px 2px 6px}
+  .seat-table-hd b{font-size:13.5px;overflow-wrap:anywhere}
+  .seat-table-hd .lock-ic{font-size:12px}
+  .seat-table-body{min-height:30px;display:flex;flex-wrap:wrap;gap:5px;cursor:pointer;padding-bottom:6px}
+  .seat-table-arm-overlay{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:var(--gold-b);text-align:center;padding:6px 0}
+  .seat-table-arm-overlay.gray{color:var(--dim)}
+  .seat-occ-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border-radius:8px;font-size:11.5px;background:var(--card);border:1px solid var(--line);cursor:pointer;max-width:100%}
+  .seat-occ-chip.b{border-inline-start:3px solid var(--bride)}
+  .seat-occ-chip.g{border-inline-start:3px solid var(--groom)}
+  .seat-occ-chip .nophone-badge{margin:0;padding:0 3px;font-size:9.5px}
+  .seat-occ-chip .seat-drift{color:#e6c67a;font-weight:800}
+  .seat-fillbar{height:9px;border-radius:999px;background:rgba(9,18,32,.9);border:1px solid var(--line);overflow:hidden;margin-top:4px}
+  .seat-fillfill{height:100%;border-radius:999px;transition:width .5s ease}
+  .seat-fillfill.ok{background:linear-gradient(90deg,#2f9e8f,#4dc0af)}
+  .seat-fillfill.full{background:linear-gradient(90deg,var(--gold),var(--gold-b))}
+  .seat-fillfill.over{background:linear-gradient(90deg,#a83232,#d94f4f)}
+  .seat-fill-txt{font-size:11px;color:var(--dim);margin-top:3px}
+  .seat-fill-txt.over{color:#e08a8a;font-weight:700}
+  .seat-tray-wrap{position:sticky;bottom:0;z-index:5;background:var(--deep);border-top:1px solid var(--line);padding:8px 0 calc(8px + env(safe-area-inset-bottom));margin-top:10px}
+  .seat-tray-filters{display:flex;gap:6px;margin-bottom:7px;overflow-x:auto}
+  .seat-tray-filters button{flex:0 0 auto;padding:6px 12px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--dim);font-family:inherit;font-size:11.5px;font-weight:700;cursor:pointer}
+  .seat-tray-filters button.on{border-color:var(--gold);background:rgba(201,162,39,.14);color:var(--gold-b)}
+  .seat-tray{height:88px;display:flex;align-items:center;gap:8px;overflow-x:auto;padding:0 2px}
+  .seat-tray-chip{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:8px 12px;border-radius:12px;background:var(--card2);border:1px solid var(--line);cursor:pointer;min-width:88px}
+  .seat-tray-chip.b{border-inline-start:3px solid var(--bride)}
+  .seat-tray-chip.g{border-inline-start:3px solid var(--groom)}
+  .seat-tray-chip.armed{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold);transform:scale(1.06)}
+  .seat-tray-chip b{font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:110px}
+  .seat-tray-chip>span{font-size:11px;color:var(--gold-b);font-weight:800}
+  .seat-tray-empty{color:var(--dim);font-size:12.5px;padding:10px 4px;font-family:'Amiri',serif}
+  .seat-ctx-row{display:flex;flex-wrap:wrap;gap:3px;margin-top:2px;max-width:150px}
+  .seat-ctx{font-size:9.5px;padding:0 5px;border-radius:5px;border:1px solid var(--line);background:var(--card);color:var(--dim);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:82px}
+  .seat-ctx.group{border-color:rgba(150,130,220,.5);background:rgba(150,130,220,.13);color:#c3b3f0}
+  .seat-ctx.tag{border-style:dashed}
+  .seat-empty-card{display:flex;flex-direction:column;align-items:center;gap:10px;padding:34px 16px;color:var(--dim);text-align:center}
+  .seat-empty-ic{font-size:34px}
+  .seat-empty-t{font-size:14px;color:var(--ivory)}
+  .seat-empty-btn{padding:9px 20px;border:1px solid var(--gold);border-radius:999px;background:rgba(201,162,39,.14);color:var(--gold-b);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer}
+  .seat-over-warn{color:#e6b45a;font-weight:800;font-size:12.5px;margin:0 0 8px}
+  .seat-print-open{margin-inline-start:auto;background:none;border:1px solid var(--line);border-radius:8px;color:var(--ivory);font-size:15px;padding:3px 9px;cursor:pointer}
+  .seat-print-modal{max-width:440px;width:92%}
+  .seat-print-body{max-height:58vh;overflow-y:auto;text-align:start;margin:6px 0 12px}
+  .sp-table{margin-bottom:12px}
+  .sp-table h4{display:flex;justify-content:space-between;gap:10px;font-size:14.5px;color:var(--gold-b);border-bottom:1px solid var(--line);padding-bottom:3px;margin:0 0 4px}
+  .sp-table .sp-count.over{color:#e08a8a}
+  .sp-table ul{list-style:none;margin:0;padding:0}
+  .sp-table li{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:2px 0;color:var(--ivory)}
+  .sp-empty{color:var(--dim);font-size:12.5px;padding:4px 0}
+  .sp-unseated h4{color:var(--dim)}
+  .seat-gen-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0}
+  .seat-gen-row>span:first-child{font-size:13.5px;color:var(--ivory)}
+  .seat-hit{outline:2px solid var(--gold-b);outline-offset:1px}
+  @media print{
+    body>*:not(#seatPrintBg){display:none!important}
+    #seatPrintBg{position:static!important;display:block!important;background:#fff!important;padding:0}
+    #seatPrintBg .modal{box-shadow:none!important;max-height:none!important;max-width:none!important;width:auto!important;background:#fff!important;color:#000!important;border:none!important}
+    #seatPrintBg .seat-print-body{max-height:none!important;overflow:visible!important}
+    #seatPrintBg .m-actions{display:none!important}
+    #seatPrintBg h3,#seatPrintBg h4,#seatPrintBg li,#seatPrintBg span,#seatPrintBg b,#seatPrintBg p{color:#000!important}
+    #seatPrintBg .sp-table h4{border-bottom:1px solid #999!important}
+  }
   [hidden]{display:none!important}
 </style>
 </head>
@@ -497,9 +572,38 @@
     <div id="settingsList"></div>
     <button type="button" class="next save-btn" id="settingsAddBtn" onclick="addCustomEvent()"></button>
     <button type="button" class="next save-btn" id="settingsSaveBtn" onclick="saveSettings()" style="margin-top:10px"></button>
+
+    <h2 class="sec" id="tablesGenTitle"></h2>
+    <div class="cap-card" id="tablesGenCard">
+      <div class="seat-gen-row">
+        <span id="tablesGenTablesLbl"></span>
+        <div class="seat-step"><button type="button" onclick="tablesGenBump('t',-1)">−</button><span id="tablesGenTablesVal">20</span><button type="button" onclick="tablesGenBump('t',1)">+</button></div>
+      </div>
+      <div class="seat-gen-row">
+        <span id="tablesGenSeatsLbl"></span>
+        <div class="seat-step"><button type="button" onclick="tablesGenBump('s',-1)">−</button><span id="tablesGenSeatsVal">10</span><button type="button" onclick="tablesGenBump('s',1)">+</button></div>
+      </div>
+      <button type="button" class="next save-btn" id="tablesGenCreateBtn" onclick="createTables()"></button>
+    </div>
   </div>
 
-  <p class="ver">٢٦٫٢ · 26.2</p>
+  <div class="screen" id="scrTables" hidden>
+    <div class="seat-topbar" id="seatTopbar">
+      <span class="seat-stat" id="seatStatSeated"></span>
+      <span class="seat-stat" id="seatStatUnseated"></span>
+      <span class="seat-stat over" id="seatStatOver" hidden></span>
+      <button type="button" class="seat-undo-btn" id="seatUndoBtn" onclick="seatUndo()" hidden></button>
+      <button type="button" class="seat-print-open" id="seatPrintOpenBtn" onclick="openSeatPrint()">🖨</button>
+    </div>
+    <input class="search" id="seatSearch" oninput="seatSearchInput()">
+    <div class="seat-grid" id="seatGrid"></div>
+    <div class="seat-tray-wrap">
+      <div class="seat-tray-filters" id="seatTrayFilters"></div>
+      <div class="seat-tray" id="seatTray"></div>
+    </div>
+  </div>
+
+  <p class="ver">٢٧٫٠ · 27.0</p>
 </div>
 
 <div class="modal-bg" id="filterBg" hidden onmousedown="if(event.target===this) closeFilterSheet()">
@@ -675,6 +779,73 @@
   </div>
 </div>
 
+<div class="modal-bg" id="tableEditBg" hidden>
+  <div class="modal">
+    <h3 id="tableEditTitle"></h3>
+    <input class="wiz-in" id="tblLabelAr" dir="auto" lang="ar" style="font-size:16px;margin-bottom:8px">
+    <input class="wiz-in" id="tblLabelEn" dir="ltr" style="font-size:15px;margin-bottom:10px">
+    <div class="count-row" style="margin:4px 0 10px">
+      <button type="button" id="tblSeatsPlus" onclick="tblSeatsBump(1)" style="width:52px;height:52px;font-size:26px">+</button>
+      <span id="tblSeatsVal" style="font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:600;color:var(--gold-b);min-width:56px">10</span>
+      <button type="button" id="tblSeatsMinus" onclick="tblSeatsBump(-1)" style="width:52px;height:52px;font-size:26px">−</button>
+    </div>
+    <label class="check-row"><input type="checkbox" id="tblLockChk"><span id="tblLockLabel"></span></label>
+    <div class="m-actions">
+      <button class="m-ok" onclick="saveTableEdit()" id="tblSave"></button>
+      <button class="m-cancel" onclick="closeTableEdit()" id="tblCancel"></button>
+    </div>
+    <button class="m-delete" type="button" onclick="deleteTable()" id="tblDelete"></button>
+  </div>
+</div>
+
+<div class="modal-bg" id="seatChipBg" hidden>
+  <div class="modal" style="text-align:center">
+    <h3 id="seatChipTitle"></h3>
+    <div class="m-actions">
+      <button class="m-ok" type="button" onclick="seatChipMove()" id="seatChipMoveBtn"></button>
+    </div>
+    <p class="mp" id="seatChipSeatsLbl"></p>
+    <div class="count-row" style="margin:4px 0 10px">
+      <button type="button" id="seatChipSeatsPlus" onclick="seatChipSeatsBump(1)" style="width:52px;height:52px;font-size:26px">+</button>
+      <span id="seatChipSeatsVal" style="font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:600;color:var(--gold-b);min-width:56px">1</span>
+      <button type="button" id="seatChipSeatsMinus" onclick="seatChipSeatsBump(-1)" style="width:52px;height:52px;font-size:26px">−</button>
+    </div>
+    <div class="m-actions">
+      <button class="m-cancel" type="button" onclick="seatChipLock()" id="seatChipLockBtn"></button>
+      <button class="m-cancel" type="button" onclick="closeSeatChipSheet()" id="seatChipCancelBtn"></button>
+    </div>
+    <button class="m-delete" type="button" onclick="seatChipRemove()" id="seatChipRemoveBtn"></button>
+  </div>
+</div>
+
+<div class="modal-bg" id="splitBg" hidden>
+  <div class="modal" style="text-align:center">
+    <h3 id="splitTitle"></h3>
+    <p class="mp" id="splitSub"></p>
+    <div class="count-row" style="margin:4px 0 10px">
+      <button type="button" id="splitPlus" onclick="splitBump(1)" style="width:52px;height:52px;font-size:26px">+</button>
+      <span id="splitVal" style="font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:600;color:var(--gold-b);min-width:56px">0</span>
+      <button type="button" id="splitMinus" onclick="splitBump(-1)" style="width:52px;height:52px;font-size:26px">−</button>
+    </div>
+    <p class="mp seat-over-warn" id="splitOverWarn" hidden></p>
+    <div class="m-actions">
+      <button class="m-ok" type="button" onclick="confirmSplit()" id="splitConfirmBtn"></button>
+      <button class="m-cancel" type="button" onclick="cancelSplit()" id="splitCancelBtn"></button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="seatPrintBg" hidden>
+  <div class="modal seat-print-modal">
+    <h3 id="seatPrintTitle"></h3>
+    <div class="seat-print-body" id="seatPrintBody"></div>
+    <div class="m-actions">
+      <button class="m-ok" type="button" onclick="window.print()" id="seatPrintBtn"></button>
+      <button class="m-cancel" type="button" onclick="closeSeatPrint()" id="seatPrintCloseBtn"></button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -820,6 +991,12 @@ const STR = {
     setMap:"الخريطة", setCapacity:"السعة", setSplit:"التوزيع", setNumbers:"أرقام", setBride:"العروسة",
     setGroom:"العريس", setMeal:"الوجبة", setPlated:"وجبات", setBuffet:"بوفيه", setDishes:"الأصناف",
     setAddEvent:"➕ مناسبة", setEveryone:"الكل", setUnlimited:"بلا حد", setDeleteEvent:"حذف",
+    menuTables:"الطاولات", seatedLbl:"مجلّسون", unseatedLbl:"بلا طاولة", seatUndoLbl:"تراجع", seatSearchPh:"بحث",
+    tableWord:"طاولة", seatsWord:"مقاعد", seatsWordDef:"المقاعد", createLbl:"إنشاء", deleteLbl:"حذف",
+    lockLbl:"قفل", unlockLbl:"فك القفل", moveLbl:"نقل", removeLbl:"إزالة", confirmLbl:"تأكيد",
+    restChip:n=>`الباقي ${n}`, seatDrift:n=>`فرق ${n}`, lockedHint:"🔒 مقفولة", tblCreated:n=>`اتضافت ${n} طاولة ✓`,
+    tblDeleteBlocked:"في عائلات جالسة عليها — نقلوهم الأول", seatMoveHint:"دوسوا على طاولة تانية",
+    seatNoTables:"مفيش طاولات لسه", seatOverviewLbl:"توزيع الطاولات", seatPrintEmptyTable:"فاضية", printLbl:"طباعة",
   },
   en: {
     kicker:"Guest List", sideQ:"Which side are you from? One minute to add your families.",
@@ -900,6 +1077,12 @@ const STR = {
     setMap:"Map", setCapacity:"Capacity", setSplit:"Split", setNumbers:"Numbers", setBride:"Bride",
     setGroom:"Groom", setMeal:"Meal", setPlated:"Plated", setBuffet:"Buffet", setDishes:"Dishes",
     setAddEvent:"➕ Event", setEveryone:"Everyone", setUnlimited:"Unlimited", setDeleteEvent:"Delete",
+    menuTables:"Tables", seatedLbl:"Seated", unseatedLbl:"Unseated", seatUndoLbl:"Undo", seatSearchPh:"Search",
+    tableWord:"Table", seatsWord:"Seats", seatsWordDef:"Seats", createLbl:"Create", deleteLbl:"Delete",
+    lockLbl:"Lock", unlockLbl:"Unlock", moveLbl:"Move", removeLbl:"Remove", confirmLbl:"Confirm",
+    restChip:n=>`Rest ${n}`, seatDrift:n=>`Off ${n}`, lockedHint:"🔒 Locked", tblCreated:n=>`Added ${n} tables ✓`,
+    tblDeleteBlocked:"Families are seated there — move them first", seatMoveHint:"Tap another table",
+    seatNoTables:"No tables yet", seatOverviewLbl:"Seating overview", seatPrintEmptyTable:"Empty", printLbl:"Print",
   }
 };
 let L = localStorage.getItem("wedLang") || "ar";
@@ -965,6 +1148,21 @@ function applyLang(){
   if (typeof inviteRow !== "undefined" && inviteRow && !$("inviteBg").hidden) renderInviteModal();
   updateRoleChip();
   if (typeof editing !== "undefined" && editing && !$("editBg").hidden) { renderETagPills(); renderEGroupChips(); }
+  set("tablesGenTitle","menuTables"); set("tablesGenTablesLbl","menuTables"); set("tablesGenSeatsLbl","seatsWordDef");
+  set("tablesGenCreateBtn","createLbl");
+  set("tblLockLabel","lockLbl"); set("tblSave","save"); set("tblCancel","cancel"); set("tblDelete","deleteLbl");
+  set("seatChipSeatsLbl","seatsWord"); set("seatChipMoveBtn","moveLbl"); set("seatChipCancelBtn","cancel"); set("seatChipRemoveBtn","removeLbl");
+  set("splitConfirmBtn","confirmLbl"); set("splitCancelBtn","cancel");
+  set("seatUndoBtn","seatUndoLbl");
+  set("seatPrintBtn","printLbl"); set("seatPrintCloseBtn","cancel");
+  $("seatSearch").placeholder = t("seatSearchPh");
+  $("seatPrintOpenBtn").setAttribute("aria-label", t("seatOverviewLbl"));
+  $("seatPrintOpenBtn").title = t("seatOverviewLbl");
+  if (typeof renderSeatChipSheetLabels === "function" && !$("seatChipBg").hidden) renderSeatChipSheetLabels();
+  if (typeof renderTableEditLabels === "function" && !$("tableEditBg").hidden) renderTableEditLabels();
+  if (typeof renderSplitLabels === "function" && !$("splitBg").hidden) renderSplitLabels();
+  if (typeof openSeatPrint === "function" && !$("seatPrintBg").hidden) openSeatPrint();
+  if (typeof renderTablesScreen === "function" && !$("scrTables").hidden) renderTablesScreen();
   renderMine(); renderAll(); renderCaps(); renderMenu();
 }
 
@@ -1205,13 +1403,14 @@ function route(){
   }
 }
 
-const SCREEN_HASHES = ["list","add","fast","photos","waitlist","deleted","tags","settings"];
+const SCREEN_HASHES = ["list","add","fast","photos","waitlist","deleted","tags","settings","tables"];
 function currentHash(){ const h = (location.hash || "").replace(/^#/, ""); return SCREEN_HASHES.includes(h) ? h : ""; }
 function screenAllowed(scr){
   if (scr === "add" || scr === "fast" || scr === "photos") return true;
   if (scr === "list") return isOrg();
   if (scr === "waitlist" || scr === "deleted" || scr === "tags") return isMasterRole();
   if (scr === "settings") return isMasterRole();
+  if (scr === "tables") return isMasterRole();
   return false;
 }
 function openOrgList(){
@@ -1221,12 +1420,16 @@ function openOrgList(){
 }
 function showScreen(scr){
   const wasList = !$("scrList").hidden;
-  ["scrAdd","scrFast","scrPhotos","scrList","scrSettings"].forEach(id => $(id).hidden = true);
-  const domId = scr === "add" ? "scrAdd" : scr === "fast" ? "scrFast" : scr === "photos" ? "scrPhotos" : scr === "settings" ? "scrSettings" : "scrList";
+  const wasTables = !$("scrTables").hidden;
+  ["scrAdd","scrFast","scrPhotos","scrList","scrSettings","scrTables"].forEach(id => $(id).hidden = true);
+  const domId = scr === "add" ? "scrAdd" : scr === "fast" ? "scrFast" : scr === "photos" ? "scrPhotos" : scr === "settings" ? "scrSettings" : scr === "tables" ? "scrTables" : "scrList";
   $(domId).hidden = false;
   const enteringList = domId === "scrList";
+  const enteringTables = domId === "scrTables";
   if (enteringList) { if (!wasList) openOrgList(); }
   else if (wasList && orgTimer) { clearInterval(orgTimer); orgTimer = null; }
+  if (enteringTables) { if (!wasTables) openTablesScreen(); }
+  else if (wasTables && seatTimer) { clearInterval(seatTimer); seatTimer = null; }
   if (domId === "scrAdd") renderAddScreen();
   if (domId === "scrPhotos") loadPhotos();
   if (domId === "scrSettings") renderSettingsScreen();
@@ -1271,6 +1474,7 @@ function menuRowsFor(){
   rows.push({ id: "fast", label: t("fastEntryLbl"), onClick: nav("fast") });
   rows.push({ id: "photos", label: t("menuPhotos"), badge: localDigits(photoCount), onClick: nav("photos") });
   if (role === "master") {
+    rows.push({ id: "tables", label: t("menuTables"), onClick: nav("tables") });
     rows.push({ id: "waitlist", label: t("waitlistLabel"), onClick: nav("waitlist") });
     rows.push({ id: "deleted", label: t("menuDeleted"), onClick: nav("deleted") });
     rows.push({ id: "tags", label: t("menuTags"), onClick: nav("tags") });
@@ -2687,6 +2891,471 @@ async function saveSettings(){
   }
 }
 
+/* ── v27: seating chart — master-only #tables. One event scoped (reception) for phase 1;
+   event_key is threaded through every call so a future event switcher (backlog) is a filter,
+   not a rework. One row = one placement (table_id, family_id, seats); splits are a second row. ── */
+const SEATING_TABLES_URL = "https://wydodvbkqhpoyefcwpnf.supabase.co/rest/v1/seating_tables";
+const SEATING_ASSIGN_URL = "https://wydodvbkqhpoyefcwpnf.supabase.co/rest/v1/seating_assignments";
+const SEAT_EVENT = "reception";
+let SEAT_TABLES = [], SEAT_ASSIGN = [], seatTimer = null;
+let seatArmed = null;          // { familyId, remaining, moveFrom: assignmentRow|null }
+let seatUndoStack = [];
+let trayFilter = "all";
+let genTables = 20, genSeats = 10;
+let tableEditId = null, tblSeatsEdit = 10;
+let splitState = null, splitVal = 0;
+let seatChipAssignId = null;
+
+function tableById(id){ return SEAT_TABLES.find(tb => tb.id === id); }
+function assignById(id){ return SEAT_ASSIGN.find(a => a.id === id); }
+// v27: a family soft-deleted or waitlisted AFTER being seated keeps its seating_assignments row
+// (so a later restore / un-waitlist brings the seating back untouched), but the chart hides its
+// chip and frees its seats. Simplest safe post-assignment behavior: hidden, not destructively released.
+function assignFamLive(a){ const f = famById(a.family_id); return !!f && !f.deleted_at && !f.waitlist; }
+function liveAssign(){ return SEAT_ASSIGN.filter(assignFamLive); }
+function tableUsed(tableId){ return liveAssign().filter(a => a.table_id === tableId).reduce((s, a) => s + (a.seats || 0), 0); }
+function famSeatedSum(familyId){ return liveAssign().filter(a => a.family_id === familyId).reduce((s, a) => s + (a.seats || 0), 0); }
+// legacy booleans stay authoritative until Event Setup's event_id backfill lands — same fallback
+// pattern as v26's eventEff/eventInvited when the wedding_events row hasn't loaded yet.
+function famReceptionInvited(f){ const e = eventById(SEAT_EVENT); return e ? eventInvited(f, e) : !f.church_only; }
+function famReceptionCount(f){ const e = eventById(SEAT_EVENT); return e ? eventEff(f, e) : f.count; }
+function famDrift(f){ return famSeatedSum(f.id) - famReceptionCount(f); }
+function eligiblePool(){ return all.filter(f => !f.deleted_at && !f.waitlist && famReceptionInvited(f)); }
+function unseatedList(){ return eligiblePool().map(f => ({ f, remaining: famReceptionCount(f) - famSeatedSum(f.id) })).filter(x => x.remaining > 0); }
+function seatedTotalCapped(){ return eligiblePool().reduce((s, f) => s + Math.min(famSeatedSum(f.id), famReceptionCount(f)), 0); }
+function totalInvitedCount(){ return eligiblePool().reduce((s, f) => s + famReceptionCount(f), 0); }
+function overCapacityTotal(){ return SEAT_TABLES.reduce((s, tb) => s + Math.max(0, tableUsed(tb.id) - tb.seats), 0); }
+function tableLabel(tb){ const custom = L === "ar" ? tb.label_ar : tb.label_en; return custom || `${t("tableWord")} ${localDigits(tb.pos)}`; }
+// v27: which table(s) a family is effectively seated at, for the Excel export. Uses liveAssign so
+// a hidden (deleted/waitlisted) assignment reports no table, matching what the chart shows.
+function familyTableLabels(familyId){
+  return liveAssign().filter(a => a.family_id === familyId)
+    .map(a => { const tb = tableById(a.table_id); return tb ? tableLabel(tb) : ""; })
+    .filter(Boolean).join(" · ");
+}
+
+async function loadSeating(){
+  try {
+    const [tr, ar] = await Promise.all([
+      fetch(`${SEATING_TABLES_URL}?event_key=eq.${SEAT_EVENT}&order=pos`, { headers: H }),
+      fetch(`${SEATING_ASSIGN_URL}?event_key=eq.${SEAT_EVENT}`, { headers: H }),
+    ]);
+    if (tr.ok) SEAT_TABLES = await tr.json();
+    if (ar.ok) SEAT_ASSIGN = await ar.json();
+  } catch(e) {}
+  renderTablesScreen();
+}
+function openTablesScreen(){
+  refreshAll();
+  loadSeating();
+  if (!seatTimer) seatTimer = setInterval(() => { if (!document.hidden) { refreshAll(); loadSeating(); } }, 4000);
+  window.scrollTo({ top: 0 });
+}
+
+/* ── table config (generator lives in Settings; edit sheet lives here) ── */
+function tablesGenBump(which, d){
+  if (which === "t") genTables = Math.max(1, Math.min(80, genTables + d));
+  else genSeats = Math.max(1, Math.min(30, genSeats + d));
+  $("tablesGenTablesVal").textContent = localDigits(genTables);
+  $("tablesGenSeatsVal").textContent = localDigits(genSeats);
+}
+async function createTables(){
+  const toAdd = Math.max(0, genTables - SEAT_TABLES.length);
+  if (!toAdd) { toast(t("edited")); return; }
+  const maxPos = SEAT_TABLES.reduce((m, tb) => Math.max(m, tb.pos || 0), 0);
+  const rows = [];
+  for (let i = 1; i <= toAdd; i++) rows.push({ event_key: SEAT_EVENT, pos: maxPos + i, seats: genSeats, locked: false });
+  try {
+    const r = await fetch(SEATING_TABLES_URL, { method: "POST", headers: { ...H, Prefer: "return=representation" }, body: JSON.stringify(rows) });
+    if (!r.ok) { toast(t("netErr"), true); return; }
+    const inserted = await r.json();
+    SEAT_TABLES = SEAT_TABLES.concat(Array.isArray(inserted) ? inserted : [inserted]);
+    toast(t("tblCreated")(localDigits(toAdd)));
+    if (!$("scrTables").hidden) renderTablesScreen();
+  } catch(e) { toast(t("netErr"), true); }
+}
+function renderTableEditLabels(){
+  const tb = tableEditId ? tableById(tableEditId) : null;
+  $("tableEditTitle").textContent = tb ? tableLabel(tb) : t("tableWord");
+}
+function openTableEdit(tableId){
+  const tb = tableById(tableId); if (!tb) return;
+  tableEditId = tableId;
+  $("tblLabelAr").value = tb.label_ar || "";
+  $("tblLabelEn").value = tb.label_en || "";
+  $("tblLabelAr").placeholder = `${t("tableWord")} ${localDigits(tb.pos)}`;
+  $("tblLabelEn").placeholder = `Table ${tb.pos}`;
+  tblSeatsEdit = tb.seats;
+  $("tblSeatsVal").textContent = localDigits(tblSeatsEdit);
+  $("tblLockChk").checked = !!tb.locked;
+  const used = tableUsed(tableId);
+  $("tblDelete").disabled = used > 0;
+  $("tblDelete").style.opacity = used > 0 ? .4 : 1;
+  renderTableEditLabels();
+  $("tableEditBg").hidden = false;
+}
+function closeTableEdit(){ $("tableEditBg").hidden = true; tableEditId = null; }
+function tblSeatsBump(d){ tblSeatsEdit = Math.max(1, Math.min(30, tblSeatsEdit + d)); $("tblSeatsVal").textContent = localDigits(tblSeatsEdit); }
+async function saveTableEdit(){
+  if (!tableEditId) return;
+  const body = { label_ar: $("tblLabelAr").value.trim() || null, label_en: $("tblLabelEn").value.trim() || null, seats: tblSeatsEdit, locked: $("tblLockChk").checked };
+  try {
+    const r = await fetch(`${SEATING_TABLES_URL}?id=eq.${tableEditId}`, { method: "PATCH", headers: H, body: JSON.stringify(body) });
+    if (!r.ok) { toast(t("netErr"), true); return; }
+    const tb = tableById(tableEditId); if (tb) Object.assign(tb, body);
+    closeTableEdit();
+    renderTablesScreen();
+    toast(t("edited"));
+  } catch(e) { toast(t("netErr"), true); }
+}
+async function deleteTable(){
+  if (!tableEditId) return;
+  if (tableUsed(tableEditId) > 0) { toast(t("tblDeleteBlocked"), true); return; }
+  try {
+    const r = await fetch(`${SEATING_TABLES_URL}?id=eq.${tableEditId}`, { method: "DELETE", headers: { ...H, Prefer: "return=representation" } });
+    if (r.status === 409) { toast(t("tblDeleteBlocked"), true); return; }
+    if (!r.ok) { toast(t("netErr"), true); return; }
+    SEAT_TABLES = SEAT_TABLES.filter(tb => tb.id !== tableEditId);
+    closeTableEdit();
+    renderTablesScreen();
+    toast(t("edited"));
+  } catch(e) { toast(t("netErr"), true); }
+}
+
+/* ── assignment REST primitives ── */
+async function upsertAssignment(tableId, familyId, seats, locked){
+  try {
+    const r = await fetch(`${SEATING_ASSIGN_URL}?on_conflict=event_key,table_id,family_id`, {
+      method: "POST",
+      headers: { ...H, Prefer: "resolution=merge-duplicates,return=representation" },
+      body: JSON.stringify({ event_key: SEAT_EVENT, table_id: tableId, family_id: familyId, seats, locked: !!locked }),
+    });
+    if (!r.ok) return null;
+    const body = await r.json();
+    return Array.isArray(body) ? body[0] : body;
+  } catch(e) { return null; }
+}
+async function deleteAssignmentGuarded(id, updatedAt){
+  try {
+    const qs = updatedAt ? `&updated_at=eq.${encodeURIComponent(updatedAt)}` : "";
+    const r = await fetch(`${SEATING_ASSIGN_URL}?id=eq.${id}${qs}`, { method: "DELETE", headers: { ...H, Prefer: "return=representation" } });
+    if (!r.ok) return false;
+    const body = await r.json();
+    return Array.isArray(body) && body.length > 0;
+  } catch(e) { return false; }
+}
+async function patchAssignment(id, body){
+  try {
+    const r = await fetch(`${SEATING_ASSIGN_URL}?id=eq.${id}`, { method: "PATCH", headers: H, body: JSON.stringify(body) });
+    if (!r.ok) return false;
+    const a = assignById(id); if (a) Object.assign(a, body);
+    return true;
+  } catch(e) { return false; }
+}
+
+/* ── undo: last 20 ops, each a self-contained inverse closure ── */
+function pushSeatUndo(entry){ seatUndoStack.push(entry); if (seatUndoStack.length > 20) seatUndoStack.shift(); updateSeatUndoBtn(); }
+function updateSeatUndoBtn(){ const b = $("seatUndoBtn"); if (b) b.hidden = seatUndoStack.length === 0; }
+async function seatUndo(){
+  const entry = seatUndoStack.pop();
+  updateSeatUndoBtn();
+  if (!entry) return;
+  try { await entry.run(); } catch(e) {}
+  await loadSeating();
+}
+
+/* ── tap-to-place (primary) — drag is progressive enhancement layered on the SAME placeAssignment
+   path, per spec item 5; phase-1 ships the touch-first path fully, pointer-drag is future polish. ── */
+function armForPlace(familyId){
+  const f = famById(familyId); if (!f) return;
+  const remain = famReceptionCount(f) - famSeatedSum(familyId);
+  if (remain <= 0) return;
+  seatArmed = { familyId, remaining: remain, moveFrom: null };
+  renderTablesScreen();
+}
+function armForMove(assignRow){
+  seatArmed = { familyId: assignRow.family_id, remaining: assignRow.seats, moveFrom: assignRow };
+  renderTablesScreen();
+}
+function disarmSeat(){ seatArmed = null; renderTablesScreen(); }
+function tapTrayChip(familyId){
+  if (seatArmed && seatArmed.familyId === familyId && !seatArmed.moveFrom) { disarmSeat(); return; }
+  armForPlace(familyId);
+}
+function tapTableBody(tableId){
+  if (!seatArmed) return;
+  const tb = tableById(tableId); if (!tb) return;
+  if (tb.locked) { toast(t("lockedHint"), true); return; }
+  const selfSeats = (seatArmed.moveFrom && seatArmed.moveFrom.table_id === tableId) ? seatArmed.moveFrom.seats : 0;
+  const room = tb.seats - (tableUsed(tableId) - selfSeats);
+  if (room < seatArmed.remaining) { openSplitSheet(tableId, Math.max(0, room)); return; }
+  placeAssignment(tableId, seatArmed.remaining);
+}
+async function placeAssignment(tableId, seats){
+  const armed = seatArmed; if (!armed) return;
+  const family = famById(armed.familyId);
+  const tb = tableById(tableId);
+  if (armed.moveFrom) {
+    const destRow = await upsertAssignment(tableId, armed.familyId, seats, false);
+    if (!destRow) { toast(t("netErr"), true); seatArmed = null; renderTablesScreen(); return; }
+    await deleteAssignmentGuarded(armed.moveFrom.id, armed.moveFrom.updated_at);
+    const from = armed.moveFrom;
+    pushSeatUndo({ run: async () => { await deleteAssignmentGuarded(destRow.id, destRow.updated_at); await upsertAssignment(from.table_id, armed.familyId, from.seats, from.locked); } });
+  } else {
+    const row = await upsertAssignment(tableId, armed.familyId, seats, false);
+    if (!row) { toast(t("netErr"), true); seatArmed = null; renderTablesScreen(); return; }
+    pushSeatUndo({ run: async () => { await deleteAssignmentGuarded(row.id, row.updated_at); } });
+  }
+  seatArmed = null;
+  await loadSeating();
+  toast((family ? displayName(family) : "") + " → " + (tb ? tableLabel(tb) : ""), false, { label: t("undo"), fn: seatUndo });
+}
+
+/* ── split sheet: target table has less room than the armed family's remaining people ── */
+function openSplitSheet(tableId, presetRoom){
+  if (!seatArmed) return;
+  splitState = { tableId, room: Math.max(0, presetRoom) };
+  splitVal = Math.max(0, Math.min(presetRoom, seatArmed.remaining));
+  renderSplitLabels();
+  updateSplitView();
+  $("splitBg").hidden = false;
+}
+function renderSplitLabels(){
+  if (!splitState || !seatArmed) return;
+  const f = famById(seatArmed.familyId), tb = tableById(splitState.tableId);
+  $("splitTitle").textContent = f ? displayName(f) : "";
+  $("splitSub").textContent = tb ? tableLabel(tb) : "";
+}
+// amber warning when the seater bumps past the free seats — over-capacity is allowed but loud, never blocked
+function updateSplitView(){
+  $("splitVal").textContent = localDigits(splitVal);
+  const over = Math.max(0, splitVal - (splitState ? splitState.room : 0));
+  const warn = $("splitOverWarn");
+  if (warn) { warn.hidden = over <= 0; if (over > 0) warn.textContent = t("capOver")(localDigits(over)); }
+}
+function splitBump(d){ if (!seatArmed) return; splitVal = Math.max(0, Math.min(seatArmed.remaining, splitVal + d)); updateSplitView(); }
+function cancelSplit(){ $("splitBg").hidden = true; splitState = null; }
+async function confirmSplit(){
+  if (!splitState || !seatArmed) return;
+  const tableId = splitState.tableId;
+  $("splitBg").hidden = true;
+  splitState = null;
+  if (splitVal > 0) await placeAssignment(tableId, splitVal);
+  else { seatArmed = null; renderTablesScreen(); }
+}
+
+/* ── seated-chip sheet: move / seats / lock / remove ── */
+function renderSeatChipSheetLabels(){
+  const a = seatChipAssignId ? assignById(seatChipAssignId) : null;
+  const f = a ? famById(a.family_id) : null;
+  $("seatChipTitle").textContent = f ? displayName(f) : "";
+  $("seatChipLockBtn").textContent = a && a.locked ? t("unlockLbl") : t("lockLbl");
+  if (a) $("seatChipSeatsVal").textContent = localDigits(a.seats);
+}
+function openSeatChipSheet(assignId){
+  seatChipAssignId = assignId;
+  renderSeatChipSheetLabels();
+  $("seatChipBg").hidden = false;
+}
+function closeSeatChipSheet(){ $("seatChipBg").hidden = true; seatChipAssignId = null; }
+function seatChipMove(){
+  const a = assignById(seatChipAssignId); if (!a) return;
+  $("seatChipBg").hidden = true;
+  armForMove(a);
+  toast(t("seatMoveHint"));
+}
+async function seatChipSeatsBump(d){
+  const a = assignById(seatChipAssignId); if (!a) return;
+  const f = famById(a.family_id);
+  const otherSeated = famSeatedSum(a.family_id) - a.seats;
+  const maxAllowed = f ? Math.max(1, famReceptionCount(f) - otherSeated) : 30;
+  const next = Math.max(1, Math.min(maxAllowed, a.seats + d));
+  if (next === a.seats) return;
+  const prevSeats = a.seats;
+  a.seats = next;
+  $("seatChipSeatsVal").textContent = localDigits(next);
+  renderTablesScreen();
+  const ok = await patchAssignment(a.id, { seats: next });
+  if (ok) pushSeatUndo({ run: async () => { await patchAssignment(a.id, { seats: prevSeats }); } });
+  else { a.seats = prevSeats; $("seatChipSeatsVal").textContent = localDigits(prevSeats); renderTablesScreen(); toast(t("netErr"), true); }
+}
+async function seatChipLock(){
+  const a = assignById(seatChipAssignId); if (!a) return;
+  const prev = a.locked;
+  const ok = await patchAssignment(a.id, { locked: !prev });
+  if (ok) { pushSeatUndo({ run: async () => { await patchAssignment(a.id, { locked: prev }); } }); renderSeatChipSheetLabels(); renderTablesScreen(); }
+  else toast(t("netErr"), true);
+}
+async function seatChipRemove(){
+  const a = assignById(seatChipAssignId); if (!a) return;
+  $("seatChipBg").hidden = true;
+  const snap = { table_id: a.table_id, family_id: a.family_id, seats: a.seats, locked: a.locked };
+  const ok = await deleteAssignmentGuarded(a.id, a.updated_at);
+  seatChipAssignId = null;
+  if (!ok) { toast(t("netErr"), true); return; }
+  SEAT_ASSIGN = SEAT_ASSIGN.filter(x => x.id !== a.id);
+  pushSeatUndo({ run: async () => { await upsertAssignment(snap.table_id, snap.family_id, snap.seats, snap.locked); } });
+  const f = famById(snap.family_id);
+  toast(t("removed")(f ? displayName(f) : ""), false, { label: t("undo"), fn: seatUndo });
+  renderTablesScreen();
+}
+
+/* ── render ── */
+function renderTrayFilters(){
+  const el = $("seatTrayFilters"); if (!el) return;
+  el.innerHTML = "";
+  [["all", t("segAll")], ["bride", t("segBride")], ["groom", t("segGroom")], ["confirmed", t("fConfirmed")]].forEach(([key, label]) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = trayFilter === key ? "on" : ""; b.textContent = label;
+    b.onclick = () => { trayFilter = key; renderTablesScreen(); };
+    el.appendChild(b);
+  });
+}
+function renderOccChip(a){
+  const f = famById(a.family_id);
+  const chip = document.createElement("div");
+  chip.className = "seat-occ-chip " + (f && f.side === "groom" ? "g" : "b");
+  if (f) chip.dataset.familyId = f.id;
+  const name = f ? displayName(f) : "?";
+  const st = f ? numberState(f) : "";
+  const drift = f ? famDrift(f) : 0;
+  chip.innerHTML = `${esc(name)} <b>${localDigits(a.seats)}</b>`
+    + (st === "missing" ? ` <span class="nophone-badge">📵</span>` : "")
+    + (drift > 0 ? ` <span class="seat-drift">${esc(t("seatDrift")(localDigits(drift)))}</span>` : "");
+  // while armed, tapping ANY part of a table — including an existing occupant chip, which a
+  // touch tap will often land on — still counts as "place here"; the chip's own action sheet
+  // is only reachable when nothing is armed
+  chip.onclick = e => { e.stopPropagation(); if (seatArmed) { tapTableBody(a.table_id); return; } openSeatChipSheet(a.id); };
+  return chip;
+}
+function renderTableCard(tb){
+  const card = document.createElement("div");
+  card.className = "seat-table-card" + (tb.locked ? " locked" : "");
+  card.dataset.tableId = tb.id;
+  const used = tableUsed(tb.id);
+  const hd = document.createElement("div");
+  hd.className = "seat-table-hd";
+  hd.innerHTML = `<b>${esc(tableLabel(tb))}</b>${tb.locked ? '<span class="lock-ic">🔒</span>' : ""}`;
+  hd.onclick = e => { e.stopPropagation(); openTableEdit(tb.id); };
+  card.appendChild(hd);
+  const body = document.createElement("div");
+  body.className = "seat-table-body";
+  if (seatArmed) {
+    const selfSeats = (seatArmed.moveFrom && seatArmed.moveFrom.table_id === tb.id) ? seatArmed.moveFrom.seats : 0;
+    const room = tb.seats - (used - selfSeats);
+    if (!tb.locked) card.classList.add(room >= seatArmed.remaining ? "armed-fit" : (room > 0 ? "armed-partial" : "armed-full"));
+    const overlay = document.createElement("div");
+    overlay.className = "seat-table-arm-overlay" + (room < seatArmed.remaining ? " gray" : "");
+    overlay.textContent = (room >= 0 ? "+" : "") + localDigits(room);
+    body.appendChild(overlay);
+  }
+  liveAssign().filter(a => a.table_id === tb.id).forEach(a => body.appendChild(renderOccChip(a)));
+  body.onclick = () => tapTableBody(tb.id);
+  card.appendChild(body);
+  const pct = tb.seats > 0 ? Math.min(100, Math.round(used / tb.seats * 100)) : 0;
+  const cls = used > tb.seats ? "over" : (used === tb.seats ? "full" : "ok");
+  const fillWrap = document.createElement("div");
+  fillWrap.innerHTML = `<div class="seat-fillbar"><div class="seat-fillfill ${cls}" style="width:${pct}%"></div></div>`
+    + `<div class="seat-fill-txt${used > tb.seats ? " over" : ""}">${localDigits(used)}/${localDigits(tb.seats)}${used > tb.seats ? " · " + esc(t("capOver")(localDigits(used - tb.seats))) : ""}</div>`;
+  card.appendChild(fillWrap);
+  return card;
+}
+function renderSeatGrid(){
+  const el = $("seatGrid"); if (!el) return;
+  el.innerHTML = "";
+  if (!SEAT_TABLES.length) {
+    const card = document.createElement("div");
+    card.className = "seat-empty-card";
+    card.innerHTML = `<span class="seat-empty-ic">🪑</span>`
+      + `<span class="seat-empty-t">${esc(t("seatNoTables"))}</span>`
+      + `<button type="button" class="seat-empty-btn" onclick="location.hash='#settings'">${esc(t("menuSettings"))}</button>`;
+    el.appendChild(card);
+    return;
+  }
+  SEAT_TABLES.slice().sort((a, b) => (a.pos || 0) - (b.pos || 0)).forEach(tb => el.appendChild(renderTableCard(tb)));
+}
+function renderSeatTray(unseated){
+  renderTrayFilters();
+  const el = $("seatTray"); if (!el) return;
+  el.innerHTML = "";
+  let list = unseated;
+  if (trayFilter === "bride") list = list.filter(x => x.f.side === "bride");
+  else if (trayFilter === "groom") list = list.filter(x => x.f.side === "groom");
+  else if (trayFilter === "confirmed") list = list.filter(x => !!x.f.confirmed);
+  list = list.slice().sort((a, b) => b.remaining - a.remaining);
+  if (!list.length) { el.innerHTML = `<p class="seat-tray-empty">${t("listEmpty")}</p>`; return; }
+  list.forEach(({ f, remaining }) => {
+    const chip = document.createElement("div");
+    chip.className = "seat-tray-chip " + (f.side === "groom" ? "g" : "b") + (seatArmed && seatArmed.familyId === f.id && !seatArmed.moveFrom ? " armed" : "");
+    chip.dataset.familyId = f.id;
+    const isPartial = remaining < famReceptionCount(f);
+    // side is already the chip's start-border; add relationship_group + tags as small context
+    // chips (existing card-chip visual language) so the seater has who-sits-with-whom cues
+    const ctx = [];
+    if (f.relationship_group) ctx.push(`<span class="seat-ctx group">${esc(groupLabel(f.relationship_group))}</span>`);
+    if (Array.isArray(f.tags)) f.tags.forEach(tg => { if (tg) ctx.push(`<span class="seat-ctx tag">${esc(tg)}</span>`); });
+    chip.innerHTML = `<b>${esc(displayName(f))}</b><span>${isPartial ? esc(t("restChip")(localDigits(remaining))) : localDigits(remaining)}</span>`
+      + (ctx.length ? `<div class="seat-ctx-row">${ctx.join("")}</div>` : "");
+    chip.onclick = () => tapTrayChip(f.id);
+    el.appendChild(chip);
+  });
+}
+function renderTablesScreen(){
+  if ($("scrTables").hidden) return;
+  const unseated = unseatedList();
+  $("seatStatSeated").textContent = `${t("seatedLbl")} ${localDigits(seatedTotalCapped())}/${localDigits(totalInvitedCount())}`;
+  $("seatStatUnseated").textContent = `${t("unseatedLbl")} ${localDigits(unseated.length)}`;
+  const over = overCapacityTotal();
+  $("seatStatOver").hidden = over <= 0;
+  if (over > 0) $("seatStatOver").textContent = t("capOver")(localDigits(over));
+  updateSeatUndoBtn();
+  renderSeatGrid();
+  renderSeatTray(unseated);
+  seatApplySearchHighlight();
+}
+function seatApplySearchHighlight(){
+  document.querySelectorAll(".seat-hit").forEach(el => el.classList.remove("seat-hit"));
+  const q = ($("seatSearch") ? $("seatSearch").value : "").trim();
+  if (!q) return;
+  const nq = normName(q);
+  const matchIds = new Set(all.filter(f => !f.deleted_at && (normName(f.name).includes(nq) || normName(f.name_en || "").includes(nq))).map(f => f.id));
+  if (!matchIds.size) return;
+  let hit = null;
+  document.querySelectorAll("#seatGrid .seat-occ-chip, #seatTray .seat-tray-chip").forEach(chip => {
+    if (matchIds.has(chip.dataset.familyId)) { chip.classList.add("seat-hit"); if (!hit) hit = chip; }
+  });
+  if (hit) hit.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+}
+function seatSearchInput(){ renderTablesScreen(); }
+// v27: print-friendly per-table overview — groups by table (label, people/seats, families + counts),
+// then the still-unseated pool. Rendered into a visible modal (screenshotable for the venue) whose
+// Print button hands the same DOM to window.print() via the @media print rules.
+function openSeatPrint(){
+  const body = $("seatPrintBody"); if (!body) return;
+  $("seatPrintTitle").textContent = t("seatOverviewLbl");
+  const tables = SEAT_TABLES.slice().sort((a, b) => (a.pos || 0) - (b.pos || 0));
+  if (!tables.length) {
+    body.innerHTML = `<p class="sp-empty">${esc(t("seatNoTables"))}</p>`;
+    $("seatPrintBg").hidden = false;
+    return;
+  }
+  const sections = tables.map(tb => {
+    const rows = liveAssign().filter(a => a.table_id === tb.id);
+    const people = rows.reduce((s, a) => s + (a.seats || 0), 0);
+    const items = rows.map(a => { const f = famById(a.family_id); return `<li><span>${esc(f ? displayName(f) : "?")}</span><b>${localDigits(a.seats)}</b></li>`; }).join("");
+    return `<div class="sp-table"><h4><span>${esc(tableLabel(tb))}</span><span class="sp-count${people > tb.seats ? " over" : ""}">${localDigits(people)}/${localDigits(tb.seats)}</span></h4>`
+      + (items ? `<ul>${items}</ul>` : `<p class="sp-empty">${esc(t("seatPrintEmptyTable"))}</p>`) + `</div>`;
+  }).join("");
+  const uns = unseatedList();
+  const unsSection = uns.length
+    ? `<div class="sp-table sp-unseated"><h4><span>${esc(t("unseatedLbl"))}</span><span class="sp-count">${localDigits(uns.length)}</span></h4><ul>`
+      + uns.map(({ f, remaining }) => `<li><span>${esc(displayName(f))}</span><b>${localDigits(remaining)}</b></li>`).join("") + `</ul></div>`
+    : "";
+  body.innerHTML = sections + unsSection;
+  $("seatPrintBg").hidden = false;
+}
+function closeSeatPrint(){ $("seatPrintBg").hidden = true; }
+
 function renderMine(){
   const live = mine.filter(r => !r.deleted_at);
   const el = $("mineList");
@@ -3160,13 +3829,13 @@ async function handleFiles(files){
 
 /* ── exports ── */
 function exportExcel(){
-  const head = ["Name (الاسم)", "Name (English)", "Side (الطرف)", "People (الأفراد)", "WhatsApp", ev2Name(), "Church Only (الكنيسة فقط)", "Tags (تصنيفات)", "Waitlist (انتظار)", "Confirmed (مؤكد)", "Group (المجموعة)", "Family (العائلة)", "Members (الأفراد بالاسم)", "Invite Sent (اتبعتت)", "Sent On (تاريخ الإرسال)", "Added"];
+  const head = ["Name (الاسم)", "Name (English)", "Side (الطرف)", "People (الأفراد)", "WhatsApp", ev2Name(), "Church Only (الكنيسة فقط)", "Tags (تصنيفات)", "Waitlist (انتظار)", "Confirmed (مؤكد)", "Group (المجموعة)", "Family (العائلة)", "Table (الطاولة)", "Members (الأفراد بالاسم)", "Invite Sent (اتبعتت)", "Sent On (تاريخ الإرسال)", "Added"];
   const xrole = orgRole() || "master";
   const xrows = (xrole === "master" ? all : all.filter(r => r.side === xrole)).filter(r => !r.deleted_at);
   const rows_ = xrows.map(r => {
     const entry = sentEntry(r);
     const sentAt = entry && entry.at ? entry.at : "";
-    return [r.name, r.name_en || "", r.side === "bride" ? "Bride عروسة" : "Groom عريس", r.count, r.phone || "", r.event2 ? (hennaOverridden(r) ? "YES (" + r.seats.henna + ")" : "YES") : "", r.church_only ? "YES" : "", (Array.isArray(r.tags) && r.tags.length ? r.tags.join("، ") : ""), r.waitlist ? "YES" : "", r.confirmed ? "YES" : "", r.relationship_group || "", [...breadcrumb(r), displayName(r)].join(" › "), (Array.isArray(r.members) ? r.members.filter(v => v && memNorm(v) !== memNorm(r.name) && memNorm(v) !== memNorm(r.name_en)).join(", ") : ""),
+    return [r.name, r.name_en || "", r.side === "bride" ? "Bride عروسة" : "Groom عريس", r.count, r.phone || "", r.event2 ? (hennaOverridden(r) ? "YES (" + r.seats.henna + ")" : "YES") : "", r.church_only ? "YES" : "", (Array.isArray(r.tags) && r.tags.length ? r.tags.join("، ") : ""), r.waitlist ? "YES" : "", r.confirmed ? "YES" : "", r.relationship_group || "", [...breadcrumb(r), displayName(r)].join(" › "), familyTableLabels(r.id), (Array.isArray(r.members) ? r.members.filter(v => v && memNorm(v) !== memNorm(r.name) && memNorm(v) !== memNorm(r.name_en)).join(", ") : ""),
       entry ? "YES" : "", sentAt.slice(0, 10), (r.created_at || "").slice(0, 10)];
   });
   const csv = "﻿" + [head, ...rows_].map(row => row.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\r\n");
