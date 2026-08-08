@@ -58,7 +58,7 @@ CHURCH_LINK = (
     "?cat=3eff4b55-85f1-4322-8ab6-f1bf8fd8c85c"
     "&g=rsvp-7110440c-c1ca-4577-abac-3cae79bce03c"
 )
-VERSION = "٢٧٫١ · 27.1"
+VERSION = "٢٧٫٢ · 27.2"
 TEMPLATE_VERSION = "21.0"
 ARABIC = re.compile(r"[؀-ۿ]")
 FAMILIES = [
@@ -175,6 +175,7 @@ def run_browser(browser_type, browser_name, base_url):
           localStorage.setItem("wedSide", "bride");
           localStorage.setItem("wedOrg", "master");
           localStorage.setItem("wedLang", "en");
+          if (!localStorage.getItem("wedAddSide")) localStorage.setItem("wedAddSide", "groom");
           window.__copied = [];
           window.__opened = [];
           Object.defineProperty(navigator, "clipboard", {
@@ -462,6 +463,11 @@ def run_browser(browser_type, browser_name, base_url):
         return family_gets[-1]
 
     page.goto(base_url, wait_until="domcontentloaded")
+    # v27.2: master's add-side initializes from storage and every side tap persists the new choice.
+    assert page.evaluate("addSide") == "groom"
+    assert page.get_attribute("#addSideGroom", "class") == "on"
+    page.evaluate("setAddSide('bride')")
+    assert page.evaluate("localStorage.getItem('wedAddSide')") == "bride"
     # v25: #add is the default landing screen for every role; the organizer #list screen
     # (and its Filters trigger) is unreachable until navigated to explicitly via the router
     assert page.evaluate("location.hash") == "#add"
@@ -997,9 +1003,34 @@ def run_browser(browser_type, browser_name, base_url):
     page.wait_for_function("!document.getElementById('editBg').hidden")
     assert page.locator("#eParentLabel").is_hidden()
     assert page.locator("#eParent").is_hidden()
+    assert page.locator("#eSideSec").is_hidden()
     page.locator("#editCancel").click()
     page.wait_for_function("document.getElementById('editBg').hidden")
     page.evaluate("localStorage.setItem('wedOrg', 'master')")  # restore organizer context
+
+    # ── v27.2: an organizer can move a groom-side family to Bride in Edit; the full PATCH carries
+    # side, and the local row is updated before renderAll() so both header totals move immediately.
+    patched.setdefault("henna-family", {})["side"] = "groom"
+    page.evaluate("async () => { await refreshAll(); openEdit(famById('henna-family')); }")
+    page.wait_for_function("!document.getElementById('editBg').hidden")
+    assert not page.locator("#eSideSec").is_hidden()
+    assert page.locator("#eSideLabel").inner_text() == "Side"
+    assert page.locator("#eSideBride").inner_text() == "Bride"
+    assert page.locator("#eSideGroom").inner_text() == "Groom"
+    assert page.get_attribute("#eSideGroom", "class") == "on"
+    moved_count = page.evaluate("famById('henna-family').count")
+    bride_before = int(page.locator("#tB").inner_text())
+    groom_before = int(page.locator("#tG").inner_text())
+    n = len(family_mutations)
+    page.locator("#eSideBride").click()
+    assert page.get_attribute("#eSideBride", "class") == "on"
+    page.locator("#editSave").click()
+    mut = wait_new_mutation(n)
+    assert mut[0] == "PATCH" and "id=eq.henna-family" in mut[1], mut
+    assert json.loads(mut[2]).get("side") == "bride", mut
+    page.wait_for_function("famById('henna-family').side === 'bride'")
+    assert int(page.locator("#tB").inner_text()) == bride_before + moved_count
+    assert int(page.locator("#tG").inner_text()) == groom_before - moved_count
 
     # ── v23 item 8: the Edit henna stepper writes seats {henna:n} in the PATCH
     henna_row.locator(".edit-btn").click()
@@ -1089,10 +1120,10 @@ def run_browser(browser_type, browser_name, base_url):
     ]
     assert len(toggle_patches) == 4, toggle_patches
     edit_patches = [m for m in family_mutations if m[0] == "PATCH" and "name" in json.loads(m[2] or "{}")]
-    assert len(edit_patches) == 3, edit_patches  # no-phone edit + henna seats edit + church round-trip
+    assert len(edit_patches) == 4, edit_patches  # no-phone edit + v27.2 side-switch save + henna seats edit + church round-trip
     delete_patches = [m for m in family_mutations if m[0] == "PATCH" and "deleted_at" in json.loads(m[2] or "{}")]
     assert len(delete_patches) == 2, delete_patches  # soft-delete + restore
-    assert methods.count("PATCH") == 12, methods
+    assert methods.count("PATCH") == 13, methods  # +1: v27.2 side-switch save
 
     # ── v23.1: the mock mirrors live column constraints EXACTLY (asserted last — these direct
     # probes intentionally add to family_mutations, so they run after the counts above).

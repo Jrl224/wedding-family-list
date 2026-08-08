@@ -599,7 +599,7 @@
     </div>
   </div>
 
-  <p class="ver">٢٧٫١ · 27.1</p>
+  <p class="ver">٢٧٫٢ · 27.2</p>
 </div>
 
 <div class="modal-bg" id="filterBg" hidden onmousedown="if(event.target===this) closeFilterSheet()">
@@ -703,6 +703,7 @@
     <label class="check-row"><input type="checkbox" id="eRecChk" onchange="setEChurch(!this.checked)"><span id="eChurchLabel"></span></label>
     <div class="check-row-seats"><label class="check-row"><input type="checkbox" id="eEv2Chk" onchange="setEEv2(this.checked)"><span id="eEv2Label"></span></label><span class="seat-step" id="eHennaSeatsRow" hidden><button type="button" onclick="hennaBump(-1)">−</button><span id="eHennaSeats"></span><button type="button" onclick="hennaBump(1)">+</button></span></div>
     <label class="check-row"><input type="checkbox" id="eConfirmedChk"><span id="eConfirmedLabel"></span></label>
+    <div class="fs-section" id="eSideSec" hidden><p class="fs-label" id="eSideLabel"></p><div class="segment"><button type="button" id="eSideBride" onclick="setESide('bride')"></button><button type="button" id="eSideGroom" onclick="setESide('groom')"></button></div></div>
     <div class="fs-section" id="eGroupSec">
       <p class="fs-label" id="eGroupLabel"></p>
       <div class="tag-pills" id="eGroupChips"></div>
@@ -1364,7 +1365,7 @@ function collectMembers(containerId){
   return vals.some(v => v) ? vals : null;
 }
 /* ── routing (v25: hash router replaces the 3-step wizard) ── */
-let addSide = "";           // master's chosen target side on #add; side-locked roles ignore this
+let addSide = localStorage.getItem("wedAddSide") || "";           // master's chosen target side on #add; side-locked roles ignore this
 let addTags = [];
 let addDupConfirmed = false;
 let photoCount = 0;
@@ -1509,6 +1510,7 @@ document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("menuSc
 function targetSide(){ return isMasterRole() ? (addSide || mySide || "bride") : mySide; }
 function setAddSide(s){
   addSide = s;
+  localStorage.setItem("wedAddSide", s);
   renderAddSideUI();
   renderCaps();
   resetAddDupState();
@@ -2128,7 +2130,17 @@ async function renameGroup(oldCanon, newRaw){
   return ok;
 }
 
-/* ── Edit modal: waitlist segment (master-only) ── */
+/* ── Edit modal: organizer side segment + master-only waitlist segment ── */
+let eSideVal = "";
+function renderESideSeg(){
+  $("eSideLabel").textContent = t("sideLinkLbl");
+  $("eSideBride").textContent = t("fB");
+  $("eSideGroom").textContent = t("fG");
+  $("eSideBride").className = eSideVal === "bride" ? "on" : "";
+  $("eSideGroom").className = eSideVal === "groom" ? "on" : "";
+}
+function setESide(s){ eSideVal = s; renderESideSeg(); }
+
 let eWaitlistVal = false;
 function renderEWaitlistSeg(){
   const sent = isInviteSent(editing);
@@ -2478,6 +2490,7 @@ let editing = null, eCount = 2;
 function eBump(d){ eCount = Math.min(30, Math.max(1, eCount + d)); $("eCount").textContent = eCount; if (eEv2 && eHenna > eCount) { eHenna = eCount; renderHennaSeats(); } renderMemberInputs("eMembers", eCount, collectMembers("eMembers") || [], displayName(editing)); }
 function openEdit(r){
   editing = r; eCount = r.count;
+  eSideVal = r.side;
   eHenna = hennaSeats(r);
   setEEv2(!!r.event2); setEChurch(!!r.church_only);
   $("eName").value = r.name; $("eNameEn").value = r.name_en || ""; $("ePhone").value = r.phone || ""; $("eCount").textContent = eCount;
@@ -2490,6 +2503,8 @@ function openEdit(r){
   const showParent = isOrg();
   $("eParentLabel").hidden = !showParent;
   $("eParent").hidden = !showParent;
+  document.getElementById("eSideSec").hidden = !isOrg();
+  if (isOrg()) renderESideSeg();
   const showMasterFields = isMasterRole();
   $("eWaitlistSec").hidden = !showMasterFields;
   if (showMasterFields) {
@@ -2514,11 +2529,14 @@ async function saveEdit(){
   const seats = editing.seats && typeof editing.seats === "object" && !Array.isArray(editing.seats) ? { ...editing.seats } : {};
   if (eEv2 && eHenna > 0 && eHenna < eCount) seats.henna = eHenna; else delete seats.henna;
   const seatsVal = Object.keys(seats).length ? seats : null;
+  const orgFields = isOrg();
   const masterFields = isMasterRole();
   const body = { name, name_en: name_en || null, count: eCount, phone, event2: eEv2, church_only: eChurch, confirmed, seats: seatsVal, parent_id, members, tags: editingTags.length ? editingTags : null };
+  if (orgFields) { body.side = eSideVal; }
   if (masterFields) { body.waitlist = eWaitlistVal; }
   $("editBg").hidden = true;
   editing.name = name; editing.name_en = name_en || null; editing.count = eCount; editing.phone = phone; editing.event2 = eEv2; editing.church_only = eChurch; editing.confirmed = confirmed; editing.seats = seatsVal; editing.parent_id = parent_id; editing.members = members; editing.tags = editingTags.length ? editingTags : null;
+  if (orgFields) { editing.side = eSideVal; }
   if (masterFields) { editing.waitlist = body.waitlist; }
   renderMine(); renderAll();
   try {
